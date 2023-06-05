@@ -1,0 +1,7 @@
+package UtilitiesTests;
+
+public class TestTokens {
+
+    public static final String access_token = "BQBciXRA9WCbd1Njtw32yEcFhoITm-8bps6Dy3xi6vOldLprWCden9zG06iaj9CprXZhL-bB27YfKlPA9xlWrredzRAKw2DU8uzaIkgeLxR1eYQAxrJTbP0_JqzLkWlauObhZ28-xamK_cohfeu2AtpwmUdlIazTYtj8E8o7Y_FDAPkqaoOBUoUNx99SBrzGVKHweAnNmTkgBaXa-G858P-jkNpzEs5tmPbTo9xVeo0DuWpR6a121amuUL9n";
+    public static final String refresh_token = "AQApuw5XpXDUAzW_9kmOCN6b4VhfDwhxJJ1EhPcOyoIxyqx2ewedQwjayWdddUmoIprrCRJRVDimObS6YkNJ99RIdNDf_9CYHWkiIbOC6b1Po6r-AdlvJJArhm-bzBTBUew";
+}

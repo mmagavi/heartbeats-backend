@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVSearcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">s0</a> &gt; <a href="index.source.html" class="el_package">CSVUtilities.CSVSearcher</a> &gt; <span class="el_source">CSVSearcher.java</span></div><h1>CSVSearcher.java</h1><pre class="source lang-java linenums">package CSVUtilities.CSVSearcher;
+
+import CSVUtilities.CSVParser.CSVParser;
+import CSVUtilities.CSVParser.FactoryFailureException;
+import CSVUtilities.CSVParser.ListStringCreator;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * A class that searches a CSV file for a row containing a specific value, optionally with
+ * parameters to narrow the search to specific columns Has the following fields: - filename: the
+ * String filename of the CSV file to be searched - headers: a boolean value indicating whether
+ * there are headers in this file - dataArray : a 2D array of strings representing the CSV data,
+ * built from the create() method from a class ListStringCreator which implements the interface
+ * CreatorFromRow, basically turning each row into a list of strings, and thus the entire table into
+ * a List&lt;List String&gt;
+ *
+ * @author Stephen Rosa - 1/30/23 - Brown University CSCI0320 Spring '23
+ * @version 1.0
+ */
+public class CSVSearcher {
+  // the String filename of the CSV file - must be non-null
+  private final String filename;
+
+  // defensive getter for debugging/testing
+  public String getFilename() {
+<span class="nc" id="L29">    String ret = filename;</span>
+<span class="nc" id="L30">    return ret;</span>
+  }
+
+  // a boolean value indicating whether there are headers in this file - must
+  // be true or false
+  private final boolean hasHeaders;
+
+  // defensive getter for debugging/testing
+  public boolean getHasHeaders() {
+<span class="nc" id="L39">    return Boolean.logicalAnd(hasHeaders, true);</span>
+  }
+
+  // a 2d array of strings. initially null, but after parsing, will represent
+  // the CSV data (not including headers if this.hasHeaders is true)
+  private List&lt;List&lt;String&gt;&gt; dataArray;
+  /** Fetches defensive copy of the dataArray containing parsed CSV file */
+  public List&lt;List&lt;String&gt;&gt; getCSVData() {
+<span class="nc" id="L47">    List&lt;List&lt;String&gt;&gt; ret = new ArrayList&lt;&gt;(List.of());</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">    if (this.headers != null) {</span>
+<span class="nc" id="L49">      ret.add(this.headers);</span>
+    };
+<span class="nc bnc" id="L51" title="All 2 branches missed.">    for (List&lt;String&gt; row : this.dataArray) {</span>
+<span class="nc" id="L52">      List&lt;String&gt; newRow = new ArrayList&lt;&gt;(List.of());</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">      for (String element : row) {</span>
+<span class="nc" id="L54">        String newElement = element;</span>
+<span class="nc" id="L55">        newRow.add(newElement);</span>
+<span class="nc" id="L56">      }</span>
+<span class="nc" id="L57">      ret.add(newRow);</span>
+<span class="nc" id="L58">    }</span>
+<span class="nc" id="L59">    return ret;</span>
+  }
+  private List&lt;String&gt; headers;
+
+  /**
+   * Class constructor for a CSVSearcher object (meant to parse and search CSV files by filename and
+   * value to search rows for - rows with matches will be printed)
+   *
+   * @param filename the String name of CSV file to be searched
+   * @param hasHeaders a boolean value indicating whether there are headers in this file
+   */
+  public CSVSearcher(String filename, boolean hasHeaders)
+<span class="nc" id="L71">      throws IOException, FactoryFailureException {</span>
+<span class="nc" id="L72">    this.filename = filename;</span>
+<span class="nc" id="L73">    this.hasHeaders = hasHeaders;</span>
+<span class="nc" id="L74">    this.dataArray = null;</span>
+<span class="nc" id="L75">    this.headers = null;</span>
+
+    // parse to open file
+<span class="nc" id="L78">    parseFile(); // throws IOException, FactoryFailureException</span>
+<span class="nc" id="L79">  }</span>
+
+  /**
+   * a method to parse the given CSV file according to the ListStringCreator class's create() method
+   * - creates a List&lt;List String&gt; to be searched and stores it in this.dataArray
+   *
+   * @throws IOException from CSVParser.parse() if CSVReader can't readLine()
+   * @throws FactoryFailureException from ListStringCreator.create() if creator can't create()
+   */
+  private void parseFile() throws IOException, FactoryFailureException {
+    // create ListStringCreator to create List&lt;List&lt;String&gt;&gt; of CSV data
+<span class="nc" id="L90">    ListStringCreator creator = new ListStringCreator();</span>
+    // open file for reading
+<span class="nc" id="L92">    FileReader csvReader = new FileReader(this.filename);</span>
+    // create parser
+<span class="nc" id="L94">    CSVParser&lt;List&lt;String&gt;&gt; parser = new CSVParser&lt;&gt;(creator, this.hasHeaders, csvReader);</span>
+    // parse
+<span class="nc" id="L96">    this.dataArray = parser.parse();</span>
+<span class="nc" id="L97">    this.headers = parser.headers;</span>
+<span class="nc" id="L98">  }</span>
+
+  /**
+   * method to search a parsed CSV file stored as a List&lt;List String&gt; stored in this.dataArray for a
+   * certain value, then return the rows the value was found in as a List&lt;List String&gt;. If this
+   * field is null, attempts to parse the file and store it there first. Future calls to search will
+   * use this saved field of parsed data. This means that if changes are made to the CSV file being
+   * searched, and you want those changes to be reflected in your searches, you should create a new
+   * object or wipe out this.dataArray before searching again.
+   *
+   * @param value the value to be searched for
+   * @param identifier header name of which column to look for value in identifier == null means no
+   *     identifier given if identifier can't be found in headers (first row)
+   * @param index index of which column to look for value in index greater than 0 less than n (# of
+   *     columns) is a real index (search given index) index == -1 means no index given (search
+   *     every column) index == -2 means no index given, but identifier given (search column that
+   *     corresponds to identifier) if index greater than or equal to n (# of columns) or index less
+   *     than -2 , IllegalArgumentException (index was out of bounds)
+   * @throws IllegalArgumentException if index less than -2 or index greater than or equal to # of
+   *     columns OR if index == -2 but identifier couldn't be found in headers (first row)
+   */
+  public List&lt;List&lt;String&gt;&gt; searchFile(String value, String identifier, int index)
+      throws IllegalArgumentException {
+    // check for input errors
+<span class="nc bnc" id="L122" title="All 4 branches missed.">    if (index != -2 &amp;&amp; identifier != null) {</span>
+<span class="nc" id="L123">      throw new IllegalArgumentException(</span>
+          &quot;Bad input to searchFile(): index != -2 but identifier != null&quot;);
+<span class="nc bnc" id="L125" title="All 4 branches missed.">    } else if (index == -2 &amp;&amp; identifier == null) {</span>
+<span class="nc" id="L126">      throw new IllegalArgumentException(</span>
+          &quot;Bad input to searchFile(): index == -2 but identifier == null&quot;);
+<span class="nc bnc" id="L128" title="All 4 branches missed.">    } else if (index == -2 &amp;&amp; !this.hasHeaders) {</span>
+<span class="nc" id="L129">      throw new IllegalArgumentException(</span>
+          &quot;Bad input to searchFile(): index == -2 and identifier == null, BUT it was &quot;
+              + &quot;indicated in cvsSearcher constructor that this CSV file has no headers&quot;);
+    }
+
+    // check how to search
+    // first, check for index == -2 and set index appropriately
+    // (we know from error checking that identifier != null and this.hasHeaders is true IF index ==
+    // -2)
+<span class="nc bnc" id="L138" title="All 2 branches missed.">    if (index == -2) {</span>
+      // find column index corresponding to identifier
+      // now this.index is either -1, or a valid index. if -1, we won't check
+      // for identifier's index again, and won't use index - will search all
+      // columns
+<span class="nc" id="L143">      int i = this.headers.indexOf(identifier);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">      if (i &lt; 0) {</span>
+        // couldn't find identifier in headers
+<span class="nc" id="L146">        throw new IllegalArgumentException(</span>
+            &quot;Couldn't find identifier '&quot; + identifier + &quot;' in headers (first row)&quot;);
+      } else {
+        // found identifier in headers
+        // update parameters for if-cases further down...
+<span class="nc" id="L151">        index = i;</span>
+      }
+    }
+
+<span class="nc" id="L155">    List&lt;List&lt;String&gt;&gt; matches = new ArrayList&lt;&gt;();</span>
+
+    // at this point, index will be updated if identifier was found in headers
+    // regardless of this.hasHeaders, if input indicates don't use headers, start
+    // search according to index value (specific index or -1 == all)
+    // now actually search for value
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    if (index == -1) {</span>
+      // index == -1 --&gt; search every row
+      // iterate through rows
+
+<span class="nc bnc" id="L165" title="All 2 branches missed.">      for (List&lt;String&gt; row : this.dataArray) {</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        for (String element : row) {</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">          if (element.equals(value)) {</span>
+<span class="nc" id="L168">            matches.add(row);</span>
+<span class="nc" id="L169">            break;</span>
+          }
+<span class="nc" id="L171">        }</span>
+<span class="nc" id="L172">      }</span>
+<span class="nc bnc" id="L173" title="All 4 branches missed.">    } else if (index &gt;= 0 &amp;&amp; index &lt; this.dataArray.size()) {</span>
+      // if index in bounds
+      // iterate through rows
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">      for (List&lt;String&gt; row : this.dataArray) {</span>
+<span class="nc" id="L178">        String element = row.get(index);</span>
+
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (element.equals(value)) {</span>
+<span class="nc" id="L181">          matches.add(row);</span>
+        }
+<span class="nc" id="L183">      }</span>
+
+    } else {
+<span class="nc" id="L186">      throw new IllegalArgumentException(</span>
+          &quot;Bad input to searchFile(): index '&quot; + index + &quot;' out of bounds&quot;);
+    }
+
+<span class="nc" id="L190">    return matches;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

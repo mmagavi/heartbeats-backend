@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">s0</a> &gt; <a href="index.source.html" class="el_package">CSVUtilities.CSVParser</a> &gt; <span class="el_source">CSVParser.java</span></div><h1>CSVParser.java</h1><pre class="source lang-java linenums">package CSVUtilities.CSVParser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * The Parser class of our project. This is where parsing happens.
+ *
+ * @author Stephen Rosa - 1/30/23 - Brown University CSCI0320 Spring '23
+ * @version 1.0
+ */
+public class CSVParser&lt;T&gt; {
+  private final CreatorFromRow&lt;T&gt; creator;
+  private final boolean hasHeaders;
+  // an object that implements java.io.Reader, containing CSV data to be parsed
+  private final Reader reader;
+  public List&lt;String&gt; headers;
+
+  /**
+   * constructor for CSVParser class
+   *
+   * @param creator an object of type CreatorFromRow T, parameterized. comes from
+   *     edu.brown.cs.student.main.api.CreatorFromRow
+   * @param hasHeaders a boolean value indicating whether the FIRST row of CSV data from CSVData
+   *     contains row headers for the data. If this boolean is true, the first row will not be
+   *     turned into a T by the parse method's call to creator.create(), as it is not data. Thus, if
+   *     you want the first row to be included in the output, do not provide this argument as true.
+   * @param reader an object that implements java.io.Reader, containing CSV data to be parsed
+   */
+<span class="nc" id="L34">  public CSVParser(CreatorFromRow&lt;T&gt; creator, boolean hasHeaders, Reader reader) {</span>
+<span class="nc" id="L35">    this.creator = creator;</span>
+<span class="nc" id="L36">    this.hasHeaders = hasHeaders;</span>
+<span class="nc" id="L37">    this.reader = reader;</span>
+<span class="nc" id="L38">    this.headers = null;</span>
+<span class="nc" id="L39">  }</span>
+
+  /**
+   * the method that parses a reader object representing CSV data. parameterized to return a list of
+   * type T, specified by this.creator if this.hasHeaders is true, will not read the first row as
+   * data
+   *
+   * @return a list of T created by this.creator.create()
+   * @throws IOException if there is an IO exception with the Reader CSVReader
+   * @throws FactoryFailureException if
+   */
+  public List&lt;T&gt; parse() throws IOException, FactoryFailureException {
+    // wrap CSVReader in BufferedReader to get readLine() method
+<span class="nc" id="L52">    BufferedReader csvBufferedReader = new BufferedReader(this.reader);</span>
+    String line;
+
+    // the list of our parsed CSV rows from CSVReader
+<span class="nc" id="L56">    ArrayList&lt;T&gt; parsedList = new ArrayList&lt;&gt;();</span>
+    // enter while loop which terminates when line == null (which happens when
+    // readLine() reaches EOF)
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">    if (this.hasHeaders) {</span>
+      // get first line out of the way - it is not data
+<span class="nc" id="L62">      line = csvBufferedReader.readLine();</span>
+<span class="nc" id="L63">      ArrayList&lt;String&gt; row = new ArrayList&lt;String&gt;(Arrays.asList(line.split(&quot;,&quot;)));</span>
+<span class="nc" id="L64">      this.headers = row;</span>
+    }
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">    while ((line = csvBufferedReader.readLine()) != null) { // throws IOException</span>
+      // take the newly read line and split it according to a delimiter, &quot;,&quot;,
+      // separating it into an array of column values, represented as strings.
+      // then pass this to the creator
+      // split function idea comes from
+      // https://javarevisited.blogspot.com/2015/12/how-to-split-comma-separated-string-in-java-example.html#axzz7rqSZLgrb
+<span class="nc" id="L73">      ArrayList&lt;String&gt; row = new ArrayList&lt;String&gt;(Arrays.asList(line.split(&quot;,&quot;)));</span>
+      // conversion from array to ArrayList idea comes from
+      // https://www.baeldung.com/convert-array-to-list-and-list-to-array
+<span class="nc" id="L76">      parsedList.add(this.creator.create(row)); // throws FactoryFailureException</span>
+<span class="nc" id="L77">    }</span>
+    // at this point, line == null, meaning we have read every line we can from
+    // this BufferedReader
+<span class="nc" id="L80">    return parsedList;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

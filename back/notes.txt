@@ -1,0 +1,58 @@
+1:
+ - loadcsv endpoint
+   - load one at a time (filepath on Server as parameter "filepath=")
+   - json response must include "filepath" field as well
+ - viewcsv endpoint
+   - can't view without loaded file (error response)
+   - json response must have "data" field with seralized "data" field with a serialized List<List<String>> contents of CSV
+ - searchcsv endpoint
+   - can't search without loaded file (error response)
+   - column index and header (if headers present) (parameters "val=...&col=...")
+
+
+2:
+ - weather endpoint: output temperature given lat and long (parameters "lat=...&lon=..."
+ - json response must be F or C
+ - json response must have "lat" and "lon" fields
+
+3:
+ - cache responses, instead of re-requesting, give cached response 
+   when request is "close enough" to cached request
+ - delete cached entry when "old enough"
+ - allow distance for "close enough" and time for "old enough" to be variable,
+   set by developer
+ - documentation should describe how to change these!
+ - use Google's Guava Cache Library
+
+
+4: 
+ - comments, README
+
+
+Each endpoint handled by separate handler class implementing Route
+in each handler's handle method, check "request.queryParams"
+
+
+DEFENSIVE PROGRAMMING IN CLASSES!
+ - defensive copies, getter/setter
+ - where should we allow people to loadcsv from?
+   - input sanitization!
+
+
+All serialized outputs must be serializations of Map<String, Object>
+Must have "result" field with value "success" in case of success or error code as:
+"error_bad_json" if the request was ill-formed;
+"error_bad_request" if the request was missing a needed field, or the field was ill-formed; and
+"error_datasource" if the given data source wasn't accessible (e.g., the file
+didn't exist or the NWS API returned an error for a given location)
+
+difference between error_bad_json and error_bad_request:
+"You walk into a bank and ask to withdraw a million dollars. Assuming you don't
+have a million dollars, the bank teller probably says "I'm sorry, but you don't
+have sufficient funds." This is a bad-request error: the teller understood, but
+can't satisfy your request. The error communicates something very precise
+related to the exact details of your request.
+
+You walk into a bank and ask to fjjjurrbmmtt cchchpttt xxxhur. The bank teller
+doesn't understand you, apologizes, and says so. The error doesn't really
+involve your request at all, but communicates that the message wasn't understood."

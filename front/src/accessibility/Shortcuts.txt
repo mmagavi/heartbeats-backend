@@ -1,0 +1,21 @@
+SHORTCUTS:
+Lots of shortcuts are already taken. Available on chrome w/ screen reader, 
+using ctrl + key: 
+Q, Y, I, [, ], \, ;, ', B, M, ,, /
+
+App: */
+Go to text box: ctrl + , 
+Clear history: ctrl + / 
+Go to HistoryBox: ctrl + '
+
+InputBox: */
+Input load command: ctrl + [ 
+Input view command: ctrl + ] 
+Input search command: ctrl + \ 
+Input mode command: ctrl + m 
+
+HistoryBox: */
+Toggle between newest/oldest HistoryEntryCommand (newest first): ctrl + '
+
+ServerStatus: */
+Refresh ping: ctrl + `

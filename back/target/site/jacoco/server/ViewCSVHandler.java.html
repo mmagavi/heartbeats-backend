@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ViewCSVHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">s0</a> &gt; <a href="index.source.html" class="el_package">server</a> &gt; <span class="el_source">ViewCSVHandler.java</span></div><h1>ViewCSVHandler.java</h1><pre class="source lang-java linenums">package server;
+
+import com.squareup.moshi.*;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import spark.Request;
+import spark.Response;
+import spark.Route;
+
+public class ViewCSVHandler implements Route {
+
+  private final Server.CSVSearcherContainer searcherContainer;
+
+  /**
+   * Constructor searcherContainer some shared state
+   * @param searcherContainer the shared searcher object that all endpoints have
+   *                          access to
+   *                          (note: we *DON'T* want to make a defensive copy here!)
+   */
+<span class="nc" id="L25">  public ViewCSVHandler(Server.CSVSearcherContainer searcherContainer) {</span>
+<span class="nc" id="L26">    this.searcherContainer = searcherContainer;</span>
+<span class="nc" id="L27">  }</span>
+  /**
+   * handle a new request to this endpoint!
+   * @param request the request to handle (including query params)
+   * @param response use to modify properties of the response
+   * @return response content
+   * @throws Exception This is part of the interface; we don't have to throw anything.
+   */
+  @Override
+  public Object handle(Request request, Response response) throws Exception {
+
+    // grab request url
+<span class="nc" id="L39">    String url = request.url();</span>
+
+    // error check params - we should have exactly 0
+<span class="nc bnc" id="L42" title="All 2 branches missed.">    if (request.queryParams().size() != 0) {</span>
+<span class="nc" id="L43">      return new ViewCSVResponse(url, null,</span>
+<span class="nc" id="L44">        &quot;error_bad_request: Not exactly 0 params&quot;).serialize();</span>
+    }
+
+    // if searcher is null, it was likely never loaded in the first place
+<span class="nc bnc" id="L48" title="All 2 branches missed.">    if (searcherContainer.searcher == null) {</span>
+<span class="nc" id="L49">      return new ViewCSVResponse(url, null,&quot;error_datasource: No CSV loaded&quot;).serialize();</span>
+    }
+<span class="nc" id="L51">    return new ViewCSVResponse(url, searcherContainer.searcher.getCSVData(), &quot;success&quot;).serialize();</span>
+  }
+
+  /**
+   * Makes a response map to send, containing details about the request, and
+   * our response
+   * @param url - the url of the request we received
+   * @param response - error/success plus details
+   */
+<span class="nc" id="L60">  public record ViewCSVResponse(String url, List&lt;List&lt;String&gt;&gt; CSVData, String response) {</span>
+
+    /**
+     * @return url, result, and data, serialized as Json
+     */
+    String serialize() {
+      try {
+        // add to our response map!
+<span class="nc" id="L68">        HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L69">        map.put(&quot;request&quot;, url);</span>
+<span class="nc" id="L70">        map.put(&quot;result&quot;, response);</span>
+<span class="nc" id="L71">        map.put(&quot;data&quot;, Objects.requireNonNullElse(CSVData, &quot;null&quot;));</span>
+
+        // .toJson our response map!
+<span class="nc" id="L74">        Type responseMap = Types.newParameterizedType(Map.class, String.class, Object.class);</span>
+<span class="nc" id="L75">        Moshi moshi = new Moshi.Builder().build();</span>
+<span class="nc" id="L76">        JsonAdapter&lt;Map&lt;String, Object&gt;&gt; adapter = moshi.adapter(responseMap);</span>
+
+<span class="nc" id="L78">        return adapter.toJson(map);</span>
+<span class="nc" id="L79">      } catch (Exception e) {</span>
+        // For debugging purposes, show in the console _why_ this fails
+        // Otherwise we'll just get an error 500 from the API in integration
+        // testing.
+<span class="nc" id="L83">        e.printStackTrace();</span>
+<span class="nc" id="L84">        throw e;</span>
+      }
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
