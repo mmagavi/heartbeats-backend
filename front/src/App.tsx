@@ -2,18 +2,14 @@ import React, { useState } from "react";
 import "../styles/App.css";
 import Header from "./components/Header";
 import Navbar from "react-bootstrap/Navbar";
-import { Button } from "react-bootstrap";
 import {LoginPage} from "./pages/LoginPage";
 import {AboutPage} from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import {LogoutPage} from "./pages/LogoutPage";
+import PageNotFound from "./pages/PageNotFound";
 import {MusicNav_AriaLabel, AboutNav_AriaLabel, LogoutNav_AriaLabel} from "./accessibility/Aria";
-
-/**
- * TODO: Link login page & about
- * Get value from slider & link to music box
- * Make other buttons store value which can be passed into the generate playlist button
- */
+import {HashRouter as Router, Route, Link} from "react-router-dom";
+import {Routes, RouteProps} from "react-router";
 
 // hostname of our server!
 export const server = "http://localhost:3232/";
@@ -28,68 +24,50 @@ function App() {
     const [playlistID, setPlaylist] = useState("");
     const [loggedIn, setLoggedIn] = React.useState(false);
 
-    function selectHomePage() {
-        setCurr("Home");
-    }
-    function selectAboutPage() {
-        setCurr("About");
-    }
-    function selectLogoutPage() {
-        setCurr("Logout");
-    }
-
     // render our page!
     return (
         <div className="main">
-            <Navbar fixed="top" className="header">
-                <Navbar.Brand>
-                    <Header />
-                </Navbar.Brand>
-                <div className="nav-container">
-                    <Button
-                        className="nav-elem"
-                        href="#nav-music"
-                        onClick={(e) => selectHomePage()}
-                        aria-label={MusicNav_AriaLabel}
-                    >
-                        find music
-                    </Button>
-                    <Button
-                        className="nav-elem"
-                        href="#nav-about"
-                        onClick={(e) => selectAboutPage()}
-                        aria-label={AboutNav_AriaLabel}
-                    >
-                        about
-                    </Button>
-                    <Button
-                        className="nav-elem"
-                        href="#nav-login"
-                        onClick={(e) => selectLogoutPage()}
-                        aria-label={LogoutNav_AriaLabel}
-                    >
-                        logout
-                    </Button>
-                </div>
-            </Navbar>
-            <LoginPage
-                status={currPage === "Login"}
-                userID={userID}
-                setUserID={setUserID}
-                loggedIn={loggedIn}
-                setLoggedIn={setLoggedIn}
-            />
-            <HomePage
-                status={currPage === "Home"}
-                playlist={playlistID}
-                setPlaylist={(x: string) => setPlaylist(x)}
-                loggedIn={loggedIn}
-                setLoggedIn={setLoggedIn}
-                userID={userID}
-                setUserID={setUserID}
-            />
-            <AboutPage status={currPage === "About"} />
-            <LogoutPage status={currPage === "Logout"} userID={userID} setUserID={setUserID} loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
+            <Router>
+                <Navbar fixed="top" className="header">
+                    <Navbar.Brand>
+                        <Header />
+                    </Navbar.Brand>
+                    <div className="nav-container">
+                        <Link to="/login">login</Link>
+                        <Link to="/music">find music</Link>
+                        <Link to="/about">about</Link>
+                        <Link to="/logout">logout</Link>
+                    </div>
+                </Navbar>
+                <Routes>
+                    <Route path="/login" element={<LoginPage
+                         status={currPage === "Login"}
+                         userID={userID}
+                         setUserID={setUserID}
+                         loggedIn={loggedIn}
+                         setLoggedIn={setLoggedIn}
+                     />}/>
+                    <Route path="/about" element={<AboutPage
+                        status={currPage === "About"}
+                    />}/>
+                    <Route path="/music" element={<HomePage
+                         status={currPage === "Home"}
+                         playlist={playlistID}
+                         setPlaylist={(x) => setPlaylist(x)}
+                         loggedIn={loggedIn}
+                         setLoggedIn={setLoggedIn}
+                         userID={userID}
+                         setUserID={setUserID}
+                     />}/>
+                    <Route path="/logout" element={<LogoutPage
+                         status={currPage === "Logout"}
+                         userID={userID}
+                         setUserID={setUserID}
+                         loggedIn={loggedIn}
+                         setLoggedIn={setLoggedIn}
+                    />}/>
+                </Routes>
+            </Router>
         </div>
     );
 }
