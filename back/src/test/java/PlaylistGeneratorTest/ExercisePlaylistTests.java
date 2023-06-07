@@ -1,9 +1,9 @@
 package PlaylistGeneratorTest;
 
-import PlaylistGenerating.HeartRateRange;
+import PlaylistGenerating.TargetHeartRateRange;
 import PlaylistGenerating.PlaylistTypes.GenerateExercise;
 import Server.Server;
-import SpotifyUtilities.infoUtilities;
+import SpotifyUtilities.TrackUtilities;
 import UtilitiesTests.TestTokens;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +44,7 @@ public class ExercisePlaylistTests {
         return tracks;
     }
 
-    private boolean checkSongsInTempo(List<AudioFeatures> feats, HeartRateRange bpm) {
+    private boolean checkSongsInTempo(List<AudioFeatures> feats, TargetHeartRateRange bpm) {
         for (AudioFeatures feat : feats) {
             float tempo = feat.getTempo();
             if (tempo > bpm.max_heart_rate() || tempo < bpm.min_heart_rate()) {
@@ -62,7 +62,7 @@ public class ExercisePlaylistTests {
             GenerateExercise gef1 = new GenerateExercise(21, 60, false, true, 30, "pop", Server.spotify_api);
             GenerateExercise gef2 = new GenerateExercise(21, 60, true, false, 30, "pop", Server.spotify_api);
 
-            HeartRateRange h = new HeartRateRange(91,99,107);
+            TargetHeartRateRange h = new TargetHeartRateRange(91,99,107);
 
             LinkedList<String> songs1 = gef1.getSongs().get(h);
             LinkedList<String> songs2 = gef2.getSongs().get(h);
@@ -73,8 +73,8 @@ public class ExercisePlaylistTests {
             Assertions.assertTrue(tracks1.length > 0);
             Assertions.assertTrue(tracks2.length > 0);
 
-            List<AudioFeatures> feats1 =Arrays.asList( infoUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks1) );
-            List<AudioFeatures> feats2 =Arrays.asList( infoUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks2) );
+            List<AudioFeatures> feats1 =Arrays.asList( TrackUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks1) );
+            List<AudioFeatures> feats2 =Arrays.asList( TrackUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks2) );
 
             Assertions.assertTrue(checkSongsInTempo(feats1, h));
             Assertions.assertTrue(checkSongsInTempo(feats2, h));
@@ -88,14 +88,14 @@ public class ExercisePlaylistTests {
 
         Assertions.assertDoesNotThrow(() -> {
             GenerateExercise gef1 = new GenerateExercise(21, 60, false, false, 30, "pop", Server.spotify_api);
-            HeartRateRange h1 = new HeartRateRange(88, 96, 104);
+            TargetHeartRateRange h1 = new TargetHeartRateRange(88, 96, 104);
 
             // getting the recommended songs in that range
             LinkedList<String> songs = gef1.getSongs().get(h1);
             String[] tracks = this.getTrackIDs(songs);
 
             // getting it as a list of info
-            List<AudioFeatures> info = Arrays.asList( infoUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api,tracks) );
+            List<AudioFeatures> info = Arrays.asList( TrackUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api,tracks) );
             Assertions.assertTrue(checkSongsInTempo(info, h1));
         });
     }

@@ -6,11 +6,10 @@ import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestExcept
 import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
-import PlaylistGenerating.HeartRateRange;
-import PlaylistGenerating.PlaylistTypes.GenerateExercise;
+import PlaylistGenerating.TargetHeartRateRange;
 import PlaylistGenerating.PlaylistTypes.GenerateRelax;
 import Server.Server;
-import SpotifyUtilities.infoUtilities;
+import SpotifyUtilities.TrackUtilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ public class RelaxPlaylistTests {
         }
         return tracks;
     }
-    private boolean checkSongsInTempo(List<AudioFeatures> feats, HeartRateRange bpm) {
+    private boolean checkSongsInTempo(List<AudioFeatures> feats, TargetHeartRateRange bpm) {
         for (AudioFeatures feat : feats) {
             float tempo = feat.getTempo();
             if (tempo > bpm.max_heart_rate() || tempo < bpm.min_heart_rate()) {
@@ -67,8 +66,8 @@ public class RelaxPlaylistTests {
         Assertions.assertDoesNotThrow(() -> {
             GenerateRelax gr = new GenerateRelax( 100, 60, "pop",  Server.spotify_api);
         //Create heart rate ranges that are in this playlist^
-            HeartRateRange h1 = new HeartRateRange(64, 68, 72);
-            HeartRateRange h2 = new HeartRateRange(96, 100, 104);
+            TargetHeartRateRange h1 = new TargetHeartRateRange(64, 68, 72);
+            TargetHeartRateRange h2 = new TargetHeartRateRange(96, 100, 104);
 
         //Get the songs in the playlist's IDs at each HR range
             LinkedList<String> songs1 = gr.getSongs().get(h1);
@@ -79,8 +78,8 @@ public class RelaxPlaylistTests {
             String[] tracks2 = this.getTrackIDs(songs2);
             //Get the tempos for all songs
 
-            List<AudioFeatures> feats1  =Arrays.asList( infoUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks1) );
-            List<AudioFeatures> feats2  =Arrays.asList( infoUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks2) );
+            List<AudioFeatures> feats1  =Arrays.asList( TrackUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks1) );
+            List<AudioFeatures> feats2  =Arrays.asList( TrackUtilities.getAudioFeaturesForSeveralTracks_Sync(Server.spotify_api, tracks2) );
             //Check that all songs fall in the range
             Assertions.assertEquals(true,this.checkSongsInTempo(feats1, h1));
             Assertions.assertEquals(true,this.checkSongsInTempo(feats2, h2));
