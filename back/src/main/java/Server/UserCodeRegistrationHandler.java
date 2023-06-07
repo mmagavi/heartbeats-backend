@@ -30,7 +30,6 @@ public class UserCodeRegistrationHandler implements Route {
         String access_token = "";
         String refresh_token = "";
 
-
         AuthorizationCodeRequest authorizationCodeRequest = Server.spotify_api.authorizationCode(code).build();
         try {
 
