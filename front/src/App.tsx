@@ -7,12 +7,10 @@ import {AboutPage} from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import {LogoutPage} from "./pages/LogoutPage";
 import {NavComponent} from "./components/NavComponent";
-import PageNotFound from "./pages/PageNotFound";
-import {MusicNav_AriaLabel, AboutNav_AriaLabel, LogoutNav_AriaLabel} from "./accessibility/Aria";
 import {HashRouter as Router, Route, Link} from "react-router-dom";
-import {Routes, RouteProps} from "react-router";
+import {Routes} from "react-router";
 
-// hostname of our server!
+// hostname of our server!q
 export const server = "http://localhost:3232/";
 
 /**
@@ -25,7 +23,7 @@ function App() {
     const [loggedIn, setLoggedIn] = React.useState(false);
 
     if (window.location.href.includes("code=")) {
-        window.location.replace("http://localhost:5173/home?#/music");
+        window.location.replace("http://localhost:5173/#/music");
     }
 
     // render our page!
@@ -41,6 +39,12 @@ function App() {
                     </div>
                 </Navbar>
                 <Routes>
+                    <Route path="" element={<LoginPage
+                        userID={userID}
+                        setUserID={setUserID}
+                        loggedIn={loggedIn}
+                        setLoggedIn={setLoggedIn}
+                    />}/>
                     <Route path="login" element={<LoginPage
                         userID={userID}
                         setUserID={setUserID}

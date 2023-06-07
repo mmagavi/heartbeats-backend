@@ -43,7 +43,10 @@ export default function HomePage(props: homePageProps) {
   const [currentBPM, setCurrentBPM] = useState<number>(-1);
   const [playlist_id, setPlaylistID] = useState<string | undefined>("")
 
+  // once we reach the home/music page, set logged in to true
   props.setLoggedIn(true);
+  console.log("logged in status: " + props.loggedIn);
+  console.log("user ID is: " + props.userID);
 
   // reset results
   function reset() {
