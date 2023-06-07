@@ -6,6 +6,7 @@ import {LoginPage} from "./pages/LoginPage";
 import {AboutPage} from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import {LogoutPage} from "./pages/LogoutPage";
+import {NavComponent} from "./components/NavComponent";
 import PageNotFound from "./pages/PageNotFound";
 import {MusicNav_AriaLabel, AboutNav_AriaLabel, LogoutNav_AriaLabel} from "./accessibility/Aria";
 import {HashRouter as Router, Route, Link} from "react-router-dom";
@@ -19,10 +20,13 @@ export const server = "http://localhost:3232/";
  * @returns the website's entire JSX, including Header, and currently displayed page
  */
 function App() {
-    const [currPage, setCurr] = useState("Login");
     const [userID, setUserID] = useState("");
     const [playlistID, setPlaylist] = useState("");
     const [loggedIn, setLoggedIn] = React.useState(false);
+
+    if (window.location.href.includes("code=")) {
+        window.location.replace("http://localhost:5173/home?#/music");
+    }
 
     // render our page!
     return (
@@ -33,39 +37,31 @@ function App() {
                         <Header />
                     </Navbar.Brand>
                     <div className="nav-container">
-                        <Link to="/login">login</Link>
-                        <Link to="/music">find music</Link>
-                        <Link to="/about">about</Link>
-                        <Link to="/logout">logout</Link>
+                        <NavComponent loggedIn={loggedIn}/>
                     </div>
                 </Navbar>
                 <Routes>
-                    <Route path="/login" element={<LoginPage
-                         status={currPage === "Login"}
-                         userID={userID}
-                         setUserID={setUserID}
-                         loggedIn={loggedIn}
-                         setLoggedIn={setLoggedIn}
-                     />}/>
-                    <Route path="/about" element={<AboutPage
-                        status={currPage === "About"}
+                    <Route path="login" element={<LoginPage
+                        userID={userID}
+                        setUserID={setUserID}
+                        loggedIn={loggedIn}
+                        setLoggedIn={setLoggedIn}
                     />}/>
-                    <Route path="/music" element={<HomePage
-                         status={currPage === "Home"}
-                         playlist={playlistID}
-                         setPlaylist={(x) => setPlaylist(x)}
-                         loggedIn={loggedIn}
-                         setLoggedIn={setLoggedIn}
-                         userID={userID}
-                         setUserID={setUserID}
-                     />}/>
-                    <Route path="/logout" element={<LogoutPage
-                         status={currPage === "Logout"}
-                         userID={userID}
-                         setUserID={setUserID}
-                         loggedIn={loggedIn}
-                         setLoggedIn={setLoggedIn}
+                    <Route path="about" element={<AboutPage/>}/>
+                    <Route path="music" element={<HomePage
+                        playlist={playlistID}
+                        setPlaylist={(x) => setPlaylist(x)}
+                        loggedIn={loggedIn}
+                        setLoggedIn={setLoggedIn}
+                        userID={userID}
+                        setUserID={setUserID}
                     />}/>
+                    <Route path="logout" element={<LogoutPage
+                        userID={userID}
+                        setUserID={setUserID}
+                        loggedIn={loggedIn}
+                        setLoggedIn={setLoggedIn}
+                        />}/>
                 </Routes>
             </Router>
         </div>

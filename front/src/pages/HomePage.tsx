@@ -18,7 +18,6 @@ import {SubmitButton} from "../components/SubmitButton";
  * setUserID: set userID
  */
 interface homePageProps {
-  status: boolean;
   playlist: string;
   setPlaylist: (_: string) => void;
   loggedIn: boolean;
@@ -43,6 +42,8 @@ export default function HomePage(props: homePageProps) {
   const [desiredLength, setDesiredLength] = useState<number>(-1);
   const [currentBPM, setCurrentBPM] = useState<number>(-1);
   const [playlist_id, setPlaylistID] = useState<string | undefined>("")
+
+  props.setLoggedIn(true);
 
   // reset results
   function reset() {
@@ -144,10 +145,7 @@ export default function HomePage(props: homePageProps) {
       </div>
   );
 
+  console.log("questions page....");
   console.log(playlistType);
-  if (props.status) {
-    return questionPage;
-  } else {
-    return <div />;
-  }
+  return questionPage;
 }

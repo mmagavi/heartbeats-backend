@@ -52,6 +52,10 @@ td {
   flex-direction: row;
   justify-content: right;
 }
+.nav-link {
+  color: white;
+  margin: 3vh 1vw;
+}
 
 .nav-elem {
   color: white;
