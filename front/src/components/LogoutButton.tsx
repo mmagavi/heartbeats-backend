@@ -5,7 +5,7 @@ import { LogoutButton_AriaLabel, LogoutButton_Role } from "../accessibility/Aria
  * set logged in function
  */
 interface LogoutStatusProps {
-    setID: (status: string) => void;
+    setCode: (status: string) => void;
     setLI: (status: boolean) => void;
 }
 
@@ -20,7 +20,7 @@ function LogoutButton(props: LogoutStatusProps) {
     // button click helper
     function logout() {
         props.setLI(false);
-        props.setID("");
+        props.setCode("");
         window.location.href = "http://localhost:5173/#/login";
     }
 

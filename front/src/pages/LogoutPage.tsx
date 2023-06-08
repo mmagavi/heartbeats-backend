@@ -5,14 +5,14 @@ import {LogoutPage_AriaLabel} from "../accessibility/Aria";
 /**
  * Props for LogoutPage -
  * status: should we display this page right now?
- * userID: stored user access token
- * setUserID: update access code
+ * userCode: stored user access token
+ * setUserCode: update access code
  * loggedIn: is the user currently logged in?
  * setLoggedIn: set loggedIn status
  */
 interface logoutPageProps {
-    userID : string;
-    setUserID: (status: string) => void;
+    userCode : string;
+    setUserCode: (status: string) => void;
     loggedIn : boolean;
     setLoggedIn: (status: boolean) => void;
 }
@@ -29,7 +29,7 @@ function LogoutPage(props : logoutPageProps){
             <br/><br/>
             Are you sure you would like to log out?
             <br/><br/>
-            <LogoutButton setID={props.setUserID} setLI={props.setLoggedIn}/>
+            <LogoutButton setID={props.setUserCode} setLI={props.setLoggedIn}/>
         </div>
     )
 }

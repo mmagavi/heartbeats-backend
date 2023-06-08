@@ -6,7 +6,7 @@ import { checkResponse, makeRequest } from "../requests";
  * data - selection data to send to backend
  */
 interface SubmitButtonProps {
-    userID : String; // access code
+    userCode : String; // access code
     genres : String;
     playlist_type : String;
     desired_warmup : String;
@@ -51,7 +51,6 @@ function SubmitButton(props: SubmitButtonProps) {
         let raw_args = window.location.search;
         let params = new URLSearchParams(raw_args);
 
-        
         if(access_token === "" && refresh_token === ""){
 
         const token_response : string | Map<string, string> =

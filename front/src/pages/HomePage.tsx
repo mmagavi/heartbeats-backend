@@ -14,16 +14,16 @@ import {SubmitButton} from "../components/SubmitButton";
  * setPlaylist: set generated playlist
  * loggedIn: is the user currently logged in?
  * setLoggedIn: set loggedIn
- * userID: user's access code
- * setUserID: set userID
+ * userCode: user's access code
+ * setUserCode: set userCode
  */
 interface homePageProps {
   playlist: string;
   setPlaylist: (_: string) => void;
   loggedIn: boolean;
   setLoggedIn: (status: boolean) => void;
-  userID : string;
-  setUserID: (status: string) => void;
+  userCode : string;
+  setUserCode: (status: string) => void;
 }
 
 /**
@@ -46,7 +46,7 @@ export default function HomePage(props: homePageProps) {
   // once we reach the home/music page, set logged in to true
   props.setLoggedIn(true);
   console.log("logged in status: " + props.loggedIn);
-  console.log("user ID is: " + props.userID);
+  console.log("user ID is: " + props.userCode);
 
   // reset results
   function reset() {
@@ -69,7 +69,7 @@ export default function HomePage(props: homePageProps) {
       return null;
     } else {
       return (
-          <SubmitButton userID={props.userID}
+          <SubmitButton userCode={props.userCode}
                         genres={genres}
                         playlist_type={playlistType}
                         desired_warmup={desiredWarmup}

@@ -18,11 +18,13 @@ export const server = "http://localhost:3232/";
  * @returns the website's entire JSX, including Header, and currently displayed page
  */
 function App() {
-    const [userID, setUserID] = useState("");
+    const [userCode, setUserCode] = useState("");
     const [playlistID, setPlaylist] = useState("");
     const [loggedIn, setLoggedIn] = React.useState(false);
 
     if (window.location.href.includes("code=")) {
+        //TODO: setUserCode
+
         window.location.replace("http://localhost:5173/#/music");
     }
 
@@ -40,14 +42,14 @@ function App() {
                 </Navbar>
                 <Routes>
                     <Route path="" element={<LoginPage
-                        userID={userID}
-                        setUserID={setUserID}
+                        userCode={userCode}
+                        setUserCode={setUserCode}
                         loggedIn={loggedIn}
                         setLoggedIn={setLoggedIn}
                     />}/>
                     <Route path="login" element={<LoginPage
-                        userID={userID}
-                        setUserID={setUserID}
+                        userCode={userCode}
+                        setUserCode={setUserCode}
                         loggedIn={loggedIn}
                         setLoggedIn={setLoggedIn}
                     />}/>
@@ -57,12 +59,12 @@ function App() {
                         setPlaylist={(x) => setPlaylist(x)}
                         loggedIn={loggedIn}
                         setLoggedIn={setLoggedIn}
-                        userID={userID}
-                        setUserID={setUserID}
+                        userCode={userCode}
+                        setUserCode={setUserCode}
                     />}/>
                     <Route path="logout" element={<LogoutPage
-                        userID={userID}
-                        setUserID={setUserID}
+                        userCode={userCode}
+                        setUserCode={setUserCode}
                         loggedIn={loggedIn}
                         setLoggedIn={setLoggedIn}
                         />}/>
