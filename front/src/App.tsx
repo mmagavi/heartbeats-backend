@@ -7,7 +7,7 @@ import {AboutPage} from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import {LogoutPage} from "./pages/LogoutPage";
 import {NavComponent} from "./components/NavComponent";
-import {HashRouter as Router, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {Routes} from "react-router";
 
 // hostname of our server!q

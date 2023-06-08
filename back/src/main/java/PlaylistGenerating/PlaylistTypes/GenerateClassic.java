@@ -3,7 +3,7 @@ package PlaylistGenerating.PlaylistTypes;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import PlaylistGenerating.TargetHeartRateRange;
-import SpotifyUtilities.LibraryUtilities;
+import SpotifyUtilities.PlaylistUtilities;
 import SpotifyUtilities.RecommendationArguments;
 import SpotifyUtilities.TrackUtilities;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -53,16 +53,20 @@ public class GenerateClassic extends GeneratePlaylist {
     }
 
     @Override
-    public Playlist generatePlaylist() throws Exception {
+    public String generatePlaylist() throws Exception {
 
-        User user = getCurrentUsersProfile(spotifyApi);
+        User user = getCurrentUsersProfile(spotify_api);
 
         // Create a playlist on the user's account
-        createPlaylist(spotifyApi, user.getId(), user.getDisplayName());
+        Playlist playlist = createPlaylist(spotify_api, user.getId(), user.getDisplayName());
 
-        Track[] warmup_tracks = getWarmupTracks();
+        String playlist_id = playlist.getId();
 
-        return null;
+        String[] warmup_track_ids = getWarmupTracks();
+
+        PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, warmup_track_ids);
+
+        return playlist_id;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private String getSeedTracks() throws GetUsersTopTracksRequestException {
 
-        Track[] seed_tracks = GetUsersTopTracks(spotifyApi, desired_num_seed_tracks);
+        Track[] seed_tracks = GetUsersTopTracks(spotify_api, desired_num_seed_tracks);
 
         StringBuilder string_builder = new StringBuilder();
 
@@ -123,7 +127,7 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private String getSeedArtists() throws GetUsersTopArtistsRequestException {
 
-        Artist[] seed_artists = GetUsersTopArtists(spotifyApi, desired_num_seed_artists);
+        Artist[] seed_artists = GetUsersTopArtists(spotify_api, desired_num_seed_artists);
 
         StringBuilder string_builder = new StringBuilder();
 
@@ -168,11 +172,11 @@ public class GenerateClassic extends GeneratePlaylist {
     }
 
     /**
-     *
-     * @return
+     * Gets the tracks for the warmup sequence of the workout
+     * @return String Array of track ids for the warmup sequence
      * @throws Exception
      */
-    private Track[] getWarmupTracks() throws Exception {
+    private String[] getWarmupTracks() throws Exception {
 
         String seed_artists = getSeedArtists();
         String seed_tracks = getSeedTracks();
@@ -183,7 +187,7 @@ public class GenerateClassic extends GeneratePlaylist {
         int limit = 30; // Number of tracks we want to get
 
         RecommendationArguments warmup_arguments = new RecommendationArguments(
-                spotifyApi, limit, genres, seed_artists, seed_tracks, resting_bpm, target_bpm, midpoint_bpm);
+                spotify_api, limit, genres, seed_artists, seed_tracks, resting_bpm, target_bpm, midpoint_bpm);
 
         // Get songs for the warmup
         Recommendations recommendations = getRecommendations(warmup_arguments);
@@ -192,17 +196,19 @@ public class GenerateClassic extends GeneratePlaylist {
         // Get all the track ids as they are needed in the audio features request below
         String[] track_ids = getTrackIDs(recommended_tracks, limit);
 
-        AudioFeatures[] track_features = TrackUtilities.getAudioFeaturesForSeveralTracks(spotifyApi, track_ids);
+        AudioFeatures[] track_features = TrackUtilities.getAudioFeaturesForSeveralTracks(spotify_api, track_ids);
 
         for(AudioFeatures track_feature: track_features){
             System.out.println(track_feature.getTempo());
         }
 
 //        int song_length = recommended_tracks[0].getDurationMs() / 1000;
-//
-//        int num_warmup_songs = warmup_wind_down_length / 3;
 
-        return null;
+        int num_warmup_songs = warmup_wind_down_length / 3;
+
+        String[] selected_song_ids = new String[num_warmup_songs];
+
+        return selected_song_ids;
     }
 
     /**

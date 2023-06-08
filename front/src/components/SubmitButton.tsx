@@ -33,7 +33,6 @@ interface ServerResponse{
   return true
   }
 
-
   let access_token : string | undefined = "";
   let refresh_token : string | undefined = "";
 
@@ -51,7 +50,6 @@ function SubmitButton(props: SubmitButtonProps) {
         let raw_args = window.location.search;
         let params = new URLSearchParams(raw_args);
 
-        
         if(access_token === "" && refresh_token === ""){
 
         const token_response : string | Map<string, string> =
@@ -62,7 +60,6 @@ function SubmitButton(props: SubmitButtonProps) {
             refresh_token = token_response.get("refresh_token");
         }
     }
-
     
         let et = "";
 
@@ -72,6 +69,7 @@ function SubmitButton(props: SubmitButtonProps) {
 
         let desired_warmup = "";
         let desired_cool_down = "";
+
         if(props.playlist_type === "relax"){
            et = "winding_down";
            // adding these two as we must pass them to the backend but dont ask these questions in a relax playlist

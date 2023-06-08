@@ -1,15 +1,14 @@
 package PlaylistGenerating.PlaylistTypes;
 
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
 
-abstract class GeneratePlaylist {
+abstract public class GeneratePlaylist {
 
     // Desired genres
     protected final String genres;
 
     // The spotifyAPI containing the user's information
-    protected final SpotifyApi spotifyApi;
+    protected final SpotifyApi spotify_api;
 
     // Given age
     protected final int age;
@@ -26,7 +25,7 @@ abstract class GeneratePlaylist {
 
     public GeneratePlaylist(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity) {
 
-        this.spotifyApi = spotify_api;
+        this.spotify_api = spotify_api;
         this.genres = genres;
         this.age = age;
         this.workout_length = workout_length * 60;
@@ -34,7 +33,7 @@ abstract class GeneratePlaylist {
         this.margin_of_error = (int)(workout_length * .05);
     }
 
-    public abstract Playlist generatePlaylist() throws Exception;
+    public abstract String generatePlaylist() throws Exception;
 
     protected abstract int getTargetBPM();
 

@@ -2,14 +2,20 @@ package Server;
 
 import ExceptionClasses.InvalidInputExceptions.*;
 import PlaylistGenerating.PlaylistTypes.GenerateClassic;
+import PlaylistGenerating.PlaylistTypes.GenerateIntervalOne;
+import PlaylistGenerating.PlaylistTypes.GenerateIntervalTwo;
+import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
 import java.lang.reflect.Type;
 import java.util.*;
+
+import static Server.Server.spotify_api;
 
 public class GeneratePlaylistHandler implements Route {
 
@@ -23,7 +29,6 @@ public class GeneratePlaylistHandler implements Route {
             "new-release", "opera", "party", "philippines-opm", "pop", "punk", "punk-rock", "r-n-b", "rainy-day",
             "reggae", "rock", "sad", "samba", "sertanejo ", "sleep", "soul", "spanish", "synth-pop", "techno",
             "work-out", "world-music"));
-
 
     /**
      * Constructor
@@ -57,12 +62,28 @@ public class GeneratePlaylistHandler implements Route {
             verifyAge(age);
             verifyWorkoutLength(workout_length);
 
-            Server.spotify_api.setAccessToken(access_token);
-            Server.spotify_api.setRefreshToken(refresh_token);
+            spotify_api.setAccessToken(access_token);
+            spotify_api.setRefreshToken(refresh_token);
 
+            GeneratePlaylist generator;
 
-            GenerateClassic classic = new GenerateClassic(Server.spotify_api, genres, age, workout_length, intensity);
-            classic.generatePlaylist();
+            switch (playlist_type) {
+                case "classic" -> {
+                    generator = new GenerateClassic(spotify_api, genres, age, workout_length, intensity);
+                }
+                case "interval_one" -> {
+                    generator = new GenerateIntervalOne(spotify_api, genres, age, workout_length, intensity);
+                }
+                case "interval_two" -> {
+                    generator = new GenerateIntervalTwo(spotify_api, genres, age, workout_length, intensity);
+                }
+                default -> {
+                    throw new InvalidPlaylistTypeException("playlist_type must be" +
+                            " \"classic\", \"interval_one\", or \"interval_two\"");
+                }
+            }
+
+            playlist_id = generator.generatePlaylist();
 
             return serialize("Success", url, playlist_id);
 
@@ -91,7 +112,7 @@ public class GeneratePlaylistHandler implements Route {
             throw new NullParameterException("Parameter \"playlist_type\" was not provided");
         }
 
-        if(request.queryParams("intensity") == null){
+        if (request.queryParams("intensity") == null) {
             throw new NullParameterException("Parameter \"intensity\" was not provided");
         }
 
@@ -113,13 +134,12 @@ public class GeneratePlaylistHandler implements Route {
      */
     public static void verifyPlaylistType(String playlist_type) throws InvalidPlaylistTypeException {
 
-        if(playlist_type.equalsIgnoreCase("classic")) return;
-        if(playlist_type.equalsIgnoreCase("interval_one")) return;
-        if(playlist_type.equalsIgnoreCase("interval_two")) return;
+        if (playlist_type.equalsIgnoreCase("classic")) return;
+        if (playlist_type.equalsIgnoreCase("interval_one")) return;
+        if (playlist_type.equalsIgnoreCase("interval_two")) return;
 
         throw new InvalidPlaylistTypeException("playlist_type must be \"classic\", \"interval_one\", or \"interval_two\"");
     }
-
 
     /**
      * Verifies the given intensity is valid
@@ -128,9 +148,9 @@ public class GeneratePlaylistHandler implements Route {
      * @throws InvalidIntensityException if intensity is not "low", "medium", or "high" (Not case-sensitive)
      */
     public static void verifyIntensity(String intensity) throws InvalidIntensityException {
-        if(intensity.equalsIgnoreCase("low")) return;
-        if(intensity.equalsIgnoreCase("medium")) return;
-        if(intensity.equalsIgnoreCase("high")) return;
+        if (intensity.equalsIgnoreCase("low")) return;
+        if (intensity.equalsIgnoreCase("medium")) return;
+        if (intensity.equalsIgnoreCase("high")) return;
 
         throw new InvalidIntensityException("intensity must be \"low\", \"medium\", or \"high\"");
     }
