@@ -12,8 +12,6 @@ import java.io.IOException;
 
 public class BrowsingUtilities {
 
-
-
     /**
      * Gets recommendations using Spotify's recommendation endpoint
      *
@@ -25,14 +23,14 @@ public class BrowsingUtilities {
 
         try {
             GetRecommendationsRequest getRecommendationsRequest =
-                    args.spotify_api.getRecommendations()
-                            .limit(args.limit)
-                            .min_tempo(args.min_tempo)
-                            .max_tempo(args.max_tempo)
-                            .target_tempo(args.target_tempo)
-                            .seed_genres(args.seed_genres)
-                            .seed_tracks(args.seed_tracks)
-                            .seed_artists(args.seed_artists)
+                    args.spotify_api().getRecommendations()
+                            .limit(args.limit())
+                            .min_tempo(args.min_tempo())
+                            .max_tempo(args.max_tempo())
+                            .target_tempo(args.target_tempo())
+                            .seed_genres(args.seed_genres())
+                            .seed_tracks(args.seed_tracks())
+                            .seed_artists(args.seed_artists())
                             .build();
 
             return getRecommendationsRequest.execute();
@@ -41,8 +39,6 @@ public class BrowsingUtilities {
 
             throw new GetRecommendationsException(ex.getMessage());
         }
-
     }
-
     //TODO: Overload this method in case we do not always want to use all these arguments :)
 }

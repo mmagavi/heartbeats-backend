@@ -2,27 +2,29 @@ package PlaylistGenerating;
 
 import java.util.Map;
 
+// These numbers for optimal heart rate ranges are pulled from the Mayo Clinic at the link below
+// https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/exercise-intensity/art-20046887
+
 public class DesiredHeartRateRanges {
 
     private enum AGE_RANGE {
         TWENTIES_AND_UNDER, THIRTY_TO_THIRTY_FIVE, THIRTY_FIVE_TO_FORTY, FORTY_TO_FORTY_FIVE,
         FORTY_FIVE_TO_FIFTY, FIFTY_TO_FIFTY_FIVE, FIFTY_FIVE_TO_SIXTY, SIXTY_TO_SIXTY_FIVE, SIXTY_FIVE_TO_SEVENTY,
         SEVENTY_AND_UP
-
     }
 
-    private final static HeartRateRange twenty_and_under = new HeartRateRange(125, 135, 145);
-    private final static HeartRateRange thirty_to_thirty_five = new HeartRateRange(118, 128, 138);
-    private final static HeartRateRange thirty_five_to_forty = new HeartRateRange(115, 125, 135);
-    private final static HeartRateRange forty_to_forty_five = new HeartRateRange(111, 121, 131);
-    private final static HeartRateRange forty_five_to_fifty = new HeartRateRange(108, 118, 128);
-    private final static HeartRateRange fifty_to_fifty_five = new HeartRateRange(105, 115, 125);
-    private final static HeartRateRange fifty_five_to_sixty = new HeartRateRange(101, 111, 121);
-    private final static HeartRateRange sixty_to_sixty_five = new HeartRateRange(98, 108, 118);
-    private final static HeartRateRange sixty_five_to_seventy = new HeartRateRange(95, 105, 115);
-    private final static HeartRateRange seventy_and_up = new HeartRateRange(95, 105, 115);
+    private final static TargetHeartRateRange twenty_and_under = new TargetHeartRateRange(110, 140, 170);
+    private final static TargetHeartRateRange thirty_to_thirty_five = new TargetHeartRateRange(105, 133, 162);
+    private final static TargetHeartRateRange thirty_five_to_forty = new TargetHeartRateRange(103, 130, 157);
+    private final static TargetHeartRateRange forty_to_forty_five = new TargetHeartRateRange(100, 126, 153);
+    private final static TargetHeartRateRange forty_five_to_fifty = new TargetHeartRateRange(98, 124, 149);
+    private final static TargetHeartRateRange fifty_to_fifty_five = new TargetHeartRateRange(95, 120, 145);
+    private final static TargetHeartRateRange fifty_five_to_sixty = new TargetHeartRateRange(93, 117, 140);
+    private final static TargetHeartRateRange sixty_to_sixty_five = new TargetHeartRateRange(90, 113, 136);
+    private final static TargetHeartRateRange sixty_five_to_seventy = new TargetHeartRateRange(88, 110, 132);
+    private final static TargetHeartRateRange seventy_and_up = new TargetHeartRateRange(85, 107, 128);
 
-    private static final Map<AGE_RANGE, HeartRateRange> age_to_heart_rate_map = Map.of
+    private static final Map<AGE_RANGE, TargetHeartRateRange> age_to_heart_rate_map = Map.of
             (AGE_RANGE.TWENTIES_AND_UNDER, twenty_and_under,
                     AGE_RANGE.THIRTY_TO_THIRTY_FIVE, thirty_to_thirty_five,
                     AGE_RANGE.THIRTY_FIVE_TO_FORTY, thirty_five_to_forty,
@@ -38,9 +40,9 @@ public class DesiredHeartRateRanges {
      * Takes in an int age and returns a corresponding HeartRateRange object
      *
      * @param age provided age
-     * @return HeartRateRange object for the provided age
+     * @return TargetHeartRateRange object for the provided age
      */
-    public static HeartRateRange getHeartRateRange(int age) {
+    public static TargetHeartRateRange getTargetHeartRateRange(int age) {
 
         if (age < 30) {
             return age_to_heart_rate_map.get(AGE_RANGE.TWENTIES_AND_UNDER);
@@ -55,7 +57,6 @@ public class DesiredHeartRateRanges {
 
         int users_age_range_value = ((age - 30) / 5) + 1;
 
-
         return switch (users_age_range_value) {
             case 1 -> age_to_heart_rate_map.get(AGE_RANGE.THIRTY_TO_THIRTY_FIVE);
             case 2 -> age_to_heart_rate_map.get(AGE_RANGE.THIRTY_FIVE_TO_FORTY);
@@ -67,9 +68,5 @@ public class DesiredHeartRateRanges {
             case 8 -> age_to_heart_rate_map.get(AGE_RANGE.SIXTY_FIVE_TO_SEVENTY);
             default -> age_to_heart_rate_map.get(AGE_RANGE.SEVENTY_AND_UP);
         };
-    }
-
-    public static HeartRateRange toHeartRateRange(int target, int offset) {
-        return new HeartRateRange(target - offset, target, target + offset);
     }
 }

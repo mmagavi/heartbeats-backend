@@ -24,7 +24,7 @@ public class LibraryUtilitiesTests {
     public void passingNullToGetUsersSavedTracksThrowsException() {
 
         assertThrows(GetUsersSavedTracksException.class, () -> {
-            LibraryUtilities.GetUsersSavedTracks(null);
+            LibraryUtilities.getUsersSavedTracks(null);
         });
     }
 
@@ -32,7 +32,7 @@ public class LibraryUtilitiesTests {
     public void passingValidArgsToGetUsersSavedTracksDoesNotThrowException() {
 
         assertDoesNotThrow(() -> {
-            SavedTrack[] saved_tracks = LibraryUtilities.GetUsersSavedTracks(Server.spotify_api);
+            SavedTrack[] saved_tracks = LibraryUtilities.getUsersSavedTracks(Server.spotify_api);
             System.out.println("Number of saved tracks: " + saved_tracks.length);
         });
     }
@@ -41,7 +41,7 @@ public class LibraryUtilitiesTests {
     public void passingNullToGetUsersSavedAlbumsThrowsException() {
 
         assertThrows(GetUsersSavedAlbumsException.class, () -> {
-            LibraryUtilities.GetUsersSavedAlbums(null);
+            LibraryUtilities.getUsersSavedAlbums(null);
         });
     }
 
@@ -49,7 +49,7 @@ public class LibraryUtilitiesTests {
     public void passingValidArgsToGetUsersSavedAlbumsDoesNotThrowException() {
 
         assertDoesNotThrow(() -> {
-            SavedAlbum[] saved_albums = LibraryUtilities.GetUsersSavedAlbums(Server.spotify_api);
+            SavedAlbum[] saved_albums = LibraryUtilities.getUsersSavedAlbums(Server.spotify_api);
             System.out.println("Number of saved albums: " + saved_albums.length);
         });
     }

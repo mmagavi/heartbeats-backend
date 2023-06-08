@@ -3,6 +3,7 @@ package SpotifyUtilities;
 import ExceptionClasses.LibraryExceptions.GetUsersSavedAlbumsException;
 import ExceptionClasses.LibraryExceptions.GetUsersSavedTracksException;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.SavedAlbum;
 import se.michaelthelin.spotify.model_objects.specification.SavedTrack;
@@ -17,7 +18,7 @@ public class LibraryUtilities {
      * @return SavedTrack array of the user's saved tracks (Their liked songs)
      * @throws GetUsersSavedTracksException if an exception was thrown in getUsersSavedTracksRequest.execute()
      */
-    public static SavedTrack[] GetUsersSavedTracks(SpotifyApi spotify_api) throws GetUsersSavedTracksException {
+    public static SavedTrack[] getUsersSavedTracks(SpotifyApi spotify_api) throws GetUsersSavedTracksException {
 
         try{
 
@@ -39,7 +40,7 @@ public class LibraryUtilities {
      * @return SavedTrack array of the user's saved tracks (Their liked songs)
      * @throws GetUsersSavedAlbumsException if an exception was thrown in getUsersSavedAlbumsRequest.execute()
      */
-    public static SavedAlbum[] GetUsersSavedAlbums(SpotifyApi spotify_api) throws GetUsersSavedAlbumsException {
+    public static SavedAlbum[] getUsersSavedAlbums(SpotifyApi spotify_api) throws GetUsersSavedAlbumsException {
 
         try{
 
