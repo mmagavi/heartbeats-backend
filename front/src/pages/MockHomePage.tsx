@@ -14,8 +14,8 @@ import {MockSubmitButton} from "../components/MockSubmitButton";
  * setPlaylist: set generated playlist
  * loggedIn: is the user currently logged in?
  * setLoggedIn: set loggedIn
- * userID: user's access code
- * setUserID: set userID
+ * userCode: user's access code
+ * setUserCode: set userCode
  */
 interface mockHomePageProps {
     status: boolean;
@@ -23,8 +23,8 @@ interface mockHomePageProps {
     setPlaylist: (_: string) => void;
     loggedIn: boolean;
     setLoggedIn: (status: boolean) => void;
-    userID : string;
-    setUserID: (status: string) => void;
+    userCode : string;
+    setUserCode: (status: string) => void;
 }
 
 /**
@@ -67,7 +67,7 @@ export default function MockHomePage(props: mockHomePageProps) {
         } else {
             return (
                 <MockSubmitButton
-                    userID={props.userID}
+                    userCode={props.userCode}
                     genres={genres}
                     playlist_type={playlistType}
                     desired_warmup={desiredWarmup}

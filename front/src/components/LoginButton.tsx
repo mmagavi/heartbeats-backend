@@ -1,10 +1,10 @@
 import { LoginButton_AriaLabel, LoginButton_Role } from "../accessibility/Aria";
 
 /**
- * props for login status - setID (set the stored id) and setLI (set logged in)
+ * props for login status - setCode (set the stored id) and setLI (set logged in)
  */
 interface LoginStatusProps {
-    setID: (status: string) => void;
+    setCode: (status: string) => void;
     setLI: (status: boolean) => void;
 }
 
@@ -12,7 +12,7 @@ interface LoginStatusProps {
 /**
  * Constructor for Login Button, returns a login button which takes you to the
  * spotify login page and allows user to log into their spotify
- * @param props props for this component - setID, setLI
+ * @param props props for this component - setCode, setLI
  * @returns component which is a login button!
  */
 function LoginButton(props: LoginStatusProps) {

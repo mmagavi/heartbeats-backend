@@ -14,16 +14,16 @@ import {SubmitButton} from "../components/SubmitButton";
  * setPlaylist: set generated playlist
  * loggedIn: is the user currently logged in?
  * setLoggedIn: set loggedIn
- * userID: user's access code
- * setUserID: set userID
+ * userCode: user's access code
+ * setUserCode: set userCode
  */
 interface homePageProps {
   playlist: string;
   setPlaylist: (_: string) => void;
   loggedIn: boolean;
   setLoggedIn: (status: boolean) => void;
-  userID : string;
-  setUserID: (status: string) => void;
+  userCode : string;
+  setUserCode: (status: string) => void;
 }
 
 /**
@@ -44,9 +44,22 @@ export default function HomePage(props: homePageProps) {
   const [playlist_id, setPlaylistID] = useState<string | undefined>("")
 
   // once we reach the home/music page, set logged in to true
+  if (window.location.href.includes("code=")) {
+    //TODO: setUserCode
+    let raw_args = window.location.search;
+    let params = new URLSearchParams(raw_args);
+    if (typeof(params.get("code")) != null ) {
+      props.setUserCode(String(params.get("code")));
+      //setLoggedIn(true);
+
+      console.log(String(params.get("code")));
+      //console.log("params.get(code) is: " + params.get("code"));
+      console.log("line 33 app user code is:" + props.userCode);
+    }
+  }
   props.setLoggedIn(true);
   console.log("logged in status: " + props.loggedIn);
-  console.log("user ID is: " + props.userID);
+  console.log("user ID is: " + props.userCode);
 
   // reset results
   function reset() {
@@ -69,7 +82,7 @@ export default function HomePage(props: homePageProps) {
       return null;
     } else {
       return (
-          <SubmitButton userID={props.userID}
+          <SubmitButton userCode={props.userCode}
                         genres={genres}
                         playlist_type={playlistType}
                         desired_warmup={desiredWarmup}

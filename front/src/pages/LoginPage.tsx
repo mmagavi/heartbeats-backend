@@ -5,14 +5,14 @@ import {LoginPage_AriaLabel} from "../accessibility/Aria";
 /**
  * Props for LoginPage -
  * status: should we display this page right now?
- * userID: stored user access token
- * setUserID: update access code
+ * userCode: stored user access token
+ * setUserCode: update access code
  * loggedIn: is the user currently logged in?
  * setLoggedIn: set loggedIn status
  */
 interface loginPageProps {
-    userID : string;
-    setUserID: (status: string) => void;
+    userCode : string;
+    setUserCode: (status: string) => void;
     loggedIn : boolean;
     setLoggedIn: (status: boolean) => void;
 }
@@ -30,7 +30,7 @@ function LoginPage(props : loginPageProps){
     return (
         <div className="loginBody" aria-label={LoginPage_AriaLabel}>
             <div className="subtitle">Welcome to heartBeats!</div>
-            <LoginButton setID={props.setUserID} setLI={props.setLoggedIn}/>
+            <LoginButton setCode={props.setUserCode} setLI={props.setLoggedIn}/>
             <div className="subtext">Please login to your Spotify account so that we can find songs from your favorites and create custom playlists :)</div>
         </div>)
 }

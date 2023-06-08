@@ -2,7 +2,7 @@ import { SubmitButton_AriaLabel, SubmitButton_Role } from "../accessibility/Aria
 import { checkResponse, makeRequest } from "../requests";
 
 interface MockSubmitButtonProps {
-    userID : String; // access code
+    userCode : String; // access code
     genres : String;
     playlist_type : String;
     desired_warmup : String;

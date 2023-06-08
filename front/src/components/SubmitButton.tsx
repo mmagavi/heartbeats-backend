@@ -6,7 +6,7 @@ import { checkResponse, makeRequest } from "../requests";
  * data - selection data to send to backend
  */
 interface SubmitButtonProps {
-    userID : String; // access code
+    userCode : String; // access code
     genres : String;
     playlist_type : String;
     desired_warmup : String;
