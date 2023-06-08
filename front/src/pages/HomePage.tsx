@@ -44,6 +44,19 @@ export default function HomePage(props: homePageProps) {
   const [playlist_id, setPlaylistID] = useState<string | undefined>("")
 
   // once we reach the home/music page, set logged in to true
+  if (window.location.href.includes("code=")) {
+    //TODO: setUserCode
+    let raw_args = window.location.search;
+    let params = new URLSearchParams(raw_args);
+    if (typeof(params.get("code")) != null ) {
+      props.setUserCode(String(params.get("code")));
+      //setLoggedIn(true);
+
+      console.log(String(params.get("code")));
+      //console.log("params.get(code) is: " + params.get("code"));
+      console.log("line 33 app user code is:" + props.userCode);
+    }
+  }
   props.setLoggedIn(true);
   console.log("logged in status: " + props.loggedIn);
   console.log("user ID is: " + props.userCode);

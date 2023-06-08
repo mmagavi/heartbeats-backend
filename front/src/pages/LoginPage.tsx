@@ -30,7 +30,7 @@ function LoginPage(props : loginPageProps){
     return (
         <div className="loginBody" aria-label={LoginPage_AriaLabel}>
             <div className="subtitle">Welcome to heartBeats!</div>
-            <LoginButton setID={props.setUserCode} setLI={props.setLoggedIn}/>
+            <LoginButton setCode={props.setUserCode} setLI={props.setLoggedIn}/>
             <div className="subtext">Please login to your Spotify account so that we can find songs from your favorites and create custom playlists :)</div>
         </div>)
 }

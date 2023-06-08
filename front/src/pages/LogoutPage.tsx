@@ -29,7 +29,7 @@ function LogoutPage(props : logoutPageProps){
             <br/><br/>
             Are you sure you would like to log out?
             <br/><br/>
-            <LogoutButton setID={props.setUserCode} setLI={props.setLoggedIn}/>
+            <LogoutButton setCode={props.setUserCode} setLI={props.setLoggedIn}/>
         </div>
     )
 }
