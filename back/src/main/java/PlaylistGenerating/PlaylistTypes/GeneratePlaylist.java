@@ -13,7 +13,7 @@ abstract public class GeneratePlaylist {
     // Given age
     protected final int age;
 
-    // Length of the workout in seconds
+    // Length of the workout in MilliSeconds
     protected final int workout_length;
 
     // Intensity of the workout
@@ -28,7 +28,7 @@ abstract public class GeneratePlaylist {
         this.spotify_api = spotify_api;
         this.genres = genres;
         this.age = age;
-        this.workout_length = workout_length * 60;
+        this.workout_length = workout_length * 60_000;
         this.intensity = intensity;
         this.margin_of_error = (int)(workout_length * .05);
     }
