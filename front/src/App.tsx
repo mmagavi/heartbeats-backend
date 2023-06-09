@@ -24,24 +24,6 @@ function App(this: any) {
     const [playlistID, setPlaylist] = useState("");
     const [loggedIn, setLoggedIn] = React.useState(false);
 
-    if (window.location.href.includes("code=") && !(window.location.href.includes("music"))) {
-        //TODO: setUserCode
-        let raw_args = window.location.search;
-        let params = new URLSearchParams(raw_args);
-
-        if (typeof(params.get("code")) != null ) {
-            setUserCode(String(params.get("code")));
-            //setLoggedIn(true);
-
-            console.log(String(params.get("code")));
-            //console.log("params.get(code) is: " + params.get("code"));
-            console.log("line 33 app user code is:" + userCode);
-
-            // redirect user
-            // window.location.replace(window.location.href.concat("/#/music"));
-        }
-    }
-
     // render our page!
     return (
         <div className="main">

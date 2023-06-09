@@ -26,7 +26,7 @@ export const server = "http://localhost:3232/";
  */
 function MockApp() {
     const [currPage, setCurr] = useState("Login");
-    const [userID, setUserID] = useState("");
+    const [userCode, setUserCode] = useState("");
     const [playlistID, setPlaylist] = useState("");
     const [loggedIn, setLoggedIn] = React.useState(false);
 
@@ -75,23 +75,21 @@ function MockApp() {
                 </div>
             </Navbar>
             <LoginPage
-                status={currPage === "Login"}
-                userID={userID}
-                setUserID={setUserID}
+                userCode={userCode}
+                setUserCode={setUserCode}
                 loggedIn={loggedIn}
                 setLoggedIn={setLoggedIn}
             />
             <MockHomePage
-                status={currPage === "Home"}
                 playlist={playlistID}
                 setPlaylist={(x: string) => setPlaylist(x)}
                 loggedIn={loggedIn}
                 setLoggedIn={setLoggedIn}
-                userID={userID}
-                setUserID={setUserID}
+                userCode={userCode}
+                setUserCode={setUserCode}
             />
-            <AboutPage status={currPage === "About"} />
-            <LogoutPage status={currPage === "Logout"} userID={userID} setUserID={setUserID} loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
+            <AboutPage/>
+            <LogoutPage userCode={userCode} setUserCode={setUserCode} loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
         </div>
     );
 }
