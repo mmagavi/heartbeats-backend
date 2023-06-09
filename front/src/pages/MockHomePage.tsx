@@ -18,7 +18,6 @@ import {MockSubmitButton} from "../components/MockSubmitButton";
  * setUserCode: set userCode
  */
 interface mockHomePageProps {
-    status: boolean;
     playlist: string;
     setPlaylist: (_: string) => void;
     loggedIn: boolean;
@@ -147,9 +146,5 @@ export default function MockHomePage(props: mockHomePageProps) {
     );
 
     console.log(playlistType);
-    if (props.status) {
-        return questionPage;
-    } else {
-        return <div />;
-    }
+    return questionPage;
 }

@@ -6,6 +6,7 @@ import { ExerciseQuestions } from "../questions/ExerciseQuestions";
 import { RelaxQuestions } from "../questions/RelaxQuestions";
 import { questionsType } from "../questions/QuestionsType";
 import {SubmitButton} from "../components/SubmitButton";
+import ModeQuestionComponent from "../components/ModeQuestionComponent";
 
 /**
  * Props for the HomePage component -
@@ -45,19 +46,16 @@ export default function HomePage(props: homePageProps) {
 
   // once we reach the home/music page, set logged in to true
   if (window.location.href.includes("code=")) {
-    //TODO: setUserCode
     let raw_args = window.location.search;
     let params = new URLSearchParams(raw_args);
     if (typeof(params.get("code")) != null ) {
       props.setUserCode(String(params.get("code")));
-      //setLoggedIn(true);
+      props.setLoggedIn(true);
 
       console.log(String(params.get("code")));
-      //console.log("params.get(code) is: " + params.get("code"));
       console.log("line 33 app user code is:" + props.userCode);
     }
   }
-  props.setLoggedIn(true);
   console.log("logged in status: " + props.loggedIn);
   console.log("user ID is: " + props.userCode);
 
@@ -104,20 +102,30 @@ export default function HomePage(props: homePageProps) {
     relax: RelaxQuestions,
   };
 
-  // structure of the questions
   const playlistQuestion = {
-    question: "What kind of playlist are you looking for?",
+    question:
+        "Please choose a mode:",
     id: 1,
     choices: [
       {
-        text: "working out",
-        img: "https://s3-us-west-1.amazonaws.com/contentlab.studiod/getty/31a4debc7443411195df509e38a5f9a3.jpg",
-        val: "exercise",
+        text: "Standard",
+        img: "standardMode",
+        val: "standard",
       },
       {
-        text: "winding down",
-        img: "https://discovery.sndimg.com/content/dam/images/discovery/fullset/2020/4/2/nightsky2_getty.jpg.rend.hgtvcom.406.305.suffix/1585862428885.jpeg",
-        val: "relax",
+        text: "Wind-Down",
+        img: "windDownMode",
+        val: "windDown",
+      },
+      {
+        text: "Standard Interval",
+        img: "standardIntervalMode",
+        val: "standardInterval",
+      },
+      {
+        text: "Pyramid Interval",
+        img: "pyramidIntervalMode",
+        val: "pyramidInterval",
       },
     ],
     setChoice: (_: number, s: string) => {
@@ -135,7 +143,7 @@ export default function HomePage(props: homePageProps) {
       <ResultPage playlistID={playlist_id} reset={reset}/>
   ) : playlistType == "" ? ( // first screen
       <div className="mainBody">
-        <QuestionComponent {...playlistQuestion}
+        <ModeQuestionComponent {...playlistQuestion}
                            setDesiredWarmup={setDesiredWarmup}
                            setDesiredCoolDown={setDesiredCoolDown}
                            setDesiredAge={setDesiredAge}
@@ -150,7 +158,7 @@ export default function HomePage(props: homePageProps) {
         <QuestionsPage
             setPlaylist={props.setPlaylist}
             submitButton={getSubmitButton}
-            questionsRaw={playlistChoices[playlistType]}
+            questionsRaw={playlistChoices["exercise"]}
             setGenres={setGenres}
             setDesiredWarmup={setDesiredWarmup}
             setDesiredCoolDown={setDesiredCoolDown}

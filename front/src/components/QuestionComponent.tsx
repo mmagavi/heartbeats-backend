@@ -40,6 +40,7 @@ export default function QuestionComponent(props: questionProps) {
     return props.getChoice(props.id, v);
   }
 
+  // TODO: Update!!
   function setNumHelper(n : number) {
     props.setChoice(props.id, n);
     if (props.id == 3) {

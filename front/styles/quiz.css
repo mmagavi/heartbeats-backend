@@ -30,6 +30,20 @@
   font-weight: bold;
 }
 
+img{
+  max-width: 35vw;
+  max-height: 35vh;
+}
+
+.mode-choices-list {
+  display: flex;
+  flex-flow: wrap row;
+  overflow-y: hidden;
+  flex-direction: row;
+  justify-content: center;
+  padding: 8vh 10vw 20vh;
+}
+
 .choices-list {
   display: flex;
   flex-flow: nowrap row;
@@ -60,6 +74,37 @@ label {
 }
 label:hover {
   color:red;
+}
+
+.mode-choice {
+  box-sizing: inherit;
+  transition-property: all;
+  transition-duration: 1s;
+  transition-timing-function: ease;
+
+  color: #fff;
+  cursor: pointer;
+  display: block;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 45px;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  /*width: 100%;*/
+  width: fit-content;
+  height: 300px;
+  margin: 0;
+  padding-bottom: 15vh;
+  padding-right: 2vw;
+  padding-left: 2vw;
+  /*padding: 50px 0 0;*/
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 0;
+  border-color: rgba(0, 0, 0, 0);
 }
 
 .choice {

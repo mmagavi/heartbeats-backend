@@ -16,6 +16,7 @@ interface SliderProps {
   id : number;
 }
 
+
 /**
  * Value label component for the SliderUI component
  * Shows the current value of the slider
@@ -43,21 +44,16 @@ export default function SliderUI(props: SliderProps): ReactComponent {
   let DEFAULT = -1;
   let ROLE = "";
 
-  if (props.id == 3) {
-    MIN = 45;
-    MAX = 140;
-    DEFAULT = 80;
-    ROLE = "Slider1"
-  } if (props.id == 4) {
+  if (props.id == 2) {
     MIN = 13;
     MAX = 100;
     DEFAULT = 35;
-    ROLE = "Slider2"
-  } if (props.id == 5) {
+    ROLE = "Slider1"
+  } if (props.id == 3) {
     MIN = 15;
     MAX = 180;
     DEFAULT = 30;
-    ROLE = "Slider3"
+    ROLE = "Slider2"
   }
 
   function handleChange(n: number) {
@@ -76,7 +72,6 @@ export default function SliderUI(props: SliderProps): ReactComponent {
         }}
         aria-label="custom thumb label"
         defaultValue={DEFAULT}
-        color="secondary"
         role={ROLE}
         onChange={(e, n, _) =>
           typeof n === "number" ? handleChange(n) : handleChange(n[0])

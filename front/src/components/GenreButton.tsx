@@ -29,10 +29,10 @@ export default function GenreButton(props: genreProps) {
     // style CSS for question display text
     const styleCSS = {
         letterSpacing: checked ? "3px" : undefined,
-        background: checked ? "#d25756" : "grey",
-        padding: checked ? "1vw" : undefined,
-        paddingLeft: checked ? "1vw" : undefined,
-        paddingRight: checked ? "1vw" : undefined,
+        background: checked ? "#f13837" : "grey",
+        padding: checked ? "0.5vw" : undefined,
+        paddingLeft: checked ? "0.5vw" : undefined,
+        paddingRight: checked ? "0.5vw" : undefined,
         borderRadius: checked ? "27px" : "17px",
     };
 
