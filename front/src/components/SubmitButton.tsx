@@ -67,32 +67,30 @@ function SubmitButton(props: SubmitButtonProps) {
             et = "working_out";
         }
 
-        let desired_warmup = "";
-        let desired_cool_down = "";
+        // let desired_warmup = "";
+        // let desired_cool_down = "";
 
-        if(props.playlist_type === "relax"){
-           et = "winding_down";
-           // adding these two as we must pass them to the backend but dont ask these questions in a relax playlist
-           // props.desired_warmup = "start_with_warmup";
-           // props.desired_cool_down = "start_with_warmup";
+        // if(props.playlist_type === "relax"){
+        //    et = "winding_down";
+        //    // adding these two as we must pass them to the backend but dont ask these questions in a relax playlist
+        //    // props.desired_warmup = "start_with_warmup";
+        //    // props.desired_cool_down = "start_with_warmup";
 
-            // sorry i messed with this but can't change the vals this way
-            desired_warmup = "start_with_warmup";
-            desired_cool_down = "start_with_warmup";
-        } else {
-            desired_warmup = props.desired_warmup.toString();
-            desired_cool_down = props.desired_cool_down.toString();
-        }
+        //     // sorry i messed with this but can't change the vals this way
+        //     desired_warmup = "start_with_warmup";
+        //     desired_cool_down = "start_with_warmup";
+        // } else {
+        //     desired_warmup = props.desired_warmup.toString();
+        //     desired_cool_down = props.desired_cool_down.toString();
+        // }
 
         let playlist_request: string ="generate-playlist?access_token=" + access_token
         + "&refresh_token=" + refresh_token
+        + "&playlist_type=classic"
+        + "&intensity=low"
         + "&genres=" + props.genres
-        + "&playlist_type=" + et
-        + "&desired_warmup=" + desired_warmup;
-        + "&desired_cool_down=" + desired_cool_down;
-        + "&age=" + props.age
+        + "&age=33"
         + "&workout_length=" + props.workout_length
-        + "&current_bpm=" + props.current_bpm
 
         const playlist_response: string | Map<string, string> =
         await checkResponse(await makeRequest(playlist_request))

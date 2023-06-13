@@ -27,7 +27,7 @@ public class GeneratePlaylistHandler implements Route {
             "folk", "french", "funk", "garage", "german", "grunge", "hardcore", "hip-hop", "indian", "indie",
             "indie-pop", "industrial", "j-pop", "jazz", "k-pop", "latino", "malay", "mandopop", "metal", "new-age",
             "new-release", "opera", "party", "philippines-opm", "pop", "punk", "punk-rock", "r-n-b", "rainy-day",
-            "reggae", "rock", "sad", "samba", "sertanejo ", "sleep", "soul", "spanish", "synth-pop", "techno",
+            "reggae", "rock", "sad", "samba", "sertanejo", "sleep", "soul", "spanish", "synth-pop", "techno",
             "work-out", "world-music"));
 
     /**

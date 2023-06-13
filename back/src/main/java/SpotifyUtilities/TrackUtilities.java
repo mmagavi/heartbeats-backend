@@ -3,10 +3,18 @@ package SpotifyUtilities;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForSeveralTracksException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
+import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import se.michaelthelin.spotify.requests.data.tracks.GetAudioFeaturesForSeveralTracksRequest;
+
+import java.util.Comparator;
 
 public class TrackUtilities {
     private static final String[] ids = new String[]{"01iyCAUm8EvOFqVWYJ3dVX"};
+
+    // Compares tracks by duration which we want to sort all tracks by (in ascending order)
+    public static final Comparator<TrackSimplified> duration_comparator =
+            (TrackSimplified track_one, TrackSimplified track_two)
+            -> Integer.compare(track_one.getDurationMs(), track_two.getDurationMs());
 
 
     /**

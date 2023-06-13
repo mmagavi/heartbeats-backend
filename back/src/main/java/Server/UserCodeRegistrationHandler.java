@@ -38,8 +38,8 @@ public class UserCodeRegistrationHandler implements Route {
             access_token = authorizationCodeCredentials.getAccessToken();
             refresh_token = authorizationCodeCredentials.getRefreshToken();
 
-            System.out.println("Access token: " + access_token);
-            System.out.println("Refresh token: " + refresh_token);
+            //System.out.println("Access token: " + access_token);
+            //System.out.println("Refresh token: " + refresh_token);
 
         }catch (Exception ex){
             ex.printStackTrace();
