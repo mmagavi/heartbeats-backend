@@ -27,6 +27,7 @@ interface choice {
   text: string;
   img: string;
   val: string;
+  key: number;
 }
 
 /**
@@ -42,11 +43,9 @@ export default function ModeQuestionComponent(props: questionProps) {
 
   function setNumHelper(n : number) {
     props.setChoice(props.id, n);
-    if (props.id == 3) {
-      props.setDesiredBPM(n);
-    } else if (props.id == 4) {
+    if (props.id == 2) {
       props.setDesiredAge(n);
-    } else if (props.id == 5) {
+    } else if (props.id == 3) {
       props.setDesiredLength(n);
     }
   }
@@ -80,9 +79,9 @@ export default function ModeQuestionComponent(props: questionProps) {
     );
 
   return (
-    <div className="question-item">
+    <div className="questionItem">
       <div className="question" role={Question_Role} aria-label={props.question}>{props.question}</div>
-      <div className="mode-choices-list">{choices}</div>
+      <div className="modeChoicesList">{choices}</div>
     </div>
   );
 }

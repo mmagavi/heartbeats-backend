@@ -1,9 +1,8 @@
-import QuestionComponent from "../components/QuestionComponent";
+import ModeQuestionComponent from "../components/QuestionComponent";
 import { useState } from "react";
 import QuestionsPage from "./QuestionsPage";
 import ResultPage from "./ResultPage";
 import { ExerciseQuestions } from "../questions/ExerciseQuestions";
-import { RelaxQuestions } from "../questions/RelaxQuestions";
 import { questionsType } from "../questions/QuestionsType";
 import {MockSubmitButton} from "../components/MockSubmitButton";
 
@@ -85,7 +84,6 @@ export default function MockHomePage(props: mockHomePageProps) {
     const playlistChoices: { [key: string]: questionsType[] } = {
         // each question set page needs a way to change the playlist code
         exercise: ExerciseQuestions,
-        relax: RelaxQuestions,
     };
 
     // structure of the questions
@@ -97,11 +95,13 @@ export default function MockHomePage(props: mockHomePageProps) {
                 text: "working out",
                 img: "https://s3-us-west-1.amazonaws.com/contentlab.studiod/getty/31a4debc7443411195df509e38a5f9a3.jpg",
                 val: "exercise",
+                key: 500,
             },
             {
                 text: "winding down",
                 img: "https://discovery.sndimg.com/content/dam/images/discovery/fullset/2020/4/2/nightsky2_getty.jpg.rend.hgtvcom.406.305.suffix/1585862428885.jpeg",
                 val: "relax",
+                key: 501,
             },
         ],
         setChoice: (_: number, s: string) => {
@@ -119,7 +119,7 @@ export default function MockHomePage(props: mockHomePageProps) {
         <ResultPage playlistID={playlist_id} reset={reset}/>
     ) : playlistType == "" ? ( // first screen
         <div className="mainBody">
-            <QuestionComponent {...playlistQuestion}
+            <ModeQuestionComponent {...playlistQuestion}
                                setDesiredWarmup={setDesiredWarmup}
                                setDesiredCoolDown={setDesiredCoolDown}
                                setDesiredAge={setDesiredAge}

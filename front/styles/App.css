@@ -47,37 +47,40 @@ td {
   flex-wrap: wrap;
 }
 
-.nav-container {
+.navContainer {
   display: flex;
   flex-direction: row;
   justify-content: right;
 }
-.nav-link {
+.navLink {
   color: white;
   margin: 3vh 1vw;
 }
 
-.nav-elem {
+.navElem {
   color: white;
   width: fit-content;
-  margin: 2.9vh 1vw;
+  margin: 2.9vh 0vw;
 }
 
-.nav-elem:hover {
+.navElem:hover {
   font-weight: bold;
   color: darkred;
 }
 
 .backButton {
-  background-color: transparent;
+  border-radius: 1vw;
   color: white;
-  border-width: 0;
+  border: none;
   margin-bottom: 10vh;
   font-size: 20px;
   font-family: Avenir;
+  background-color: transparent;
+  padding: 1vh;
 }
-
-
+.backButton:hover {
+  background-color: rgba(147, 147, 147, 0.2);
+}
 
 .mainBody {
   animation: fadeIn 2s;
@@ -108,7 +111,7 @@ td {
   }
 }
 
-.iframe-result {
+.iframeResult {
   width: 30%;
   margin: 0 4%;
   height: 420px;
@@ -168,10 +171,10 @@ iframe {
 }
 .subtext {
   font-family: Avenir;
-  padding-top: 2vh;
-  max-width: 20vw;
+  padding-top: 3vh;
+  padding-right: 35vw;
+  padding-left: 35vw;
 }
-
 .serverStatusDiv {
   color: white;
   width: auto;
@@ -200,10 +203,10 @@ iframe {
 }
 
 .LoginButton {
-  width: 18vw;
-  height: 7vh;
-  padding: 1vh;
-  font-size: 1.4vw;
+  width: 230px;
+  height: 60px;
+  padding: 2vh;
+  font-size: 20px;
   border-radius: 20px;
   margin-bottom: 10px;
   background-color: #ffffff;
@@ -212,7 +215,7 @@ iframe {
   /*border-color: #f87a7a;*/
 }
 
-.commands-list {
+.commandsList {
   width: auto;
   height: min(4vh, 40px);
   font-size: min(4vh, 18px);
@@ -239,13 +242,6 @@ button {
 .LoginButton:hover {
   box-shadow: #ff5757 0 -0.5vh 0 inset;
   border-color: #ff5757;
-  transition: border-color 0.25s, box-shadow 0.25s;
-  outline: none;
-}
-
-.repl-button:hover {
-  box-shadow: #579dff 0 -0.5vh 0 inset;
-  border-color: #579dff;
   transition: border-color 0.25s, box-shadow 0.25s;
   outline: none;
 }

@@ -27,6 +27,7 @@ interface choice {
   text: string;
   img: string;
   val: string;
+  key: number;
 }
 
 /**
@@ -81,9 +82,9 @@ export default function QuestionComponent(props: questionProps) {
     );
 
   return (
-    <div className="question-item">
+    <div className="questionItem">
       <div className="question" role={Question_Role} aria-label={props.question}>{props.question}</div>
-      <div className="choices-list">{choices}</div>
+      <div className="choicesList">{choices}</div>
     </div>
   );
 }

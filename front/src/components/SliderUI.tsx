@@ -16,7 +16,6 @@ interface SliderProps {
   id : number;
 }
 
-
 /**
  * Value label component for the SliderUI component
  * Shows the current value of the slider
@@ -59,6 +58,7 @@ export default function SliderUI(props: SliderProps): ReactComponent {
   function handleChange(n: number) {
     props.setCurrentVal(n);
   }
+
   return (
     <div
       className="SliderContainer"
@@ -66,6 +66,20 @@ export default function SliderUI(props: SliderProps): ReactComponent {
       role={Slider_Role}
     >
       <Slider
+          sx={{
+            '& .MuiSlider-thumb': {
+              color: "red"
+            },
+            '& .MuiSlider-track': {
+              color: "red"
+            },
+            '& .MuiSlider-rail': {
+              color: "#ff6767"
+            },
+            '& .MuiSlider-active': {
+              color: "green"
+            }
+          }}
         valueLabelDisplay="auto"
         slots={{
           valueLabel: ValueLabelComponent,

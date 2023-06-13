@@ -32,8 +32,9 @@ export default function ChoiceButton(props: choiceProps) {
 
   // style CSS for question display text
   const styleCSS = {
-    letterSpacing: checked ? "5px" : undefined,
+    // letterSpacing: checked ? "5px" : undefined,
     color: checked ? "#FF0000" : "white",
+    background: checked ? "rgba(98, 95, 95, 0.88)" : undefined,
   };
 
   // TODO: Update!!

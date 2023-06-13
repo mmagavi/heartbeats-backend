@@ -28,12 +28,13 @@ export default function GenreButton(props: genreProps) {
 
     // style CSS for question display text
     const styleCSS = {
-        letterSpacing: checked ? "3px" : undefined,
-        background: checked ? "#f13837" : "grey",
-        padding: checked ? "0.5vw" : undefined,
-        paddingLeft: checked ? "0.5vw" : undefined,
-        paddingRight: checked ? "0.5vw" : undefined,
-        borderRadius: checked ? "27px" : "17px",
+        //letterSpacing: checked ? "3px" : undefined,
+        //background: checked ? "#da6560" : "grey",
+        background: checked ? "rgba(175,175,175,0.88)" : "rgba(180,180,180,0.2)",
+        padding: checked ? "0.7vw" : undefined,
+        paddingLeft: checked ? "1.2vw" : undefined,
+        paddingRight: checked ? "1.2vw" : undefined,
+        borderRadius: checked ? "5vw" : "3vw",
     };
 
     // return button

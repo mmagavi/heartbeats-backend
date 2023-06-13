@@ -39,14 +39,14 @@ export default function ResultPage(props: ResultPageProps) {
   const scriptSrc = "https://open.spotify.com/embed-playlist/iframe-api/v1";
 
   const iframe = (
-    <div className="iframe-result">
+    <div className="iframeResult">
       {/* taken from Spotify Dev front page */}
       <iframe
     title="Your HeartBeats Result Playlist"
     src={embedLink}
     width={"100%"}
     height={"100%"}
-    allowTransparency={true}
+    // allowTransparency={true}
     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     loading="lazy"
     />
@@ -59,7 +59,7 @@ export default function ResultPage(props: ResultPageProps) {
       {/* ^^^ needed for iframe to run*/}
       {iframe}
       {/* Description */}
-      <div className="iframe-result" role="playlist">
+      <div className="iframeResult" role="playlist">
         <h1> Share your heartBeat!</h1>
         <p>Our playlist, curated for you with heart</p>
         <p>
