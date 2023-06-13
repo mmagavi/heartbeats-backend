@@ -28,6 +28,17 @@ public class GenerateClassic extends GeneratePlaylist {
     private final int target_bpm;
     private final float bpm_difference;
     private int num_intervals;
+    private int warmup_wind_down_length_ms;
+    private int min_allowable_length_ms;
+    private int max_allowable_length_ms;
+
+    //TODO: Play around with limit and see how few songs we can fetch while still getting good results
+    private final int limit = 21; // Number of tracks we want to get
+
+    private enum DURATION_RESULT {
+        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT,
+        WITHIN_THIRTY_SECONDS_LONG
+    }
 
     /**
      * Constructor for generating a classic style playlist
@@ -60,6 +71,12 @@ public class GenerateClassic extends GeneratePlaylist {
 
         bpm_difference = findBpmDifference();
 
+        int warmup_wind_down_length_ms = (int) (warmup_wind_down_length * 60_000); // conversion
+
+        // MilliSeconds of length that is acceptable for the warmup / wind-down sequence based on our MOE
+        int min_allowable_length_ms = warmup_wind_down_length_ms - (warmup_wind_down_length_ms * margin_of_error);
+        int max_allowable_length_ms = warmup_wind_down_length_ms + (warmup_wind_down_length_ms * margin_of_error);
+
     }
 
     /**
@@ -91,6 +108,8 @@ public class GenerateClassic extends GeneratePlaylist {
         String playlist_id = playlist.getId();
 
         String[] warmup_track_ids = getWarmupTracks();
+        // String[] middle_portion_tracks;
+        String[] wind_down_track_ids = getWindDownTracks();
 
         // PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, warmup_track_ids);
 
@@ -202,6 +221,218 @@ public class GenerateClassic extends GeneratePlaylist {
     }
 
     /**
+     * Checks if the track array provided is within the allowable duration range
+     * SPECIFICALLY FOR WARMUP AND WIND-DOWN SEQUENCES ONLY
+     *
+     * @param tracks tracks to be checked for their duration
+     * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
+     */
+    private DURATION_RESULT checkDuration(TrackSimplified[] tracks) {
+        int duration_ms = 0;
+
+        for (TrackSimplified track : tracks) {
+            duration_ms += track.getDurationMs();
+        }
+
+        int thirty_seconds_ms = 30_000;
+
+        if (duration_ms < min_allowable_length_ms && duration_ms >= min_allowable_length_ms - thirty_seconds_ms) {
+            return DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT;
+        } else if (duration_ms > max_allowable_length_ms && duration_ms <= max_allowable_length_ms + thirty_seconds_ms) {
+            return DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG;
+        } else if (duration_ms < min_allowable_length_ms) {
+            return DURATION_RESULT.TOO_SHORT;
+        } else if (duration_ms > max_allowable_length_ms) {
+            return DURATION_RESULT.TOO_LONG;
+        } else {
+            return DURATION_RESULT.ACCEPTABLE;
+        }
+    }
+
+    /**
+     * @param intervals
+     * @param is_warmup
+     * @return
+     * @throws Exception
+     */
+    private String[] findOrdering(HashMap<Integer, TrackSimplified[]> intervals, boolean is_warmup) throws Exception {
+
+        boolean column_found = false; // flag for while loop
+        int closest_column;
+
+        do {
+            intervals = getSortedIntervals(is_warmup); // move this out of function possibly
+
+            closest_column = findClosestColumn(intervals);
+
+        } while (closest_column == -1); // if the closest column was not found we will retry
+
+        TrackSimplified[] tracks = getTracksInColumn(intervals, closest_column);
+        DURATION_RESULT result = checkDuration(tracks);
+
+        if(result == DURATION_RESULT.ACCEPTABLE){
+            return getTrackIDs(tracks);
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the column closest to the target duration
+     *
+     * @param intervals intervals from which to find the best fitting column
+     * @return the closest column or -1 if there was not a good column
+     */
+    private int findClosestColumn(HashMap<Integer, TrackSimplified[]> intervals) {
+        TrackSimplified[] current_tracks;
+
+        // First check if the shortest combination is too long and check if the longest combination is too short
+        current_tracks = getTracksInColumn(intervals, 0);
+        if (checkDuration(current_tracks) == DURATION_RESULT.TOO_LONG) return -1;
+
+        current_tracks = getTracksInColumn(intervals, limit - 1);
+        if (checkDuration(current_tracks) == DURATION_RESULT.TOO_SHORT) return -1;
+
+        int current_column = limit / 2; // middle column
+        int current_scope = current_column; // portion of the limit we are looking at, will be halved repeatedly
+        int new_column;
+        int distance_to_previous_column = 100;
+        int distance_to_bound = 100;
+        DURATION_RESULT result = DURATION_RESULT.ACCEPTABLE;
+
+        while (distance_to_previous_column >= 4 && distance_to_bound >= 3) {
+
+            current_tracks = getTracksInColumn(intervals, current_column);
+            result = checkDuration(current_tracks);
+
+            if (result == DURATION_RESULT.TOO_SHORT) {
+                new_column = (current_column + 1) + (current_scope / 2); // mid-point of the right side of the current
+
+                distance_to_previous_column = new_column - current_column; // new - current since new will be greater
+                distance_to_bound = (limit - 1) - new_column; // distance to right side of TrackSimplified array
+            }
+            else if (result == DURATION_RESULT.TOO_LONG) {
+                new_column = (current_column - 1) - (current_scope / 2); // mid-point of the left side of the current
+
+                distance_to_previous_column = current_column - new_column; // current - new since current is greater
+                distance_to_bound = new_column; // distance from 0
+            }
+            else { // In this case the column is either an acceptable length or 30 seconds off from the target
+                break;
+            }
+
+            current_column = new_column; // update the current column
+            current_scope /= 2; // halve the current scope as our search area halves
+        }
+        // In the cases that we left the while loop due to being within 30 seconds of the allowable duration, or we
+        // got too close to the bounds of the track arrays we are going to search adjacent columns for best fit
+
+        if(result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT){
+            return checkForLongerColumn(intervals, current_column);
+        }
+        else if(result == DURATION_RESULT.TOO_LONG || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG){
+            return checkForShorterColumn(intervals, current_column);
+        } else if (result == DURATION_RESULT.ACCEPTABLE) {
+            return current_column;
+        }
+        else {
+            return -1;
+        }
+    }
+
+    /**
+     * Checks columns to the right of the given column in the TrackSimplified arrays in the intervals map for better
+     * fitting columns
+     * @param intervals map to search the TrackSimplified arrays of
+     * @param column column to start from
+     * @return best fitting column
+     */
+    private int checkForLongerColumn(HashMap<Integer, TrackSimplified[]> intervals, int column){
+
+        TrackSimplified[] next_column_tracks;
+        DURATION_RESULT result;
+
+        do{
+
+            // if the next column is out of bounds return the current column
+            if(column + 1 >= limit) return column;
+
+            next_column_tracks = getTracksInColumn(intervals, column + 1);
+
+            result = checkDuration(next_column_tracks);
+
+            // if the next column is a good fit, return it
+            if(result == DURATION_RESULT.ACCEPTABLE) return column + 1;
+
+            // if the result of the next column is now too long the current column is the most ideal
+            if(result == DURATION_RESULT.TOO_LONG || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG){
+                return column;
+            }
+            else {
+                column++; // if the next column is not too long keep searching
+            }
+
+        }while(true);
+    }
+
+    /**
+     * Checks columns to the left of the given column in the TrackSimplified arrays in the intervals map for better
+     * fitting columns
+     * @param intervals map to search the TrackSimplified arrays of
+     * @param column column to start from
+     * @return best fitting column
+     */
+    private int checkForShorterColumn(HashMap<Integer, TrackSimplified[]> intervals, int column){
+
+        TrackSimplified[] next_column_tracks;
+        DURATION_RESULT result;
+
+        do{
+
+            // if the next column is out of bounds return the current column
+            if(column - 1 < 0) return column;
+
+            next_column_tracks = getTracksInColumn(intervals, column - 1);
+
+            result = checkDuration(next_column_tracks);
+
+            // if the next column is a good fit, return it
+            if(result == DURATION_RESULT.ACCEPTABLE) return column + 1;
+
+            // if the result of the next column is now too short the current column is the most ideal
+            if(result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT){
+                return column;
+            }
+            else {
+                column--; // if the next column is not too long keep searching
+            }
+
+        }while(true);
+    }
+
+    /**
+     * Gets each track in the specified column from each interval in the provided intervals argument
+     *
+     * @param intervals hashmap containing all the intervals and their tracks
+     * @param column    desired column to fetch a track from each interval
+     * @return TrackSimplified array of the songs from the requested column in each interval
+     */
+    private TrackSimplified[] getTracksInColumn(HashMap<Integer, TrackSimplified[]> intervals, int column) {
+
+        TrackSimplified[] return_tracks = new TrackSimplified[num_intervals];
+
+        TrackSimplified[] current_interval_tracks;
+
+        for (int interval = 0; interval < num_intervals; interval++) {
+            current_interval_tracks = intervals.get(interval);
+
+            return_tracks[interval] = current_interval_tracks[column];
+        }
+
+        return return_tracks;
+    }
+
+    /**
      * Gets the tracks for the warmup sequence of the workout
      *
      * @return String Array of track ids for the warmup sequence
@@ -209,20 +440,9 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private String[] getWarmupTracks() throws Exception {
 
-        HashMap<Integer, TrackSimplified[]> sorted_intervals;
+        HashMap<Integer, TrackSimplified[]> sorted_intervals = new HashMap<>();
 
-        boolean ordering_not_found = true; // flag for while loop
-        String[] warmup_track_ids = new String[num_intervals];
-
-        do{
-            sorted_intervals = getSortedIntervals(true);
-
-
-
-        }while(ordering_not_found); // if a good ordering was not found we will retry
-
-        return warmup_track_ids;
-
+        return findOrdering(sorted_intervals, true);
     }
 
     /**
@@ -233,12 +453,9 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private String[] getWindDownTracks() throws Exception {
 
-        HashMap<Integer, TrackSimplified[]> sorted_intervals = getSortedIntervals(false);
+        HashMap<Integer, TrackSimplified[]> sorted_intervals = new HashMap<>();
 
-        String[] wind_down_track_ids = new String[num_intervals];
-
-        return wind_down_track_ids;
-
+        return findOrdering(sorted_intervals, false);
     }
 
     /**
@@ -254,9 +471,6 @@ public class GenerateClassic extends GeneratePlaylist {
         String seed_tracks = getSeedTracks();
 
         HashMap<Integer, TrackSimplified[]> intervals = new HashMap<>();
-
-        //TODO: Play around with limit and see how few songs we can fetch while still getting good results
-        int limit = 10; // Number of tracks we want to get
 
         float query_bpm = initializeQueryBPM(is_warmup); // will be updated in for-loop
 
@@ -296,7 +510,7 @@ public class GenerateClassic extends GeneratePlaylist {
      * Updates the query bpm based on the isWarmup boolean
      *
      * @param query_bpm the bpm to be updated and returned
-     * @param is_warmup  if true query bpm will be increased otherwise decreased
+     * @param is_warmup if true query bpm will be increased otherwise decreased
      * @return updated query bpm
      */
     private float updateQueryBPM(float query_bpm, boolean is_warmup) {
@@ -325,10 +539,9 @@ public class GenerateClassic extends GeneratePlaylist {
      * Loops through all the given tracks and stores their IDs in a string array which is then returned
      *
      * @param tracks array of tracks to fetch the id from
-     * @param limit  number of tracks in the array
      * @return String array of all the given track's ids
      */
-    private String[] getTrackIDs(TrackSimplified[] tracks, int limit) {
+    private String[] getTrackIDs(TrackSimplified[] tracks) {
 
         String[] ids = new String[limit];
 
