@@ -9,6 +9,7 @@ import {Question_Role} from "../accessibility/Aria";
 interface choice {
     text: string;
     val: string;
+    key: number;
 }
 
 /**
@@ -56,9 +57,9 @@ export default function GenreComponent(props: questionProps) {
 
     // Return question-item
     return (
-        <div className="question-item">
+        <div className="questionItem">
             <div className="question" aria-label={props.question} role={Question_Role}>{props.question}</div>
-            <div className="genre-list">{choices}</div>
+            <div className="genreList">{choices}</div>
         </div>
     );
 }

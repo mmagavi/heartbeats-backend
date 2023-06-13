@@ -18,18 +18,18 @@ export function NavComponent(props: NavComponentProps) {
     // if user is logged in
     if (props.loggedIn) {
         return (
-            <div className="nav-container">
-                <Link className="nav-link" to="music">find music</Link>
-                <Link className="nav-link" to="about">about</Link>
-                <Link className="nav-link" to="logout">logout</Link>
+            <div className="navContainer">
+                <Link className="navLink" to="music">find music</Link>
+                <Link className="navLink" to="about">about</Link>
+                <Link className="navLink" to="logout">logout</Link>
             </div>
         )
     } else {
         // if user is not logged in
         return (
-            <div className="nav-container">
-                <Link className="nav-link" to="about">about</Link>
-                <Link className="nav-link" to="login">login</Link>
+            <div className="navContainer">
+                <Link className="navLink" to="about">about</Link>
+                <Link className="navLink" to="login">login</Link>
             </div>
         )
     }

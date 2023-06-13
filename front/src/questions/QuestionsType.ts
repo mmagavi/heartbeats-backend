@@ -6,10 +6,12 @@ type radioQuestion = {
     text: string;
     img: string;
     val: string;
+    key: number;
   }[];
 };
 
 type sliderQuestion = {
   question: string;
   id: number;
+  key: number;
 };

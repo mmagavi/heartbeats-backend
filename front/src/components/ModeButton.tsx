@@ -64,19 +64,19 @@ export default function ModeButton(props: modeProps) {
     }
 
     // get img src
-    let imgsrc = standardMode;
+    let img_src = standardMode;
     if (props.img == "standardIntervalMode") {
-        imgsrc = standardIntervalMode;
+        img_src = standardIntervalMode;
     } else if (props.img == "pyramidIntervalMode") {
-        imgsrc = pyramidIntervalMode;
+        img_src = pyramidIntervalMode;
     } else if (props.img == "windDownMode") {
-        imgsrc = windDownMode;
+        img_src = windDownMode;
     }
 
     // return button
     return (
-        <div className="mode-choice" style={styleCSS}>
-            <label key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
+        <div className="modeChoice" style={styleCSS}>
+            <label className="modeChoiceBox" key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
                 <input
                     type="radio"
                     value={props.val}
@@ -84,7 +84,7 @@ export default function ModeButton(props: modeProps) {
                     onChange={onChangeHelper}
                     name={"" + props.id}
                 />
-                <img src={imgsrc} />
+                <img src={img_src}  alt={props.text}/>
                 <div className="questionText"><p>{props.text}</p></div>
             </label>
         </div>

@@ -32,7 +32,7 @@ function App(this: any) {
                     <Navbar.Brand>
                         <Header />
                     </Navbar.Brand>
-                    <div className="nav-container">
+                    <div className="navContainer">
                         <NavComponent loggedIn={loggedIn}/>
                     </div>
                 </Navbar>

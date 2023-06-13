@@ -3,7 +3,6 @@ import { useState } from "react";
 import QuestionsPage from "./QuestionsPage";
 import ResultPage from "./ResultPage";
 import { ExerciseQuestions } from "../questions/ExerciseQuestions";
-import { RelaxQuestions } from "../questions/RelaxQuestions";
 import { questionsType } from "../questions/QuestionsType";
 import {SubmitButton} from "../components/SubmitButton";
 import ModeQuestionComponent from "../components/ModeQuestionComponent";
@@ -49,6 +48,10 @@ export default function HomePage(props: homePageProps) {
     let raw_args = window.location.search;
     let params = new URLSearchParams(raw_args);
     if (typeof(params.get("code")) != null ) {
+
+      // TODO:
+      // causing an error message: react-dom.development.js:86 Warning:
+      // Cannot update a component (`App`) while rendering a different component (`HomePage`).
       props.setUserCode(String(params.get("code")));
       props.setLoggedIn(true);
 
@@ -69,12 +72,10 @@ export default function HomePage(props: homePageProps) {
   // back button
   const backButton = (
       <button className="backButton" role="backButton" onClick={(_) => setPlaylistType("")}>
-        ️ ⬅️ &nbsp; Back
+        ️ ← &nbsp; Back
       </button>
   );
 
-  // submit button
-  // TODO: replace with a SubmitButton component
   function getSubmitButton(clear: () => void) {
     if (props.playlist == "") {
       return null;
@@ -99,33 +100,36 @@ export default function HomePage(props: homePageProps) {
   const playlistChoices: { [key: string]: questionsType[] } = {
     // each question set page needs a way to change the playlist code
     exercise: ExerciseQuestions,
-    relax: RelaxQuestions,
   };
 
   const playlistQuestion = {
     question:
-        "Please choose a mode:",
+        "Please select a playlist mode:",
     id: 1,
     choices: [
       {
         text: "Standard",
         img: "standardMode",
         val: "standard",
+        key: 200,
       },
       {
         text: "Wind-Down",
         img: "windDownMode",
         val: "windDown",
+        key: 201,
       },
       {
         text: "Standard Interval",
         img: "standardIntervalMode",
         val: "standardInterval",
+        key: 202,
       },
       {
         text: "Pyramid Interval",
         img: "pyramidIntervalMode",
         val: "pyramidInterval",
+        key: 203,
       },
     ],
     setChoice: (_: number, s: string) => {
