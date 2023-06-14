@@ -310,7 +310,7 @@ public class GenerateClassic extends GeneratePlaylist {
             track_matrix[row][1] = adjacent_tracks[row];
         }
 
-        tracks = tryTrackCombinations(track_matrix, 0);
+        tracks = tryTrackCombinations(track_matrix, new TrackSimplified[num_intervals], 0);
 
         return getTrackIDs(tracks);
     }
@@ -343,7 +343,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             track_combo = tryTrackCombinations(matrix, tracks, row + 1);
 
-            // if the track_combo is null it means the final track array was not acceptable 
+            // if the track_combo is null it means the final track array was not acceptable
             if (track_combo != null) {
                 return track_combo;
             }
