@@ -54,13 +54,13 @@ export default function ResultPage(props: ResultPageProps) {
   );
 
   return (
-    <div className="mainBody" aria-label={ResultPage_AriaLabel}>
+    <div className="resultsMainBody" aria-label={ResultPage_AriaLabel}>
       <script src={scriptSrc} async/>{" "}
       {/* ^^^ needed for iframe to run*/}
       {iframe}
       {/* Description */}
       <div className="iframeResult" role="playlist">
-        <h1> Share your heartBeat!</h1>
+        <div className="iframeTitle"> Share your heartBeat!</div>
         <p>Our playlist, curated for you with heart</p>
         <p>
           {/* share button */}

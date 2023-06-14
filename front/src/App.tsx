@@ -9,10 +9,8 @@ import {LogoutPage} from "./pages/LogoutPage";
 import {NavComponent} from "./components/NavComponent";
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {Routes} from "react-router";
-import {checkResponse, makeRequest} from "./requests";
-import {redirect} from "react-router";
 
-// hostname of our server!q
+// hostname of our server!
 export const server = "http://localhost:3232/";
 
 /**
