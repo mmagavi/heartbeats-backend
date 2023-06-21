@@ -75,14 +75,15 @@ export default function ModeButton(props: modeProps) {
 
     // return button
     return (
-        <div className="modeChoice" style={styleCSS}>
-            <label className="modeChoiceBox" key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
+        <div className="modeChoice" style={styleCSS} tabIndex={0}>
+            <label className="modeChoiceBox" key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role} >
                 <input
                     type="radio"
                     value={props.val}
                     checked={checked}
                     onChange={onChangeHelper}
                     name={"" + props.id}
+
                 />
                 <img src={img_src}  alt={props.text}/>
                 <div className="questionText"><p>{props.text}</p></div>

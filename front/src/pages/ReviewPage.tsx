@@ -14,6 +14,7 @@ interface ReviewPageProps {
 }
 
 /**
+ * OBSOLETE CURRENTLY.
  * ReviewPage component. Describes the web app briefly
  * @constructor
  */

@@ -67,23 +67,6 @@ function SubmitButton(props: SubmitButtonProps) {
             et = "working_out";
         }
 
-        // let desired_warmup = "";
-        // let desired_cool_down = "";
-
-        // if(props.playlist_type === "relax"){
-        //    et = "winding_down";
-        //    // adding these two as we must pass them to the backend but dont ask these questions in a relax playlist
-        //    // props.desired_warmup = "start_with_warmup";
-        //    // props.desired_cool_down = "start_with_warmup";
-
-        //     // sorry i messed with this but can't change the vals this way
-        //     desired_warmup = "start_with_warmup";
-        //     desired_cool_down = "start_with_warmup";
-        // } else {
-        //     desired_warmup = props.desired_warmup.toString();
-        //     desired_cool_down = props.desired_cool_down.toString();
-        // }
-
         let playlist_request: string ="generate-playlist?access_token=" + access_token
         + "&refresh_token=" + refresh_token
         + "&playlist_type=classic"
@@ -110,7 +93,7 @@ function SubmitButton(props: SubmitButtonProps) {
 
     // return component!
     return (
-        <button className="submitButton" role={SubmitButton_Role} aria-label={SubmitButton_AriaLabel} tabIndex={0} onClick={logInfo}>
+        <button className="formSubmitButton" role={SubmitButton_Role} aria-label={SubmitButton_AriaLabel} tabIndex={0} onClick={logInfo}>
             Submit
         </button>
     )

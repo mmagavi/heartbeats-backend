@@ -42,15 +42,20 @@ export default function ResultPage(props: ResultPageProps) {
   const iframe = (
     <div className="iframeResult">
       {/* taken from Spotify Dev front page */}
+    {/*  <iframe*/}
+    {/*title="Your HeartBeats Result Playlist"*/}
+    {/*src={embedLink}*/}
+    {/*width={"100%"}*/}
+    {/*height={"100%"}*/}
+    {/*// allowTransparency={true}*/}
+    {/*allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"*/}
+    {/*loading="lazy"*/}
+    {/*/>*/}
       <iframe
-    title="Your HeartBeats Result Playlist"
-    src={embedLink}
-    width={"100%"}
-    height={"100%"}
-    // allowTransparency={true}
+    src="https://open.spotify.com/embed/playlist/5CMBrLem4qr8xGGlsmK4vT?utm_source=generator&theme=0"
+    width="100%" height="100%" frameBorder="0"
     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    loading="lazy"
-    />
+    loading="lazy"/>
     </div>
   );
 
@@ -60,13 +65,13 @@ export default function ResultPage(props: ResultPageProps) {
       {/* ^^^ needed for iframe to run*/}
       {iframe}
       {/* Description */}
-      <div className="iframeResult" role="playlist">
+      <div className="iframeResTxt" role="playlist">
         <div className="iframeTitle"> Share your heartBeat!</div>
         <p>Our playlist, curated for you with heart</p>
         <p>
           {/* share button */}
           <button
-            className="refreshButton"
+            className="resultPageButton"
             role="button"
             onClick={(_) => copyLink(playlistLink)}
           >
@@ -74,20 +79,20 @@ export default function ResultPage(props: ResultPageProps) {
           </button>
           {/* open in spotify button */}
           <a href={playlistLink} target="_blank">
-            <button className="refreshButton" role="button">
+            <button className="resultPageButton" role="button">
               🎧 Open in Spotify
             </button>
           </a>
           <button
-            className="refreshButton"
+            className="resultPageButton"
             role="button"
             onClick={(_) => props.reset()}
           >
             💓 Get a New Beat!
           </button>
-          <ReviewButton />
-
           {/* refresh quiz button */}
+          <ReviewButton />
+          {/*Review button - redirects to email*/}
         </p>
       </div>
     </div>

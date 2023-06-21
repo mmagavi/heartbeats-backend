@@ -58,7 +58,7 @@ export default function GenreComponent(props: questionProps) {
     // Return question-item
     return (
         <div className="questionItem">
-            <div className="question" aria-label={props.question} role={Question_Role}>{props.question}</div>
+            <div className="question" aria-label={props.question} role={Question_Role} tabIndex={0}>{props.question}</div>
             <div className="genreList">{choices}</div>
         </div>
     );

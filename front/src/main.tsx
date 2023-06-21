@@ -14,16 +14,18 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
 /**
  *
- * FRONT END TODOS:
+ * TODO:
  *
+ * Console log errors:
  * Fix cannot render App while updating another component error
  * Fix all questions must have unique IDs error
  *
- * Pass all the variables into review button so we get a comprehensive data set
- * Popup when user clicks on playlist to show them the playlist
- * Popup when user selects too many genres
+ * Email feedback:
+ * Pass more variables into review button?
+ * Add more info to email header
  *
+ * Accessibility:
  * Aria-labels, tab indexes, accessibility
  *
- * Testing ....
+ * Testing?
  */

@@ -35,11 +35,12 @@ export default function GenreButton(props: genreProps) {
         paddingLeft: checked ? "1.2vw" : undefined,
         paddingRight: checked ? "1.2vw" : undefined,
         borderRadius: checked ? "5vw" : "3vw",
+        transition: "all 0.3s ease-in-out",
     };
 
     // return button
     return (
-        <div className="genreChoice">
+        <div className="genreChoice" tabIndex={0}>
             <label key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
                 <input
                     type="checkbox"

@@ -9,8 +9,7 @@ function Header() {
   // return our component!
   return <div role={Header_Role}
           className="title" 
-          aria-label={Header_AriaLabel}
-          tabIndex={0}>
+          aria-label={Header_AriaLabel}>
       💌 &nbsp;heartBeats
          </div>;
 }

@@ -1,27 +1,27 @@
 import { SubmitButton_AriaLabel, SubmitButton_Role } from "../accessibility/Aria";
 
+/**
+ * Review button props
+ */
 interface ReviewButtonProps {
+    //TODO: playlist type? More data to add to subject line?
 }
 
 /**
- * Review button component. Redirects to the review page.
+ * Review button component. Opens up an email window so users can send us feedback
  * @param props user data to store
  * @constructor
  */
 function ReviewButton(props : ReviewButtonProps) {
+    // TODO: add more data to subject line
 
-    // redirect to review page
-    async function redirect() {
-        //TODO: store user data
-        //in href?
-        window.location.href = "http://localhost:5173/review";
-    }
-
-    // return component!
+    // return button!!
     return (
-        <button className="refreshButton" role={SubmitButton_Role} aria-label={SubmitButton_AriaLabel} tabIndex={0} onClick={redirect}>
-            Leave a review!
+        <a href="mailto:heartbeats.feedback@gmail.com?subject=Feedback on my HeartBeats Playlist">
+        <button className="resultPageButton" role={SubmitButton_Role} aria-label={SubmitButton_AriaLabel} tabIndex={0}>
+            ✉️ Send us feedback :)
         </button>
+        </a>
     )
 }
 
