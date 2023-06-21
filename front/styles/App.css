@@ -53,6 +53,9 @@ td {
 .navLink {
   color: white;
   margin: 4vh 1vw;
+  border-bottom-width: thick;
+  border-bottom-style: solid;
+  border-bottom-color: transparent;
 }
 .navLink:hover {
   color: white;
@@ -64,7 +67,7 @@ td {
 .navElem {
   color: white;
   width: fit-content;
-  margin: 2.9vh 0vw;
+  margin: 2.9vh 0;
 }
 
 .navElem:hover {
@@ -78,12 +81,32 @@ td {
   border: none;
   margin-bottom: 10vh;
   font-size: 20px;
-  font-family: Avenir;
+  font-family: Avenir, serif;
   background-color: transparent;
   padding: 1vh;
 }
 .backButton:hover {
   background-color: rgba(147, 147, 147, 0.2);
+  padding:2vh;
+  border-radius: 30px;
+  transition: 1s;
+}
+
+.formSubmitButton {
+  border-radius: 1vw;
+  color: white;
+  border: none;
+  margin-bottom: 20vh;
+  font-size: 20px;
+  font-family: Avenir, serif;
+  background-color: transparent;
+  padding: 1vh;
+}
+.formSubmitButton:hover {
+  background-color: rgba(147, 147, 147, 0.2);
+  padding:2vh;
+  border-radius: 30px;
+  transition: 1s;
 }
 
 .mainBody {
@@ -106,12 +129,23 @@ td {
 }
 .aboutBody {
   animation: fadeIn 2s;
-  font-family: Avenir;
+  font-family: Avenir, serif;
   padding: 12vh 18vw;
   font-size: 18px;
   color: white;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reviewBody {
+  animation: fadeIn 2s;
+  padding: 12vh 18vw;
+  font-size: 18px;
+  color: white;
+  display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -126,13 +160,18 @@ td {
 }
 
 .iframeResult {
-  width: 30%;
+  width: 40%;
+  margin: 0 2% 0 10vw;
+  height: 420px;
+}
+.iframeResTxt {
+  width: 35%;
   margin: 0 2%;
   height: 420px;
-  /* border-radius: 12px; */
 }
+
 .iframeTitle {
-  padding-top: 8vh;
+  padding-top: 4vh;
   padding-bottom: 1vh;
   font-size: 55px;
   font-weight: bold;
@@ -159,7 +198,7 @@ iframe {
 
 .slider {
   margin-bottom: 15vh;
-  margin-top: 5vh;
+  margin-top: 8vh;
   width: 300px;
   padding-right: 13vw;
   padding-left: 13vw;
@@ -181,7 +220,7 @@ iframe {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  padding-top: 15vh;
+  padding-top: 12vh;
   align-items: center;
 }
 
@@ -190,7 +229,7 @@ iframe {
   margin-bottom: 30px;
 }
 .subtext {
-  font-family: Avenir;
+  font-family: Avenir, serif;
   padding-top: 3vh;
   padding-right: 35vw;
   padding-left: 35vw;
@@ -212,14 +251,24 @@ iframe {
   border-radius: 10px;
   margin-bottom: 2vh;
 }
+.reviewSubmitButton {
+  height: 100%;
+  padding: 1vh;
+  border-radius: 10px;
+  margin-bottom: 2vh;
+  max-width: 200px;
+}
 
 .submitButton {
   height: fit-content;
-  padding: 1vh;
-  border-radius: 13px;
-  margin-bottom: 10vh;
+  padding: 2vh 2vw;
+  border-radius: 25px;
+  margin-bottom: 20vh;
   font-size: 20px;
   outline-width: 0px;
+  background-color: rgba(175, 175, 175, 0.88);
+  border-color: #807c7c;
+  border-width: 0;
 }
 
 .LoginButton {
@@ -230,9 +279,6 @@ iframe {
   border-radius: 20px;
   margin-bottom: 10px;
   background-color: #ffffff;
-  /*box-shadow: lightgrey 0 -0.5vh 0 inset;*/
-  /*border-width: 0;*/
-  /*border-color: #f87a7a;*/
 }
 
 .commandsList {
@@ -253,6 +299,13 @@ button {
 }
 
 .refreshButton:hover {
+  box-shadow: #ff5757 0 -0.5vh 0 inset;
+  border-color: #ff5757;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  outline: none;
+}
+
+.reviewSubmitButton:hover {
   box-shadow: #ff5757 0 -0.5vh 0 inset;
   border-color: #ff5757;
   transition: border-color 0.25s, box-shadow 0.25s;
@@ -349,14 +402,45 @@ input:focus-visible:hover,
   background: transparent;
 }
 
+
+.rating{
+  display : flex;
+  color: red;
+}
+
+.rating input{
+  position : absolute;
+  left     : -100vw;
+}
+
+.rating label{
+  width      : 48px;
+  height     : 48px;
+  padding    : 25px 0 0;
+  overflow   : hidden;
+}
+.rating:not(:hover) input:indeterminate + label,
+.rating:not(:hover) input:checked ~ input + label,
+.rating input:hover ~ input + label{
+  color: white;
+}
+.rating:not(:hover) input:focus-visible + label{
+}
+
+.resultPageButton {
+  height: 100%;
+  padding: 1.4vh;
+  border-radius: 13px;
+  background-color: #625f5f;
+  border-color: #807c7c;
+  border-width: 0;
+  margin: 2px;
+}
+.resultPageButton:link {
+  color: black;
+}
+
 @media only screen and (max-width: 600px) {
-  /*body {*/
-  /*  background-image: radial-gradient(*/
-  /*          at bottom left,*/
-  /*          rgb(143, 10, 10) 0%,*/
-  /*          rgb(255, 87, 87) 100%*/
-  /*  );*/
-  /*}*/
 
   .sliderUIDiv {
     display: flex;
@@ -367,7 +451,7 @@ input:focus-visible:hover,
 
   .slider {
     margin-bottom: 15vh;
-    margin-top: 5vh;
+    margin-top: 8vh;
     width: 60vw;
   }
   .resultsMainBody {
@@ -378,18 +462,27 @@ input:focus-visible:hover,
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    padding-top: 5vh;
+    padding-top: 0vh;
   }
   .iframeResult {
+    margin: 0 2%;
     width: 80%;
-    height: 350px;
-    /* border-radius: 12px; */
+    height: 370px;
     max-font-size: 10px;
     text-align: center;
+    padding-top: 4vh;
+  }
+  .iframeResTxt {
+    margin: 0 2%;
+    width: 80%;
+    height: 370px;
+    max-font-size: 10px;
+    text-align: center;
+    padding-top: 4vh;
   }
   .aboutBody {
     animation: fadeIn 2s;
-    font-family: Avenir;
+    font-family: Avenir, serif;
     padding: 5vh 14vw;
     font-size: 15px;
     color: white;
@@ -420,7 +513,6 @@ input:focus-visible:hover,
   }
   .title {
     width: fit-content;
-    /*margin: auto;*/
     font-size: min(10vh, 30px);
     outline: none;
     border-color: #323232;
@@ -428,19 +520,8 @@ input:focus-visible:hover,
   }
   .iframeTitle {
     font-size: 30px;
-    padding-top: 4vh;
+    padding-top: 1vh;
     padding-bottom: 1vh;
-  }
-
-  .navContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: right;
-  }
-  .navLink {
-    color: white;
-    margin: 2vh 1vw;
-    font-size: 15px;
   }
   .header {
     font-size: 18px;
@@ -455,5 +536,28 @@ input:focus-visible:hover,
     flex-wrap: wrap;
     justify-content: left;
     align-items: flex-start;
+  }
+
+  .reviewBody {
+    animation: fadeIn 2s;
+    padding: 4vh 18vw;
+    font-size: 18px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .formSubmitButton {
+    border-radius: 1vw;
+    color: white;
+    border: none;
+    margin-bottom: 20vh;
+    margin-top: 10vh;
+    font-size: 20px;
+    font-family: Avenir, serif;
+    background-color: transparent;
+    padding: 1vh;
   }
 }

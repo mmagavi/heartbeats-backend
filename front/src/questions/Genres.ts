@@ -1,7 +1,7 @@
 export let Genres: { question: string; id: number; choices: ({ val: string; text: string; key: number } | { val: string; text: string; key: number } | { val: string; text: string; key: number } | { val: string; text: string; key: number })[] };
 Genres = {
     question:
-        "Please select 0 to 3 genres",
+        "Select 0 to 3 genres:",
     id: 3,
     choices: [
         {text: "afrobeat", val: "afrobeat", key: 0},

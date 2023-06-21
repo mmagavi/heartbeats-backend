@@ -69,7 +69,11 @@ export default function QuestionsPage(props: QuestionsPageProps) {
         props.setGenres(e => e.replace(genre + ",", ""));
       }
       else {
-        if (chooseThree()) return;
+        if (chooseThree()) {
+          //popup error message
+          window.alert("Cannot select more than 3 genres! Sorry :(");
+          return;
+        }
         setChosenGenre({...chosenGenre, [genre] : !chosenGenre[genre]});
         props.setGenres(e => e.concat(genre).concat(","));
       }

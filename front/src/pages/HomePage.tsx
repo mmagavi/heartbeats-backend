@@ -71,7 +71,7 @@ export default function HomePage(props: homePageProps) {
 
   // back button
   const backButton = (
-      <button className="backButton" role="backButton" onClick={(_) => setPlaylistType("")}>
+      <button className="backButton" role="backButton" tabIndex={0} onClick={(_) => setPlaylistType("")}>
         ️ ← &nbsp; Back
       </button>
   );
@@ -104,7 +104,7 @@ export default function HomePage(props: homePageProps) {
 
   const playlistQuestion = {
     question:
-        "Please select a playlist mode:",
+        "Select a playlist mode:",
     id: 1,
     choices: [
       {

@@ -83,7 +83,7 @@ export default function QuestionComponent(props: questionProps) {
 
   return (
     <div className="questionItem">
-      <div className="question" role={Question_Role} aria-label={props.question}>{props.question}</div>
+      <div className="question" role={Question_Role} aria-label={props.question} tabIndex={0}>{props.question}</div>
       <div className="choicesList">{choices}</div>
     </div>
   );

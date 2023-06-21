@@ -1,7 +1,7 @@
 export const ExerciseQuestions = [
   {
     // a slider question should look like this
-    question: "Select your difficulty:",
+    question: "Select your desired difficulty:",
     id: 1,
     choices: [
       {
@@ -26,7 +26,7 @@ export const ExerciseQuestions = [
   },
   {
     // a slider question should look like this
-    question: "What is your age?",
+    question: "Select your age:",
     id: 2,
     key: 103,
   },

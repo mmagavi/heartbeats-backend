@@ -9,6 +9,7 @@ import {LogoutPage} from "./pages/LogoutPage";
 import {NavComponent} from "./components/NavComponent";
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {Routes} from "react-router";
+import {ReviewPage} from "./pages/ReviewPage";
 
 // hostname of our server!
 export const server = "http://localhost:3232/";
@@ -62,6 +63,10 @@ function App(this: any) {
                         loggedIn={loggedIn}
                         setLoggedIn={setLoggedIn}
                         />}/>
+                    <Route path="review" element={<ReviewPage
+                        loggedIn={loggedIn}
+                        setLoggedIn={setLoggedIn}
+                    />}/>
                 </Routes>
             </Router>
         </div>

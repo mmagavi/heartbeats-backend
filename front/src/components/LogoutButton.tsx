@@ -21,7 +21,7 @@ function LogoutButton(props: LogoutStatusProps) {
     function logout() {
         props.setLI(false);
         props.setCode("");
-        window.location.href = "http://localhost:5173/#/login";
+        window.location.href = "http://localhost:5173/login";
     }
 
     // return component!

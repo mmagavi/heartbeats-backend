@@ -11,6 +11,7 @@ export const ResultPage_AriaLabel = "Result page";
 export const MusicNav_AriaLabel = "Navigate to music page"
 export const AboutNav_AriaLabel = "Navigate to about page"
 export const LogoutNav_AriaLabel = "Navigate to logout page"
+export const InputBox_AriaLabel = "Input box"
 
 // list of role strings for accessibility and testing!
 export const Question_Role = "Question";

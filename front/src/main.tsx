@@ -11,3 +11,21 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>
 );
+
+/**
+ *
+ * TODO:
+ *
+ * Console log errors:
+ * Fix cannot render App while updating another component error
+ * Fix all questions must have unique IDs error
+ *
+ * Email feedback:
+ * Pass more variables into review button?
+ * Add more info to email header
+ *
+ * Accessibility:
+ * Aria-labels, tab indexes, accessibility
+ *
+ * Testing?
+ */

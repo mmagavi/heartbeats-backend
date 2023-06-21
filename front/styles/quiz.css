@@ -5,8 +5,16 @@
   overflow-y: auto;
 }
 
+a {
+  color: black;
+}
+a:hover {
+  color: black;
+}
+
 .question {
-  font-size: 28px;
+  font-size: 26px;
+  /*font-family: Avenir, serif;*/
 }
 .questionText {
   color:white;
@@ -25,6 +33,7 @@
   margin-bottom: 0.5vh;
   vertical-align: middle;
 }
+
 .genreQuestionText:hover {
   font-weight: bold;
   background-color: rgba(98, 95, 95, 0.88);
@@ -51,7 +60,6 @@ img{
   overflow-y: hidden;
   flex-direction: row;
   justify-content: center;
-  /*padding: 8vh 10vw 20vw;*/
   padding-top: 8vh;
   padding-bottom: 20vh;
 }
@@ -68,15 +76,16 @@ img{
 
 .SliderContainer {
   margin-bottom: 15vh;
+  color: white;
 }
 
 label {
   display: block;
   text-align: center;
   font-size: 40px;
-  /*width: 100%;*/
-  /*height: 100%;*/
-  padding: 0px 0 0;
+  padding: 0 0 0;
+  width: max-content;
+  height: max-content;
 }
 
 .choice {
@@ -95,7 +104,6 @@ label {
   text-decoration: none;
   text-transform: uppercase;
 
-  /*width: 100%;*/
   margin: 5vh 0.5vw 15vh;
   padding: 5vh 3vw 0;
   background-position: center;
@@ -107,13 +115,12 @@ label {
   background-color: rgba(147, 147, 147, 0.2);
 }
 .choice:hover {
-  /*letter-spacing: 5px;*/
   background-color: rgba(147, 147, 147, 0.6);
 }
 .choice:after,
 .choice:before {
   backface-visibility: hidden;
-  bottom: 0px;
+  bottom: 0;
   content: " ";
   display: block;
   margin: 0 auto;
@@ -140,7 +147,6 @@ label {
   transition-duration: 1s;
   transition-timing-function: ease;
 
-  /*color: #fff;*/
   cursor: pointer;
   display: block;
   font-size: 16px;
@@ -150,7 +156,6 @@ label {
   text-decoration: none;
   text-transform: uppercase;
 
-  /*width: 100%;*/
   width: fit-content;
   min-width: 240px;
   max-width: 400px;
@@ -162,7 +167,6 @@ label {
   background-repeat: no-repeat;
   border-color: rgba(0, 0, 0, 0);
 
-  /*outline: rgb(255, 255, 255) solid 0.5px;*/
   border-radius: 1vw;
   background-color: rgba(147, 147, 147, 0.2);
 }
@@ -194,7 +198,6 @@ label {
 }
 
 .genreChoice {
-  /*box-sizing: inherit;*/
   transition-property: all;
   transition-duration: 1s;
   transition-timing-function: ease;
@@ -216,6 +219,18 @@ input {
   opacity: 0;
   visibility: hidden;
   position: absolute;
+}
+.inputDiv {
+  opacity:1;
+  visibility: visible;
+  max-width: 60vw;
+  min-width: 60vw;
+  max-height: 18vh;
+  min-height: 3vh;
+  border-radius: 15px;
+  font-size: 16px;
+  position: relative;
+  text-after-overflow: new-row;
 }
 
 @media only screen and (max-width: 600px) {
