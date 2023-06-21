@@ -1,4 +1,5 @@
 import {ResultPage_AriaLabel} from "../accessibility/Aria";
+import {ReviewButton} from "../components/ReviewButton";
 
 /**
  * Props for the result page
@@ -84,6 +85,7 @@ export default function ResultPage(props: ResultPageProps) {
           >
             💓 Get a New Beat!
           </button>
+          <ReviewButton />
 
           {/* refresh quiz button */}
         </p>

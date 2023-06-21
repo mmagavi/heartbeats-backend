@@ -217,6 +217,18 @@ input {
   visibility: hidden;
   position: absolute;
 }
+.inputDiv {
+  opacity:1;
+  visibility: visible;
+  max-width: 60vw;
+  min-width: 60vw;
+  max-height: 18vh;
+  min-height: 3vh;
+  border-radius: 15px;
+  font-size: 16px;
+  position: relative;
+  text-after-overflow: new-row;
+}
 
 @media only screen and (max-width: 600px) {
   .modeChoice {

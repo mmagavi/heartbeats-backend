@@ -11,3 +11,19 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>
 );
+
+/**
+ *
+ * FRONT END TODOS:
+ *
+ * Fix cannot render App while updating another component error
+ * Fix all questions must have unique IDs error
+ *
+ * Pass all the variables into review button so we get a comprehensive data set
+ * Popup when user clicks on playlist to show them the playlist
+ * Popup when user selects too many genres
+ *
+ * Aria-labels, tab indexes, accessibility
+ *
+ * Testing ....
+ */
