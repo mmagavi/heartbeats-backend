@@ -90,7 +90,7 @@ function SubmitButton(props: SubmitButtonProps) {
         + "&intensity=low"
         + "&genres=" + props.genres
         + "&age=33"
-        + "&workout_length=" + props.workout_length
+        + "&workout_length=60"
 
         const playlist_response: string | Map<string, string> =
         await checkResponse(await makeRequest(playlist_request))
