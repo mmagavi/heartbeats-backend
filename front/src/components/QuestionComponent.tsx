@@ -44,11 +44,9 @@ export default function QuestionComponent(props: questionProps) {
   // TODO: Update!!
   function setNumHelper(n : number) {
     props.setChoice(props.id, n);
-    if (props.id == 3) {
-      props.setDesiredBPM(n);
-    } else if (props.id == 4) {
+    if (props.id == 2) {
       props.setDesiredAge(n);
-    } else if (props.id == 5) {
+    } else if (props.id == 3) {
       props.setDesiredLength(n);
     }
   }

@@ -33,7 +33,10 @@ abstract public class GeneratePlaylist {
         this.workout_length_min = workout_length;
         this.workout_length_ms = workout_length * 60_000;
         this.intensity = intensity;
-        this.margin_of_error = .03f;
+        this.margin_of_error = .02f;
+
+
+
     }
 
     public abstract String generatePlaylist() throws Exception;
