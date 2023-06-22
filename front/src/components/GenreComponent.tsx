@@ -1,5 +1,5 @@
 import "../../styles/quiz.css";
-import GenreButton from "./GenreButton";
+import GenreButton from "./buttons/GenreButton";
 import {Question_Role} from "../accessibility/Aria";
 
 /**

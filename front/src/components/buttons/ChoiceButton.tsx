@@ -1,5 +1,5 @@
-import "../../styles/quiz.css";
-import {Choice_Role} from "../accessibility/Aria";
+import "../../../styles/quiz.css";
+import {Choice_Role} from "../../accessibility/Aria";
 
 /**
  * Props for ChoiceButton.

@@ -1,5 +1,5 @@
 import {AboutText_Role, AboutText_AriaLabel} from "../accessibility/Aria";
-import {ReviewSubmitButton} from "../components/ReviewSubmitButton";
+import {ReviewSubmitButton} from "../components/buttons/ReviewSubmitButton";
 import {useState} from "react";
 import {InputBox_AriaLabel} from "../accessibility/Aria";
 

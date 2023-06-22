@@ -1,4 +1,4 @@
-import { LogoutButton_AriaLabel, LogoutButton_Role } from "../accessibility/Aria";
+import { LogoutButton_AriaLabel, LogoutButton_Role } from "../../accessibility/Aria";
 
 /**
  * props for logout button - setID to set user access token and

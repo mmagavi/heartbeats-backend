@@ -1,4 +1,4 @@
-import {LoginButton} from "../components/LoginButton";
+import {LoginButton} from "../components/buttons/LoginButton";
 import React from "react";
 import {LoginPage_AriaLabel} from "../accessibility/Aria";
 

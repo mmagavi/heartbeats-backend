@@ -224,6 +224,10 @@ iframe {
   align-items: center;
 }
 
+.footer {
+  margin-bottom: 10vh;
+}
+
 .subtitle {
   font-size: 40px;
   margin-bottom: 30px;
@@ -484,7 +488,7 @@ input:focus-visible:hover,
     animation: fadeIn 2s;
     font-family: Avenir, serif;
     padding: 5vh 14vw;
-    font-size: 15px;
+    font-size: 14px;
     color: white;
     display: flex;
     flex-direction: row;
@@ -559,5 +563,13 @@ input:focus-visible:hover,
     font-family: Avenir, serif;
     background-color: transparent;
     padding: 1vh;
+  }
+  .mainBody {
+    animation: fadeIn 2s;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

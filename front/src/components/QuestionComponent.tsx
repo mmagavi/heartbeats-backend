@@ -1,5 +1,5 @@
 import "../../styles/quiz.css";
-import ChoiceButton from "./ChoiceButton";
+import ChoiceButton from "./buttons/ChoiceButton";
 import SliderUI from "./SliderUI";
 import {Question_Role} from "../accessibility/Aria";
 
@@ -41,13 +41,14 @@ export default function QuestionComponent(props: questionProps) {
     return props.getChoice(props.id, v);
   }
 
-  // TODO: Update!!
   function setNumHelper(n : number) {
     props.setChoice(props.id, n);
-    if (props.id == 2) {
-      props.setDesiredAge(n);
-    } else if (props.id == 3) {
+    if (props.id == 3) {
       props.setDesiredLength(n);
+      //console.log("set desired length to " + n);
+    } else if (props.id == 2) {
+      props.setDesiredAge(n);
+      //console.log("set desired age to " + n);
     }
   }
 

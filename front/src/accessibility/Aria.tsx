@@ -21,4 +21,4 @@ export const LoginButton_Role = "Login Button";
 export const LogoutButton_Role = "Logout Button";
 export const SubmitButton_Role = "Submit button";
 export const Slider_Role = "Slider";
-export const AboutText_Role = "About Text"
+export const AboutText_Role = "About Text";

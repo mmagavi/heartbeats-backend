@@ -1,5 +1,5 @@
-import { SubmitButton_AriaLabel, SubmitButton_Role } from "../accessibility/Aria";
-import { checkResponse, makeRequest } from "../requests";
+import { SubmitButton_AriaLabel, SubmitButton_Role } from "../../accessibility/Aria";
+import { checkResponse, makeRequest } from "../../requests";
 
 /**
  * Props for submit Button

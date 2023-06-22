@@ -1,9 +1,9 @@
-import "../../styles/quiz.css";
-import {Choice_Role} from "../accessibility/Aria";
-import standardMode from "../images/standardMode.png";
-import pyramidIntervalMode from "../images/pyramidIntervalMode.png";
-import standardIntervalMode from "../images/standardIntervalMode.png";
-import windDownMode from "../images/windDownMode.png";
+import "../../../styles/quiz.css";
+import {Choice_Role} from "../../accessibility/Aria";
+import standardMode from "../../images/standardMode.png";
+import pyramidIntervalMode from "../../images/pyramidIntervalMode.png";
+import standardIntervalMode from "../../images/standardIntervalMode.png";
+import windDownMode from "../../images/windDownMode.png";
 
 /**
  * Props for ModeButton.

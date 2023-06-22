@@ -1,4 +1,4 @@
-import { LoginButton_AriaLabel, LoginButton_Role } from "../accessibility/Aria";
+import { LoginButton_AriaLabel, LoginButton_Role } from "../../accessibility/Aria";
 
 /**
  * props for login status - setCode (set the stored id) and setLI (set logged in)
