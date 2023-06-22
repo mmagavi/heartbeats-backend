@@ -1,14 +1,16 @@
 package PlaylistGenerating.PlaylistTypes;
 
+import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import PlaylistGenerating.TargetHeartRateRange;
+import SpotifyUtilities.PlaylistUtilities;
 import SpotifyUtilities.RecommendationArguments;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static PlaylistGenerating.DesiredHeartRateRanges.getTargetHeartRateRange;
 import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
@@ -20,17 +22,26 @@ import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 public class GenerateClassic extends GeneratePlaylist {
 
-    private final float warmup_wind_down_length; // minutes
-    private String seed_artists;
+    private final float transition_length_min; // minutes
+    private final String seed_artists;
+    private final String seed_tracks;
     private final int seed_genres_provided;
     private int desired_num_seed_artists;
     private int desired_num_seed_tracks;
     private final int target_bpm;
     private final float bpm_difference;
     private int num_intervals;
-    private int warmup_wind_down_length_ms;
-    private int min_allowable_length_ms;
-    private int max_allowable_length_ms;
+    private final int transition_length_ms; // transition refers to the length of the warm-up/ wind down sequence individually
+    private final int min_transition_length_ms;
+    private final int max_transition_length_ms;
+
+    private final int target_length_ms;
+
+    private final int min_target_length_ms;
+    private final int max_target_length_ms;
+
+    // TODO: change the offset or increase the offset dynamically as recommendations reuturns too few tracks
+    private final int bpm_offset = 8; // How far from the query bpm we want song tempos in the recommendations request below
 
     HashMap<Integer, TrackSimplified[]> intervals;
 
@@ -38,9 +49,10 @@ public class GenerateClassic extends GeneratePlaylist {
     private final int limit = 21; // Number of tracks we want to get
 
     private enum DURATION_RESULT {
-        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT,
-        WITHIN_THIRTY_SECONDS_LONG
+        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
     }
+
+    //TODO: check the bpms in the created playlists to ensure they are what we want
 
     /**
      * Constructor for generating a classic style playlist
@@ -51,7 +63,8 @@ public class GenerateClassic extends GeneratePlaylist {
      * @param workout_length Length of the workout
      * @param intensity      desired intensity (low, medium, high)
      */
-    public GenerateClassic(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity) {
+    public GenerateClassic(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
+            throws Exception {
 
         super(spotify_api, genres, age, workout_length, intensity);
 
@@ -60,7 +73,7 @@ public class GenerateClassic extends GeneratePlaylist {
         target_bpm = getTargetBPM();
 
         // warmup and wind-down are the same length and are 10% of the workout each
-        warmup_wind_down_length = workout_length * .1f;
+        transition_length_min = workout_length * .1f;
 
         // Only 5 seed values across tracks, artists, and genres can be provided to the recommendations endpoint
         // so if less than the max of 3 genres the front end lets the user choose from were chosen we can provide
@@ -69,17 +82,26 @@ public class GenerateClassic extends GeneratePlaylist {
 
         determineSeedLimits();
 
+        seed_artists = getSeedArtists();
+        seed_tracks = getSeedTracks();
+
         // Number of intervals in which there is one song per interval (For warmup/wind-down only)
         // We will round up to avoid intervals needing to have exceptionally long songs
-        num_intervals = Math.round(warmup_wind_down_length / 3f);
+        num_intervals = Math.round(transition_length_min / 3f);
 
         bpm_difference = findBpmDifference();
 
-        warmup_wind_down_length_ms = (int) (warmup_wind_down_length * 60_000); // conversion
+        transition_length_ms = (int) (transition_length_min * 60_000); // conversion
 
         // MilliSeconds of length that is acceptable for the warmup / wind-down sequence based on our MOE
-        min_allowable_length_ms = warmup_wind_down_length_ms - (warmup_wind_down_length_ms * margin_of_error);
-        max_allowable_length_ms = warmup_wind_down_length_ms + (warmup_wind_down_length_ms * margin_of_error);
+        min_transition_length_ms = transition_length_ms - (int) (transition_length_ms * margin_of_error);
+        max_transition_length_ms = transition_length_ms + (int) (transition_length_ms * margin_of_error);
+
+        target_length_ms = workout_length_ms - (transition_length_ms * 2);
+
+        // MilliSeconds of length that is acceptable for the target sequence based on our MOE
+        min_target_length_ms = target_length_ms - (int) (target_length_ms * margin_of_error);
+        max_target_length_ms = target_length_ms + (int) (target_length_ms * margin_of_error);
     }
 
     /**
@@ -105,16 +127,22 @@ public class GenerateClassic extends GeneratePlaylist {
 
         User user = getCurrentUsersProfile(spotify_api);
 
+        String[] warmup_track_ids = getWarmupTracks();
+        System.out.println("warmup");
+        String[] target_track_ids = getTargetTracks();
+        System.out.println("target");
+        String[] wind_down_track_ids = getWindDownTracks();
+        System.out.println("wind-down");
+
+        String[] playlist_track_ids = concatTracks(warmup_track_ids, target_track_ids, wind_down_track_ids);
+
         // Create a playlist on the user's account
         Playlist playlist = createPlaylist(spotify_api, user.getId(), user.getDisplayName());
 
         String playlist_id = playlist.getId();
 
-        String[] warmup_track_ids = getWarmupTracks();
-        // String[] middle_portion_tracks;
-        String[] wind_down_track_ids = getWindDownTracks();
-
-        // PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, warmup_track_ids);
+        System.out.println("Creating Playlist");
+        PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, playlist_track_ids);
 
         return playlist_id;
     }
@@ -139,6 +167,120 @@ public class GenerateClassic extends GeneratePlaylist {
             }
         }
     }
+
+    /**
+     * Gets the target tracks for the target sequence
+     *
+     * @return String array of the track IDs
+     */
+    private String[] getTargetTracks() throws GetRecommendationsException {
+
+        int target_length_min = target_length_ms / 60_000;
+        // number of tracks we want in the target sequence
+        int num_tracks = Math.round(target_length_min / 3f);
+
+        do {
+
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2, target_bpm - bpm_offset,
+                    target_bpm + bpm_offset, target_bpm);
+
+            TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
+
+            if (tracks != null) return getTrackIDs(tracks);
+
+            //System.out.println("null");
+
+        } while (true);
+    }
+
+    /**
+     * Grabs the first batch of songs from the beginning of the tracks array and shifts the selected group
+     * of songs to the right until a song is found, or we reach a point where it is clear no grouping is acceptable
+     *
+     * @param tracks    TrackSimplified array to search for a good ordering of target songs
+     * @param num_songs number of songs we want to gather and check against the desired duration
+     * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
+     */
+    private TrackSimplified[] findBestTargetTracks(TrackSimplified[] tracks, int num_songs) {
+
+        Deque<TrackSimplified> deque = new ArrayDeque<>();
+        int index = 0;
+        DURATION_RESULT result;
+        TrackSimplified current_track;
+
+        // Get the first batch of songs into the deque
+        for (; index < num_songs; index++) {
+            current_track = tracks[index];
+            deque.add(current_track);
+        }
+
+        result = checkTargetDuration(deque);
+
+        if (result == DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
+        // If the shortest combination of tracks is too long there is no suitable combination so return null
+        if (result == DURATION_RESULT.TOO_LONG) return null;
+
+        for (; index < tracks.length; index++) {
+
+            current_track = tracks[index];
+
+            // This essentially shifts the group of tracks we are analyzing to the right (longer) side
+            deque.removeFirst(); // remove the shortest track
+            deque.add(current_track); // add the next track in line
+
+            result = checkTargetDuration(deque);
+
+            if(result == DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
+
+            if(result== DURATION_RESULT.TOO_LONG) return null; // If now too long there is no acceptable combination
+        }
+
+        return null;
+    }
+
+    /**
+     * Calls the recommendation endpoint and sorts the returned response
+     *
+     * @param limit number of songs to fetch
+     * @param min_tempo min tempo of songs to fetch
+     * @param max_tempo max tempo of songs to fetch
+     * @param target_tempo target tempo of songs to fetch
+     * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
+     * @throws GetRecommendationsException if an error occurs when fetching the recommendation
+     */
+    private TrackSimplified[] getSortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+            throws GetRecommendationsException {
+
+        RecommendationArguments current_arguments = new RecommendationArguments(
+                spotify_api, limit, genres, seed_artists, seed_tracks,
+                min_tempo, max_tempo, target_tempo);
+
+        Recommendations recommendations = getRecommendations(current_arguments);
+
+        TrackSimplified[] recommended_tracks = recommendations.getTracks();
+
+        Arrays.sort(recommended_tracks, duration_comparator);
+
+        return recommended_tracks;
+    }
+
+
+    /**
+     * @param arrays array arguments to concat
+     * @return String array of the concatenated arguments
+     */
+    private String[] concatTracks(String[]... arrays) {
+
+        Stream<String> stream = Stream.of();
+
+        for (String[] array : arrays) {
+            stream = Stream.concat(stream, Arrays.stream(array));
+        }
+
+        return stream.toArray(String[]::new);
+
+    }
+
 
     /**
      * Gets the users top track(s) and returns a comma seperated string of their IDS
@@ -229,7 +371,7 @@ public class GenerateClassic extends GeneratePlaylist {
      * @param tracks tracks to be checked for their duration
      * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
      */
-    private DURATION_RESULT checkDuration(TrackSimplified[] tracks) {
+    private DURATION_RESULT checkTransitionDuration(TrackSimplified[] tracks) {
         int duration_ms = 0;
 
         for (TrackSimplified track : tracks) {
@@ -238,13 +380,13 @@ public class GenerateClassic extends GeneratePlaylist {
 
         int thirty_seconds_ms = 30_000;
 
-        if (duration_ms < min_allowable_length_ms && duration_ms >= min_allowable_length_ms - thirty_seconds_ms) {
+        if (duration_ms < min_transition_length_ms && duration_ms >= min_transition_length_ms - thirty_seconds_ms) {
             return DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT;
-        } else if (duration_ms > max_allowable_length_ms && duration_ms <= max_allowable_length_ms + thirty_seconds_ms) {
+        } else if (duration_ms > max_transition_length_ms && duration_ms <= max_transition_length_ms + thirty_seconds_ms) {
             return DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG;
-        } else if (duration_ms < min_allowable_length_ms) {
+        } else if (duration_ms < min_transition_length_ms) {
             return DURATION_RESULT.TOO_SHORT;
-        } else if (duration_ms > max_allowable_length_ms) {
+        } else if (duration_ms > max_transition_length_ms) {
             return DURATION_RESULT.TOO_LONG;
         } else {
             return DURATION_RESULT.ACCEPTABLE;
@@ -252,11 +394,39 @@ public class GenerateClassic extends GeneratePlaylist {
     }
 
     /**
-     * @param is_warmup
-     * @return
-     * @throws Exception
+     * Checks if the track array provided is within the allowable duration range
+     * SPECIFICALLY FOR TARGET SEQUENCE ONLY
+     *
+     * @param tracks tracks to be checked for their duration
+     * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
      */
-    private String[] findOrdering(boolean is_warmup) throws Exception {
+    private DURATION_RESULT checkTargetDuration(Deque<TrackSimplified> tracks) {
+        int duration_ms = 0;
+
+        for (TrackSimplified track : tracks) {
+            duration_ms += track.getDurationMs();
+        }
+
+//        System.out.println("Duration: " + duration_ms);
+//        System.out.println("Target Duration: " + target_length_ms);
+//        System.out.println("Min Duration: " + min_target_length_ms);
+//        System.out.println("Max Duration: " + max_target_length_ms);
+
+        if (duration_ms < min_target_length_ms) {
+            return DURATION_RESULT.TOO_SHORT;
+        } else if (duration_ms > max_target_length_ms) {
+            return DURATION_RESULT.TOO_LONG;
+        } else {
+            return DURATION_RESULT.ACCEPTABLE;
+        }
+    }
+
+    /**
+     * @param is_warmup boolean indication if this is for the warmup sequence
+     * @return String array of the Track IDs
+     * @throws GetRecommendationsException if recommendations endpoint encounters an issue
+     */
+    private String[] findOrdering(boolean is_warmup) throws GetRecommendationsException{
 
         String[] track_ids = null;
         int closest_column;
@@ -265,6 +435,22 @@ public class GenerateClassic extends GeneratePlaylist {
             intervals = getSortedIntervals(is_warmup); // populated class variable intervals with sorted intervals
 
             closest_column = findClosestColumn();
+
+            for (int index = 0; index < limit; index++) {
+
+                int current_time = 0;
+
+                for (int interval = 0; interval < num_intervals; interval++) {
+
+                    current_time += intervals.get(interval)[index].getDurationMs();
+
+                }
+
+                //System.out.println("Index: " + index + " Duration: " + current_time);
+            }
+
+            //System.out.println("Transition Length: " + transition_length_ms);
+            //System.out.println("Closest Column: " + closest_column);
 
             if (closest_column == -1) continue; // a column close enough to the duration was not found so start again
 
@@ -286,7 +472,7 @@ public class GenerateClassic extends GeneratePlaylist {
         TrackSimplified[] tracks = getTracksInColumn(closest_column);
         TrackSimplified[] adjacent_tracks; // Tracks that are shorter or longer than closest_column depending on result
         TrackSimplified[][] track_matrix;
-        DURATION_RESULT result = checkDuration(tracks);
+        DURATION_RESULT result = checkTransitionDuration(tracks);
 
         if (result == DURATION_RESULT.ACCEPTABLE) {
             return getTrackIDs(tracks);
@@ -316,10 +502,12 @@ public class GenerateClassic extends GeneratePlaylist {
     }
 
     /**
-     * @param matrix
-     * @param tracks
-     * @param row
-     * @return
+     * recursive function that tries all track combinations to find a combination that fits in the allowable time range
+     *
+     * @param matrix 2d matrix of the closest column and its appropriate adjacent column
+     * @param tracks tracks that are currently being passed down the recursive call chain and will be altered at row
+     * @param row current row in the matrix to swap in the value of tracks
+     * @return TrackSimplified array of acceptable tracks if found, null otherwise
      */
     private TrackSimplified[] tryTrackCombinations(TrackSimplified[][] matrix, TrackSimplified[] tracks, int row) {
         DURATION_RESULT result;
@@ -327,7 +515,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         if (row == matrix.length) {
 
-            result = checkDuration(tracks);
+            result = checkTransitionDuration(tracks);
 
             if (result == DURATION_RESULT.ACCEPTABLE) {
                 return tracks;
@@ -362,10 +550,10 @@ public class GenerateClassic extends GeneratePlaylist {
 
         // First check if the shortest combination is too long and check if the longest combination is too short
         current_tracks = getTracksInColumn(0);
-        if (checkDuration(current_tracks) == DURATION_RESULT.TOO_LONG) return -1;
+        if (checkTransitionDuration(current_tracks) == DURATION_RESULT.TOO_LONG) return -1;
 
         current_tracks = getTracksInColumn(limit - 1);
-        if (checkDuration(current_tracks) == DURATION_RESULT.TOO_SHORT) return -1;
+        if (checkTransitionDuration(current_tracks) == DURATION_RESULT.TOO_SHORT) return -1;
 
         int current_column = limit / 2; // middle column
         int current_scope = current_column; // portion of the limit we are looking at, will be halved repeatedly
@@ -377,7 +565,7 @@ public class GenerateClassic extends GeneratePlaylist {
         while (distance_to_previous_column >= 4 && distance_to_bound >= 3) {
 
             current_tracks = getTracksInColumn(current_column);
-            result = checkDuration(current_tracks);
+            result = checkTransitionDuration(current_tracks);
 
             if (result == DURATION_RESULT.TOO_SHORT) {
                 new_column = (current_column + 1) + (current_scope / 2); // mid-point of the right side of the current
@@ -429,7 +617,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             next_column_tracks = getTracksInColumn(column + 1);
 
-            result = checkDuration(next_column_tracks);
+            result = checkTransitionDuration(next_column_tracks);
 
             // if the next column is a good fit, return it
             if (result == DURATION_RESULT.ACCEPTABLE) return column + 1;
@@ -463,10 +651,10 @@ public class GenerateClassic extends GeneratePlaylist {
 
             next_column_tracks = getTracksInColumn(column - 1);
 
-            result = checkDuration(next_column_tracks);
+            result = checkTransitionDuration(next_column_tracks);
 
             // if the next column is a good fit, return it
-            if (result == DURATION_RESULT.ACCEPTABLE) return column + 1;
+            if (result == DURATION_RESULT.ACCEPTABLE) return column - 1;
 
             // if the result of the next column is now too short the current column is the most ideal
             if (result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
@@ -526,12 +714,12 @@ public class GenerateClassic extends GeneratePlaylist {
      *
      * @param is_warmup indicates if the desired sorted intervals to be returned should be for the warmup sequence
      * @return Hashmap of Integer keys representing each interval [0 - num_intervals) and TrackSimplified[] as values
-     * @throws Exception if one of the API calls encounters an issue, will be tossed up to the calling function
+     * @throws GetRecommendationsException if recommendation API call encounters an issue,
+     * will be tossed up to the calling function
      */
-    private HashMap<Integer, TrackSimplified[]> getSortedIntervals(boolean is_warmup) throws Exception {
+    private HashMap<Integer, TrackSimplified[]> getSortedIntervals(boolean is_warmup)
+            throws GetRecommendationsException {
 
-        String seed_artists = getSeedArtists();
-        String seed_tracks = getSeedTracks();
 
         HashMap<Integer, TrackSimplified[]> sorted_intervals = new HashMap<>();
 
@@ -542,26 +730,20 @@ public class GenerateClassic extends GeneratePlaylist {
 //        System.out.println("num_intervals: " + num_intervals);
 //        System.out.println("BPM difference: " + bpm_difference);
 
-        int offset = 1; // How far from the query bpm we want song tempos in the recommendations request below
-
         // We need to call the recommendations endpoint for each interval, fetching a few songs in that interval's range
         // This yields better results than requesting a lot of songs in a large range
         for (int current_interval = 0; current_interval < num_intervals; current_interval++) {
+
+            //System.out.println("is_warmup: " + is_warmup);
+            //System.out.println("query_bpm: " + query_bpm + '\n');
 
             // Update BPM to the next interval
             query_bpm = updateQueryBPM(query_bpm, is_warmup);
 
             //System.out.println(query_bpm);
 
-            RecommendationArguments current_arguments = new RecommendationArguments(
-                    spotify_api, limit, genres, seed_artists, seed_tracks,
-                    query_bpm - offset, query_bpm + offset, query_bpm);
-
-            Recommendations recommendations = getRecommendations(current_arguments);
-
-            TrackSimplified[] recommended_tracks = recommendations.getTracks();
-
-            Arrays.sort(recommended_tracks, duration_comparator);
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(limit, query_bpm - bpm_offset,
+                    query_bpm + bpm_offset, query_bpm);
 
             sorted_intervals.put(current_interval, recommended_tracks);
         }
@@ -578,9 +760,9 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private float updateQueryBPM(float query_bpm, boolean is_warmup) {
         if (is_warmup) {
-            return query_bpm += bpm_difference; // If warming up we want to increase the BPM
+            return query_bpm + bpm_difference; // If warming up we want to increase the BPM
         } else {
-            return query_bpm -= bpm_difference; // If winding down we want to decrease the BPM
+            return query_bpm - bpm_difference; // If winding down we want to decrease the BPM
         }
     }
 
@@ -608,10 +790,12 @@ public class GenerateClassic extends GeneratePlaylist {
 
         if (tracks == null) return null;
 
-        String[] ids = new String[limit];
+        int size = tracks.length;
 
-        for (int index = 0; index < limit; index++) {
-            ids[index] = tracks[index].getId();
+        String[] ids = new String[size];
+
+        for (int index = 0; index < size; index++) {
+            ids[index] = tracks[index].getUri();
         }
 
         return ids;
