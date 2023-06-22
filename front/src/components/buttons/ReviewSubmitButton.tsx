@@ -1,4 +1,4 @@
-import { SubmitButton_AriaLabel, SubmitButton_Role } from "../accessibility/Aria";
+import { SubmitButton_AriaLabel, SubmitButton_Role } from "../../accessibility/Aria";
 
 interface ReviewSubmitButtonProps {
     // needs to get all the user data
@@ -15,9 +15,10 @@ function ReviewSubmitButton(props : ReviewSubmitButtonProps) {
     async function redirect() {
 
         //TODO: store user data
-        //in href?
+        // in href?
         // popup...
         // button to return to old page?
+
         console.log("submitting review...");
         console.log("rating: ");
         console.log("review: ");

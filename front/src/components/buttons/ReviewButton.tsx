@@ -1,4 +1,4 @@
-import { SubmitButton_AriaLabel, SubmitButton_Role } from "../accessibility/Aria";
+import { SubmitButton_AriaLabel, SubmitButton_Role } from "../../accessibility/Aria";
 
 /**
  * Review button props

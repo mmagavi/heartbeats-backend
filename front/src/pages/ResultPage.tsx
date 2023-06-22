@@ -1,5 +1,5 @@
 import {ResultPage_AriaLabel} from "../accessibility/Aria";
-import {ReviewButton} from "../components/ReviewButton";
+import {ReviewButton} from "../components/buttons/ReviewButton";
 
 /**
  * Props for the result page

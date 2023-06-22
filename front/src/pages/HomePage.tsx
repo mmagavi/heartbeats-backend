@@ -4,7 +4,7 @@ import QuestionsPage from "./QuestionsPage";
 import ResultPage from "./ResultPage";
 import { ExerciseQuestions } from "../questions/ExerciseQuestions";
 import { questionsType } from "../questions/QuestionsType";
-import {SubmitButton} from "../components/SubmitButton";
+import {SubmitButton} from "../components/buttons/SubmitButton";
 import ModeQuestionComponent from "../components/ModeQuestionComponent";
 
 /**

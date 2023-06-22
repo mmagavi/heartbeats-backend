@@ -1,5 +1,12 @@
 
 # heartBeats!
+
+BUGS!! YAY
+- Songs can appear multiple times in the playlists
+-
+
+
+
 **Team Members:** Quinn Coleman (qcoleman), Maya Magavi(mmagavi), Dalton Siminson (dsimonso), Yanchi Wang (ywang568)
 
 **Repo:** https://github.com/cs0320-s2023/heartBeats

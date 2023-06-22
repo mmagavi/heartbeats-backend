@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {LogoutButton} from "../components/LogoutButton";
+import {LogoutButton} from "../components/buttons/LogoutButton";
 import {LogoutPage_AriaLabel} from "../accessibility/Aria";
 
 /**

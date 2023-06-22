@@ -1,5 +1,5 @@
 import "../../styles/quiz.css";
-import ModeButton from "./ModeButton";
+import ModeButton from "./buttons/ModeButton";
 import SliderUI from "./SliderUI";
 import {Question_Role} from "../accessibility/Aria";
 
