@@ -1,9 +1,9 @@
 package Server;
 
 import ExceptionClasses.InvalidInputExceptions.*;
-import PlaylistGenerating.PlaylistTypes.GenerateClassic;
-import PlaylistGenerating.PlaylistTypes.GenerateIntervalOne;
-import PlaylistGenerating.PlaylistTypes.GenerateIntervalTwo;
+import PlaylistGenerating.PlaylistTypes.Classic.GenerateClassic;
+import PlaylistGenerating.PlaylistTypes.Interval.GenerateIntervalOne;
+import PlaylistGenerating.PlaylistTypes.PyramidInterval.GenerateIntervalTwo;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;

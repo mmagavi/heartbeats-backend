@@ -1,6 +1,6 @@
 //package PlaylistGeneratorTest;
 //
-//import PlaylistGenerating.TargetHeartRateRange;
+//import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 //import PlaylistGenerating.PlaylistTypes.GenerateExercise;
 //import Server.Server;
 //import SpotifyUtilities.TrackUtilities;

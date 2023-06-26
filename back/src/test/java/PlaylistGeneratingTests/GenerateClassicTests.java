@@ -1,7 +1,6 @@
 package PlaylistGeneratingTests;
 
-import PlaylistGenerating.PlaylistTypes.GenerateClassic;
-import org.junit.jupiter.api.Assertions;
+import PlaylistGenerating.PlaylistTypes.Classic.GenerateClassic;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

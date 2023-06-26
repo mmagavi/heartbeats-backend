@@ -1,4 +1,4 @@
-package PlaylistGenerating;
+package PlaylistGenerating.HeartRateRanges;
 
 import java.util.Map;
 

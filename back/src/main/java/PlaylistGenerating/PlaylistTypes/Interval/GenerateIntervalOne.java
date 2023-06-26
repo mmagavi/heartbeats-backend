@@ -1,9 +1,10 @@
-package PlaylistGenerating.PlaylistTypes;
+package PlaylistGenerating.PlaylistTypes.Interval;
 
+import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 
-public class GenerateIntervalTwo extends GeneratePlaylist {
+public class GenerateIntervalOne extends GeneratePlaylist {
 
     /**
      * Constructor for generating a classic style playlist
@@ -12,7 +13,8 @@ public class GenerateIntervalTwo extends GeneratePlaylist {
      * @param age Age of the user
      * @param workout_length Length of the workout
      */
-    public GenerateIntervalTwo(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity){
+    public GenerateIntervalOne(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
+            throws Exception{
 
         super(spotify_api, genres, age, workout_length, intensity);
 

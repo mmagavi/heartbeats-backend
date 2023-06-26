@@ -1,12 +1,7 @@
 package SpotifyUtilities;
 
 
-import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
-import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
-import PlaylistGenerating.TargetHeartRateRange;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Track;
 
 
 /**
