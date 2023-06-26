@@ -1,7 +1,8 @@
-package PlaylistGenerating.PlaylistTypes;
+package PlaylistGenerating.PlaylistTypes.Interval;
 
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
+import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;

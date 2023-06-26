@@ -6,8 +6,8 @@
 //import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 //import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 //import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
-//import PlaylistGenerating.DesiredHeartRateRanges;
-//import PlaylistGenerating.TargetHeartRateRange;
+//import PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges;
+//import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 //import se.michaelthelin.spotify.SpotifyApi;
 //import se.michaelthelin.spotify.model_objects.specification.Playlist;
 //

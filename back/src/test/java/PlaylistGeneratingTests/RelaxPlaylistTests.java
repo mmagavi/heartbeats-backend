@@ -6,7 +6,7 @@
 //import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 //import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 //import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
-//import PlaylistGenerating.TargetHeartRateRange;
+//import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 //import PlaylistGenerating.PlaylistTypes.GenerateRelax;
 //import Server.Server;
 //import SpotifyUtilities.TrackUtilities;
