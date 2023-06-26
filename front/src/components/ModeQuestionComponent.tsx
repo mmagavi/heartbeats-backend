@@ -1,7 +1,7 @@
 import "../../styles/quiz.css";
 import ModeButton from "./buttons/ModeButton";
 import SliderUI from "./SliderUI";
-import {Question_Role} from "../accessibility/Aria";
+import {ModeQuestion_AriaLabel, Question_Role} from "../accessibility/Aria";
 
 /**
  * props for non-genre questions - id number, question, choices, setChoice function
@@ -79,7 +79,7 @@ export default function ModeQuestionComponent(props: questionProps) {
     );
 
   return (
-    <div className="questionItem">
+    <div className="questionItem" aria-label={ModeQuestion_AriaLabel}>
       <div className="question" role={Question_Role} aria-label={props.question} tabIndex={0}>{props.question} </div>
       <div className="modeChoicesList">{choices}</div>
     </div>

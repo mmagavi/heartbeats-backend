@@ -126,9 +126,6 @@ export default function QuestionsPage(props: QuestionsPageProps) {
     <>
       {questions}
       {genres}
-      <div className="footer">* We recommend selecting one or two genres for best results. If you choose extremely different genres, such as punk rock & sleep, the playlist quality may decline. However
-        it is kind of funny.
-      </div>
       {submitButton}
     </>
   );

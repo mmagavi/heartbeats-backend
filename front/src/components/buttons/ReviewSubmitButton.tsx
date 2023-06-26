@@ -5,6 +5,11 @@ interface ReviewSubmitButtonProps {
 }
 
 /**
+ * NOT CURRENTLY IN USE. ONLY USED BY REVIEW PAGE WHICH WE ARE CURRENTLY NOT USING...
+ * JUST USING A MAILTO HREF INSTEAD
+ */
+
+/**
  * Review submit button component. Submits a review.
  * @param props user data to store
  * @constructor
