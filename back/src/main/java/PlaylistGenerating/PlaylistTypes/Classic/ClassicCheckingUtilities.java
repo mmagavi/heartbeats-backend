@@ -25,7 +25,7 @@ public class ClassicCheckingUtilities {
         }
 
         System.out.println("Duration: " + duration_ms);
-        System.out.println("Target Duration: " + transition_length_ms);
+        System.out.println("Transition Duration: " + transition_length_ms);
         System.out.println("Min Duration: " + min_transition_length_ms);
         System.out.println("Max Duration: " + max_transition_length_ms);
 
