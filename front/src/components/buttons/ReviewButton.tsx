@@ -1,4 +1,4 @@
-import { SubmitButton_AriaLabel, SubmitButton_Role } from "../../accessibility/Aria";
+import { ReviewButton_AriaLabel, ReviewButton_Role } from "../../accessibility/Aria";
 
 /**
  * Review button props
@@ -18,7 +18,7 @@ function ReviewButton(props : ReviewButtonProps) {
     // return button!!
     return (
         <a href="mailto:heartbeats.feedback@gmail.com?subject=Feedback on my HeartBeats Playlist">
-        <button className="resultPageButton" role={SubmitButton_Role} aria-label={SubmitButton_AriaLabel} tabIndex={0}>
+        <button className="resultPageButton" role={ReviewButton_Role} aria-label={ReviewButton_AriaLabel} tabIndex={0}>
             ✉️ Send us feedback :)
         </button>
         </a>

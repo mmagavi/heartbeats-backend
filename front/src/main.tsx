@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
  *
  * Email feedback:
  * Pass more variables into review button?
- * Add more info to email header
+ * Add more info to email header?
  *
  * Accessibility:
  * Aria-labels, tab indexes, accessibility

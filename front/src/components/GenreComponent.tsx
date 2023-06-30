@@ -1,6 +1,6 @@
 import "../../styles/quiz.css";
 import GenreButton from "./buttons/GenreButton";
-import {Question_Role} from "../accessibility/Aria";
+import {GenreQuestion_AriaLabel, Question_Role} from "../accessibility/Aria";
 
 /**
  * Choice interface - a choice contains a display text string
@@ -57,7 +57,7 @@ export default function GenreComponent(props: questionProps) {
 
     // Return question-item
     return (
-        <div className="questionItem">
+        <div className="questionItem" aria-label={GenreQuestion_AriaLabel}>
             <div className="question" aria-label={props.question} role={Question_Role} tabIndex={0}>{props.question}</div>
             <div className="genreList">{choices}</div>
         </div>

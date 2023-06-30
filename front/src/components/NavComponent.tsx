@@ -1,5 +1,6 @@
 import {Link} from "react-router-dom";
 import React from "react";
+import {AboutNav_AriaLabel, LoginNav_AriaLabel, LogoutNav_AriaLabel, MusicNav_AriaLabel} from "../accessibility/Aria";
 
 /**
  * Props for navigation component
@@ -19,17 +20,17 @@ export function NavComponent(props: NavComponentProps) {
     if (props.loggedIn) {
         return (
             <div className="navContainer">
-                <Link className="navLink" to="music">find music</Link>
-                <Link className="navLink" to="about">about</Link>
-                <Link className="navLink" to="logout">logout</Link>
+                <Link className="navLink" to="music" aria-label={MusicNav_AriaLabel}>find music</Link>
+                <Link className="navLink" to="about" aria-label={AboutNav_AriaLabel}>about</Link>
+                <Link className="navLink" to="logout" aria-label={LogoutNav_AriaLabel}>logout</Link>
             </div>
         )
     } else {
         // if user is not logged in
         return (
             <div className="navContainer">
-                <Link className="navLink" to="about">about</Link>
-                <Link className="navLink" to="login">login</Link>
+                <Link className="navLink" to="about" aria-label={AboutNav_AriaLabel}>about</Link>
+                <Link className="navLink" to="login" aria-label={LoginNav_AriaLabel}>login</Link>
             </div>
         )
     }

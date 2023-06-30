@@ -4,6 +4,7 @@ import "../../styles/quiz.css";
 import { questionsType } from "../questions/QuestionsType";
 import {Genres} from "../questions/Genres";
 import GenreComponent from "../components/GenreComponent";
+import Footer from "../components/Footer";
 
 /**
  * Props for questions page component - setPlaylist, submitButton,
@@ -123,13 +124,11 @@ export default function QuestionsPage(props: QuestionsPageProps) {
   }
   // render questions, genre question, and submit button
   return (
-    <>
+    <div className="questionsPage">
       {questions}
       {genres}
-      <div className="footer">* We recommend selecting one or two genres for best results. If you choose extremely different genres, such as punk rock & sleep, the playlist quality may decline. However
-        it is kind of funny.
-      </div>
       {submitButton}
-    </>
+      <Footer/>
+    </div>
   );
 }

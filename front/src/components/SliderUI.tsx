@@ -52,32 +52,12 @@ export default function SliderUI(props: SliderProps): ReactComponent {
     MIN = 13;
     MAX = 100;
     DEFAULT = 35;
-    ROLE = "Slider1"
-    MARKS = [
-          {
-              value: 13,
-              label: '13',
-          },
-          {
-              value: 100,
-              label: '100',
-          }
-      ];
+    ROLE = "Slider1";
   } if (props.id == 3) {
-    MIN = 15;
+    MIN = 20;
     MAX = 180;
     DEFAULT = 30;
-    ROLE = "Slider2"
-        MARKS = [
-            {
-                value: 15,
-                label: '15',
-            },
-            {
-                value: 180,
-                label: '180',
-            }
-        ];
+    ROLE = "Slider2";
   }
 
   function handleChange(n: number) {
