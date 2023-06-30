@@ -31,6 +31,7 @@ public class BrowsingUtilities {
                             .seed_genres(args.seed_genres())
                             .seed_tracks(args.seed_tracks())
                             .seed_artists(args.seed_artists())
+                            .market(args.market())
                             .build();
 
             return getRecommendationsRequest.execute();

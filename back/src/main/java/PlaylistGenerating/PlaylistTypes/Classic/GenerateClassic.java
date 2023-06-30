@@ -5,7 +5,6 @@ import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
-import PlaylistGenerating.PlaylistTypes.CommonUtilities;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import SpotifyUtilities.PlaylistUtilities;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -84,38 +83,21 @@ public class GenerateClassic extends GeneratePlaylist {
     public String generatePlaylist() throws GetCurrentUsersProfileException, GetRecommendationsException,
             CreatePlaylistException, AddItemsToPlaylistException, GetAudioFeaturesForTrackException {
 
-        User user = getCurrentUsersProfile(spotify_api);
-
-        String[] warmup_track_uris = findTransitionTracks(true);
+        TrackSimplified[] warmup_track_uris = findTransitionTracks(true);
         System.out.println("warmup");
-        String[] target_track_uris = getTargetTracks();
+        TrackSimplified[] target_track_uris = getTargetTracks();
         System.out.println("target");
-        String[] wind_down_track_uris = findTransitionTracks(false);
+        TrackSimplified[] wind_down_track_uris = findTransitionTracks(false);
         System.out.println("wind-down");
 
+        TrackSimplified[] playlist_tracks = concatTracks(warmup_track_uris, target_track_uris, wind_down_track_uris);
 
-
-        String[] playlist_track_uris = concatTracks(warmup_track_uris, target_track_uris, wind_down_track_uris);
-
-
-        eliminateDuplicates(spotify_api, playlist_track_uris, genres, seed_artists, seed_tracks);
-
-//        try {
-//
-//            AudioFeatures[] features = getAudioFeaturesForSeveralTracks(spotify_api, playlist_track_uris);
-//
-//            for(AudioFeatures feature: features){
-//                System.out.println(feature.getTempo());
-//            }
-//
-//        }catch (Exception ex){
-//            ex.printStackTrace();
-//        }
+        eliminateDupesAndNonPlayable(spotify_api, playlist_tracks, genres, seed_artists, seed_tracks, user.getCountry());
 
         // Create a playlist on the user's account
         Playlist playlist = createPlaylist(spotify_api, user.getId(), user.getDisplayName());
-
         String playlist_id = playlist.getId();
+        String[] playlist_track_uris = getTrackURIs(playlist_tracks);
 
         System.out.println("Creating Playlist");
         PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, playlist_track_uris);
@@ -129,12 +111,12 @@ public class GenerateClassic extends GeneratePlaylist {
 
     /**
      * @param is_warmup boolean indication if this is for the warmup sequence
-     * @return String array of the Track IDs
+     * @return TrackSimplified array
      * @throws GetRecommendationsException if recommendations endpoint encounters an issue
      */
-    private String[] findTransitionTracks(boolean is_warmup) throws GetRecommendationsException {
+    private TrackSimplified[] findTransitionTracks(boolean is_warmup) throws GetRecommendationsException {
 
-        String[] track_uris = null;
+        TrackSimplified[] tracks = null;
         int closest_column;
         float local_moe = transition_moe; // Keeps track of moe for duration purposes which we will be altering here
 
@@ -145,25 +127,25 @@ public class GenerateClassic extends GeneratePlaylist {
             // If a good closest column was found try and find the best fit.
 
             if (closest_column != -1) {
-                track_uris = getBestFit(closest_column);
+                tracks = getBestFit(closest_column);
             }
 
             setTransitionLengths(local_moe += .01); // relax the moe a bit so we can find something
 
-        } while (track_uris == null); // if an acceptable ordering was not found, try again
+        } while (tracks == null); // if an acceptable ordering was not found, try again
 
         setTransitionLengths(transition_moe); // restore moe
 
-        return track_uris;
+        return tracks;
     }
 
     /**
      * Now that the closest column of songs has been found, preform some fine grain searching to find a good duration
      *
      * @param closest_column closest column of songs that was found and provided by the calling function
-     * @return String array of the track IDS, or null if a good ordering could not be found
+     * @return TrackSimplified array of the track IDS, or null if a good ordering could not be found
      */
-    private String[] getBestFit(int closest_column) {
+    private TrackSimplified[] getBestFit(int closest_column) {
 
         TrackSimplified[] tracks = getTracksInColumn(intervals, closest_column);
         TrackSimplified[] adjacent_tracks; // Tracks that are shorter or longer than closest_column depending on result
@@ -172,7 +154,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         // If the duration is acceptable go no further
         if (result == DURATION_RESULT.ACCEPTABLE) {
-            return getTrackURIs(tracks);
+            return tracks;
         }
 
         // If there is only one interval there is only one song per column so doing fine grain combination
@@ -202,7 +184,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         tracks = tryTrackCombinations(track_matrix, new TrackSimplified[num_intervals], 0);
 
-        return getTrackURIs(tracks);
+        return tracks;
     }
 
     /**
@@ -363,9 +345,9 @@ public class GenerateClassic extends GeneratePlaylist {
     /**
      * Gets the target tracks for the target sequence
      *
-     * @return String array of the track IDs
+     * @return TrackSimplified array of the track IDs
      */
-    private String[] getTargetTracks() throws GetRecommendationsException {
+    private TrackSimplified[] getTargetTracks() throws GetRecommendationsException {
 
         int target_length_min = target_length_ms / 60_000;
         // number of tracks we want in the target sequence
@@ -380,7 +362,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
 
-            if (tracks != null) return getTrackURIs(tracks);
+            if (tracks != null) return tracks;
 
             System.out.println("null");
             System.out.println(local_offset);

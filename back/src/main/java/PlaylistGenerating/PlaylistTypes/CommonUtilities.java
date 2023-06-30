@@ -2,20 +2,17 @@ package PlaylistGenerating.PlaylistTypes;
 
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
-import ExceptionClasses.TrackExceptions.GetTrackException;
-import SpotifyUtilities.LibraryUtilities;
 import SpotifyUtilities.RecommendationArguments;
 import SpotifyUtilities.TrackUtilities;
+import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Recommendations;
-import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
@@ -42,7 +39,6 @@ public class CommonUtilities {
             ids[index] = tracks[index].getUri();
             //ids[index] = tracks[index].getId();
         }
-
         return ids;
     }
 
@@ -50,64 +46,70 @@ public class CommonUtilities {
      * @param arrays array arguments to concat
      * @return String array of the concatenated arguments
      */
-    public static String[] concatTracks(String[]... arrays) {
+    public static TrackSimplified[] concatTracks(TrackSimplified[]... arrays) {
 
-        Stream<String> stream = Stream.of();
+        Stream<TrackSimplified> stream = Stream.of();
 
-        for (String[] array : arrays) {
+        for (TrackSimplified[] array : arrays) {
             stream = Stream.concat(stream, Arrays.stream(array));
         }
 
-        return stream.toArray(String[]::new);
-
+        return stream.toArray(TrackSimplified[]::new);
     }
 
-    public static String[] eliminateDuplicates(SpotifyApi spotify_api, String[] track_uris, String genres,
-                                                  String seed_artists, String seed_tracks)
+    public static TrackSimplified[] eliminateDupesAndNonPlayable(SpotifyApi spotify_api, TrackSimplified[] tracks,
+                                                                 String genres, String seed_artists, String seed_tracks,
+                                                                 CountryCode market)
             throws GetAudioFeaturesForTrackException, GetRecommendationsException {
 
-        HashMap<String, Integer> track_map = new HashMap<>();
-        HashMap<String, Integer> duplicate_map = new HashMap<>();
+        HashMap<TrackSimplified, Integer> track_map = new HashMap<>();
+        // Store all the tracks that need replacement here
+        HashMap<TrackSimplified, Integer> replacement_map = new HashMap<>();
 
         // Find which tracks are duplicates and place them in our duplicate map
-        for (int index = 0; index < track_uris.length; index++) {
+        for (int index = 0; index < tracks.length; index++) {
 
-            String track_uri = track_uris[index];
+            TrackSimplified track = tracks[index];
+            boolean is_playable = track.getIsPlayable();
 
             // If the track is not already in the map it will return null from the .get() method
-            if (track_map.get(track_uri) == null) {
-                track_map.put(track_uri, index);
+            if (track_map.get(track) == null && is_playable) {
+                track_map.put(track, index);
             } else {
-                duplicate_map.put(track_uri, index); // If null was not returned above we know we have a duplicate
+                replacement_map.put(track, index); // If null was not returned above we know we have a dupe/non-playable
             }
         }
 
-        for (String uri : duplicate_map.keySet()) {
+        for (TrackSimplified duplicate_track : replacement_map.keySet()) {
             //Track track = TrackUtilities.getTrack(spotify_api, uri);
-            String replacement = replaceTrack(spotify_api, track_map, uri, genres, seed_artists, seed_tracks);
+            TrackSimplified replacement =
+                    replaceTrack(spotify_api, track_map, duplicate_track, genres, seed_artists, seed_tracks, market);
 
-            int track_index = duplicate_map.get(uri); // The index we need to put the new non-duplicate song into
+            int track_index = replacement_map.get(duplicate_track); // The index we need to put the new non-duplicate song into
 
-            track_uris[track_index] = replacement; // Replace the song
+            tracks[track_index] = replacement; // Replace the song
         }
-        return track_uris;
+        return tracks;
     }
 
-    private static String replaceTrack(SpotifyApi spotify_api, HashMap<String, Integer> track_map, String uri,
-                                       String genres, String seed_artists, String seed_tracks)
+    private static TrackSimplified replaceTrack(SpotifyApi spotify_api, HashMap<TrackSimplified, Integer> track_map,
+                                                TrackSimplified track, String genres, String seed_artists, String seed_tracks,
+                                                CountryCode market)
             throws GetAudioFeaturesForTrackException, GetRecommendationsException {
 
-        AudioFeatures track_features = TrackUtilities.getAudioFeaturesForTrack(spotify_api, uri);
+        System.out.println("Replacing");
+
+        AudioFeatures track_features = TrackUtilities.getAudioFeaturesForTrack(spotify_api, track.getId());
         float tempo = track_features.getTempo();
         int target_duration_ms = track_features.getDurationMs();
         int offset = 1;
         int limit = 21;
-        float margin_of_error = .1f; //
+        float margin_of_error = .1f;
 
         while(true) {
             RecommendationArguments current_arguments = new RecommendationArguments(
                     spotify_api, limit, genres, seed_artists, seed_tracks,
-                    tempo - offset, tempo + offset, tempo);
+                    tempo - offset, tempo + offset, tempo, market);
 
             Recommendations recommendations = getRecommendations(current_arguments);
             TrackSimplified[] recommended_tracks = recommendations.getTracks();
@@ -125,19 +127,19 @@ public class CommonUtilities {
             for(int index = 1; index < recommended_tracks.length; index++){
 
                 TrackSimplified current_track = recommended_tracks[index];
-                String current_track_uri = current_track.getUri();
+                boolean is_playable = current_track.getIsPlayable();
 
-                // If the track we are considering is a duplicate continue to the next candidate
-                if(track_map.get(current_track_uri) != null) continue;
+                // If the track we are considering is a duplicate or not playable continue to the next candidate
+                if(track_map.get(current_track) != null || !is_playable) continue;
 
-                AudioFeatures current_features = getAudioFeaturesForTrack(spotify_api, current_track_uri);
+                AudioFeatures current_features = getAudioFeaturesForTrack(spotify_api, current_track.getId());
 
                 // Compare the durations of the closest track and the current, replacing the closest track with the
                 // current if the current track is closer to the desired duration
                 closest_track = getTrackWithClosestDuration(target_duration_ms, closest_track, current_track);
             }
 
-            if(isGoodDuration(target_duration_ms, closest_track, margin_of_error)) return closest_track.getUri();
+            if(isGoodDuration(target_duration_ms, closest_track, margin_of_error)) return closest_track;
 
             offset++; // relax constraints
             margin_of_error += .05;

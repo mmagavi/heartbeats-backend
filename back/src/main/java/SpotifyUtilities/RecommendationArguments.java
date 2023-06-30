@@ -1,6 +1,7 @@
 package SpotifyUtilities;
 
 
+import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
 
 
@@ -19,4 +20,6 @@ public record RecommendationArguments(
     String seed_tracks,
     float min_tempo,
     float max_tempo,
-    float target_tempo){}
+    float target_tempo,
+    CountryCode market
+){}
