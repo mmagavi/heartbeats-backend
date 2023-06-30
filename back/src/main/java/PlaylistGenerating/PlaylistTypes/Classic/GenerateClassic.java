@@ -4,15 +4,19 @@ import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
+import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
+import PlaylistGenerating.PlaylistTypes.CommonUtilities;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import SpotifyUtilities.PlaylistUtilities;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.*;
+
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicCheckingUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicTrackUtilities.*;
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackIDs;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.eliminateDuplicates;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
 import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
@@ -20,20 +24,20 @@ public class GenerateClassic extends GeneratePlaylist {
 
     protected static final int limit = 21; // Number of tracks we want to get
     protected static int num_intervals;
-    protected static  int transition_length_ms = 0; // transition length is the warm-up/ wind down sequence individually
+    protected static int transition_length_ms = 0; // transition length is the warm-up/ wind down sequence individually
     protected static int min_transition_length_ms;
     protected static int max_transition_length_ms;
     protected static int target_length_ms = 0;
     protected static int min_target_length_ms;
     protected static int max_target_length_ms;
+
     protected enum DURATION_RESULT {
         ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
     }
 
-    //TODO: check the bpms in the created playlists to ensure they are what we want
     private final float bpm_difference;
     private HashMap<Integer, TrackSimplified[]> intervals;
-    private float transition_moe = .02f;
+    private final float transition_moe = .02f;
     private static final int bpm_offset = 3; // How far from the query bpm we want song tempos in the recommendations request below
 
 
@@ -54,7 +58,16 @@ public class GenerateClassic extends GeneratePlaylist {
         intervals = new HashMap<>();
 
         // warmup and wind-down are the same length and are 10% of the workout each
-        float transition_length_min = workout_length * .1f;
+        float transition_length_min;
+
+        //TODO do we want to do this or let the changing MOE in findTransitionTracks deal with it?
+        // This will save quite a few API calls I imagine the way we have it now so prolly keep idk
+        if (workout_length > 30) {
+            transition_length_min = workout_length * .1f;
+        } else {
+            transition_length_min = 3.5f; // If the workout is short the transition will take up more
+        }
+
 
         // Number of intervals in which there is one song per interval (For warmup/wind-down only)
         // We will round up to avoid intervals needing to have exceptionally long songs
@@ -70,7 +83,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
     @Override
     public String generatePlaylist() throws GetCurrentUsersProfileException, GetRecommendationsException,
-            CreatePlaylistException, AddItemsToPlaylistException {
+            CreatePlaylistException, AddItemsToPlaylistException, GetAudioFeaturesForTrackException {
 
         User user = getCurrentUsersProfile(spotify_api);
 
@@ -81,7 +94,12 @@ public class GenerateClassic extends GeneratePlaylist {
         String[] wind_down_track_uris = findTransitionTracks(false);
         System.out.println("wind-down");
 
+
+
         String[] playlist_track_uris = concatTracks(warmup_track_uris, target_track_uris, wind_down_track_uris);
+
+
+        eliminateDuplicates(spotify_api, playlist_track_uris, genres, seed_artists, seed_tracks);
 
 //        try {
 //
@@ -106,7 +124,6 @@ public class GenerateClassic extends GeneratePlaylist {
         return playlist_id;
     }
 
-
     //                                  //
     // Transition Tracks                //
     //                                  //
@@ -116,30 +133,29 @@ public class GenerateClassic extends GeneratePlaylist {
      * @return String array of the Track IDs
      * @throws GetRecommendationsException if recommendations endpoint encounters an issue
      */
-    private String[] findTransitionTracks(boolean is_warmup) throws GetRecommendationsException{
+    private String[] findTransitionTracks(boolean is_warmup) throws GetRecommendationsException {
 
-        String[] track_ids = null;
+        String[] track_uris = null;
         int closest_column;
-        float old_moe = transition_moe;
+        float local_moe = transition_moe; // Keeps track of moe for duration purposes which we will be altering here
 
         do {
             intervals = getSortedIntervals(is_warmup); // populated class variable intervals with sorted intervals
-
             closest_column = findClosestColumn();
 
-            if (closest_column == -1) continue; // a column close enough to the duration was not found so start again
+            // If a good closest column was found try and find the best fit.
 
-            transition_moe += .01; // relax the moe a bit so we can find something
-            setTransitionLengths(transition_moe);
+            if (closest_column != -1) {
+                track_uris = getBestFit(closest_column);
+            }
 
-            track_ids = getBestFit(closest_column);
+            setTransitionLengths(local_moe += .01); // relax the moe a bit so we can find something
 
-        } while (track_ids == null); // if an acceptable ordering was not found, try again
+        } while (track_uris == null); // if an acceptable ordering was not found, try again
 
-        transition_moe = old_moe; // restore moe
-        setTransitionLengths(transition_moe);
+        setTransitionLengths(transition_moe); // restore moe
 
-        return getBestFit(closest_column);
+        return track_uris;
     }
 
     /**
@@ -155,10 +171,17 @@ public class GenerateClassic extends GeneratePlaylist {
         TrackSimplified[][] track_matrix;
         DURATION_RESULT result = checkTransitionDuration(tracks);
 
+        // If the duration is acceptable go no further
         if (result == DURATION_RESULT.ACCEPTABLE) {
+            return getTrackURIs(tracks);
+        }
 
-            return getTrackIDs(tracks);
-        } else if (result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
+        // If there is only one interval there is only one song per column so doing fine grain combination
+        // searching is redundant in this case.
+        if(num_intervals < 1 ) return null;
+
+        // Otherwise proceed with fine grain searching
+        if (result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
 
             if (closest_column < (limit - 1)) {
                 adjacent_tracks = getTracksInColumn(intervals, closest_column + 1);
@@ -180,7 +203,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         tracks = tryTrackCombinations(track_matrix, new TrackSimplified[num_intervals], 0);
 
-        return getTrackIDs(tracks);
+        return getTrackURIs(tracks);
     }
 
     /**
@@ -188,7 +211,7 @@ public class GenerateClassic extends GeneratePlaylist {
      *
      * @param matrix 2d matrix of the closest column and its appropriate adjacent column
      * @param tracks tracks that are currently being passed down the recursive call chain and will be altered at row
-     * @param row current row in the matrix to swap in the value of tracks
+     * @param row    current row in the matrix to swap in the value of tracks
      * @return TrackSimplified array of acceptable tracks if found, null otherwise
      */
     private TrackSimplified[] tryTrackCombinations(TrackSimplified[][] matrix, TrackSimplified[] tracks, int row) {
@@ -287,7 +310,7 @@ public class GenerateClassic extends GeneratePlaylist {
      * @param is_warmup indicates if the desired sorted intervals to be returned should be for the warmup sequence
      * @return Hashmap of Integer keys representing each interval [0 - num_intervals) and TrackSimplified[] as values
      * @throws GetRecommendationsException if recommendation API call encounters an issue,
-     * will be tossed up to the calling function
+     *                                     will be tossed up to the calling function
      */
     private HashMap<Integer, TrackSimplified[]> getSortedIntervals(boolean is_warmup)
             throws GetRecommendationsException {
@@ -325,7 +348,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
                 local_offset++;
 
-            }while (recommended_tracks.length < limit);
+            } while (recommended_tracks.length < limit);
 
             sorted_intervals.put(current_interval, recommended_tracks);
         }
@@ -358,7 +381,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
 
-            if (tracks != null) return getTrackIDs(tracks);
+            if (tracks != null) return getTrackURIs(tracks);
 
             System.out.println("null");
             System.out.println(local_offset);
@@ -405,9 +428,9 @@ public class GenerateClassic extends GeneratePlaylist {
 
             result = checkTargetDuration(deque);
 
-            if(result == DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
+            if (result == DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
 
-            if(result== DURATION_RESULT.TOO_LONG) return null; // If now too long there is no acceptable combination
+            if (result == DURATION_RESULT.TOO_LONG) return null; // If now too long there is no acceptable combination
         }
 
         return null;
@@ -418,26 +441,29 @@ public class GenerateClassic extends GeneratePlaylist {
     //                                             //
 
 
-    /** Sets the min and max Target lengths based on the provided margin of error
+    /**
+     * Sets the min and max Target lengths based on the provided margin of error
      *
      * @param margin_of_error margin of error used in setting the min and max target lengths
      */
-    private void setTargetLengths(float margin_of_error){
+    private void setTargetLengths(float margin_of_error) {
         // MilliSeconds of length that is acceptable for the target sequence based on our MOE
         min_target_length_ms = target_length_ms - (int) (target_length_ms * margin_of_error);
         max_target_length_ms = target_length_ms + (int) (target_length_ms * margin_of_error);
     }
 
-    /** Sets the min and max transition lengths based on the provided margin of error
+    /**
+     * Sets the min and max transition lengths based on the provided margin of error
      *
      * @param margin_of_error margin of error used in setting the min and max transition lengths
      */
-    private void setTransitionLengths(float margin_of_error){
+    private void setTransitionLengths(float margin_of_error) {
 
         // MilliSeconds of length that is acceptable for the warmup / wind-down sequence based on our MOE
         min_transition_length_ms = transition_length_ms - (int) (transition_length_ms * margin_of_error);
         max_transition_length_ms = transition_length_ms + (int) (transition_length_ms * margin_of_error);
     }
+
     /**
      * Initializes query_bpm based on isWarmup
      *
@@ -478,7 +504,6 @@ public class GenerateClassic extends GeneratePlaylist {
         // between the resting bpm and target bpm. We also want to relax the MOE a bit here
         if (num_intervals < 2) {
             num_intervals = 1;
-            transition_moe = .15f;
             setTransitionLengths(transition_moe);
 
             return (float) ((target_bpm - resting_bpm) / 2);

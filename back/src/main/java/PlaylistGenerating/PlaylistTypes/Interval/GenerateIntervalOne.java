@@ -7,7 +7,7 @@ import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackIDs;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
@@ -212,7 +212,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
             TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2,
                     resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
 
-            if (recommended_tracks != null) return getTrackIDs(recommended_tracks);
+            if (recommended_tracks != null) return getTrackURIs(recommended_tracks);
 
             System.out.println("null");
             System.out.println(local_offset);
@@ -239,7 +239,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
             TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2,
                     target_bpm - local_offset, target_bpm + local_offset, target_bpm);
 
-            if (recommended_tracks != null) return getTrackIDs(recommended_tracks);
+            if (recommended_tracks != null) return getTrackURIs(recommended_tracks);
 
             System.out.println("null");
             System.out.println(local_offset);
@@ -257,7 +257,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      */
     private String[] concatTracks(String[] cool_tracks, String[] warm_tracks) {
 
-        
+
 
         return null;
     }

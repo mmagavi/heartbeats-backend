@@ -26,8 +26,8 @@ abstract public class GeneratePlaylist {
     protected final SpotifyApi spotify_api;
     protected final int age;
     protected final int workout_length_min;
-    // Length of the workout in MilliSeconds
-    protected final int workout_length_ms;
+
+    protected final int workout_length_ms; // Length of the workout in MilliSeconds
     protected final String intensity;
     protected final int resting_bpm = 69; // assuming an average resting bpm
     protected final float margin_of_error; // percent a playlist can be off the target by and still be acceptable
