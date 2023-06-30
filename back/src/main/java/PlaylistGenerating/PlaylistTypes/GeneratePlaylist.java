@@ -159,7 +159,6 @@ abstract public class GeneratePlaylist {
 
             flag = true;
         }
-
         return string_builder.toString();
     }
 
@@ -189,7 +188,6 @@ abstract public class GeneratePlaylist {
 
             flag = true;
         }
-
         return string_builder.toString();
     }
 }

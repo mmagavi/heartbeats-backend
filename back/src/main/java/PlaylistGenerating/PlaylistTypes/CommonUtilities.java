@@ -24,8 +24,6 @@ import static SpotifyUtilities.TrackUtilities.getAudioFeaturesForTrack;
 
 public class CommonUtilities {
 
-    //TODO rename to getTrackURIs
-
     /**
      * Loops through all the given tracks and stores their URIs in a string array which is then returned
      *
@@ -46,6 +44,22 @@ public class CommonUtilities {
         }
 
         return ids;
+    }
+
+    /**
+     * @param arrays array arguments to concat
+     * @return String array of the concatenated arguments
+     */
+    public static String[] concatTracks(String[]... arrays) {
+
+        Stream<String> stream = Stream.of();
+
+        for (String[] array : arrays) {
+            stream = Stream.concat(stream, Arrays.stream(array));
+        }
+
+        return stream.toArray(String[]::new);
+
     }
 
     public static String[] eliminateDuplicates(SpotifyApi spotify_api, String[] track_uris, String genres,
@@ -76,7 +90,6 @@ public class CommonUtilities {
 
             track_uris[track_index] = replacement; // Replace the song
         }
-
         return track_uris;
     }
 
@@ -129,7 +142,6 @@ public class CommonUtilities {
             offset++; // relax constraints
             margin_of_error += .05;
         }
-
     }
 
     /**
@@ -170,5 +182,4 @@ public class CommonUtilities {
             return track2;
         }
     }
-
 }

@@ -15,8 +15,7 @@ import java.util.*;
 
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicCheckingUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicTrackUtilities.*;
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.eliminateDuplicates;
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 

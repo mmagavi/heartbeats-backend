@@ -30,20 +30,4 @@ public class ClassicTrackUtilities {
 
         return return_tracks;
     }
-
-    /**
-     * @param arrays array arguments to concat
-     * @return String array of the concatenated arguments
-     */
-    protected static String[] concatTracks(String[]... arrays) {
-
-        Stream<String> stream = Stream.of();
-
-        for (String[] array : arrays) {
-            stream = Stream.concat(stream, Arrays.stream(array));
-        }
-
-        return stream.toArray(String[]::new);
-
-    }
 }
