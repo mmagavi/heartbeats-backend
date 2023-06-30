@@ -97,6 +97,7 @@ td {
   color: white;
   border: none;
   margin-bottom: 20vh;
+  max-width: 10vw;
   font-size: 20px;
   font-family: Avenir, serif;
   background-color: transparent;
@@ -213,6 +214,18 @@ iframe {
   color: white;
 }
 
+.footer {
+    margin-bottom: 10vh;
+  font-size: 20px;
+    color: white;
+  text-align: center;
+}
+.questionsPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .loginBody {
   animation: fadeIn 2s;
   color: white;
@@ -268,6 +281,7 @@ iframe {
   padding: 2vh 2vw;
   border-radius: 25px;
   margin-bottom: 20vh;
+  max-width: 10vw;
   font-size: 20px;
   outline-width: 0px;
   background-color: rgba(175, 175, 175, 0.88);
@@ -559,6 +573,7 @@ input:focus-visible:hover,
     border: none;
     margin-bottom: 20vh;
     margin-top: 10vh;
+    max-width: 30vw;
     font-size: 20px;
     font-family: Avenir, serif;
     background-color: transparent;

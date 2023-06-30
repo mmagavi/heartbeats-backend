@@ -16,6 +16,7 @@ export const ReviewButton_AriaLabel = "Submit button";
 export const GenreQuestion_AriaLabel = "Genre question";
 export const ModeQuestion_AriaLabel = "Mode question";
 export const LoginNav_AriaLabel = "Navigate to login page";
+export const Footer_AriaLabel = "Footer";
 
 // list of role strings for accessibility and testing!
 export const Question_Role = "Question";
