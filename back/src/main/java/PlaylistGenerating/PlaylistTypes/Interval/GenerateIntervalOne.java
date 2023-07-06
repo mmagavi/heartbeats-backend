@@ -3,6 +3,7 @@ package PlaylistGenerating.PlaylistTypes.Interval;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
+import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
@@ -62,7 +63,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      * @param age Age of the user
      * @param workout_length Length of the workout
      */
-    public GenerateIntervalOne(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity) throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException {
+    public GenerateIntervalOne(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
+            throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
 
         super(spotify_api, genres, age, workout_length, intensity);
 

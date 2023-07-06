@@ -3,13 +3,11 @@ package PlaylistGenerating.PlaylistTypes;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
+import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
 import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 import SpotifyUtilities.RecommendationArguments;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Recommendations;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Arrays;
 
@@ -18,6 +16,7 @@ import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
 import static SpotifyUtilities.TrackUtilities.duration_comparator;
+import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 abstract public class GeneratePlaylist {
 
@@ -39,8 +38,10 @@ abstract public class GeneratePlaylist {
     protected String seed_tracks;
     protected final int target_bpm;
 
+    protected User user;
+
     public GeneratePlaylist(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
-    throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException {
+    throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
 
         this.spotify_api = spotify_api;
         this.genres = genres;
@@ -49,6 +50,7 @@ abstract public class GeneratePlaylist {
         this.workout_length_ms = workout_length * 60_000;
         this.intensity = intensity;
         this.margin_of_error = .02f;
+        this.user = getCurrentUsersProfile(spotify_api);
 
         target_bpm = getTargetBPM();
 
@@ -122,7 +124,7 @@ abstract public class GeneratePlaylist {
 
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, seed_artists, seed_tracks,
-                min_tempo, max_tempo, target_tempo);
+                min_tempo, max_tempo, target_tempo, user.getCountry());
 
         Recommendations recommendations = getRecommendations(current_arguments);
 
@@ -159,7 +161,6 @@ abstract public class GeneratePlaylist {
 
             flag = true;
         }
-
         return string_builder.toString();
     }
 
@@ -189,7 +190,6 @@ abstract public class GeneratePlaylist {
 
             flag = true;
         }
-
         return string_builder.toString();
     }
 }

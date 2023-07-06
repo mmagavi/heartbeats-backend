@@ -77,6 +77,9 @@ public class GeneratePlaylistHandler implements Route {
                 case "interval_two" -> {
                     generator = new GenerateIntervalTwo(spotify_api, genres, age, workout_length, intensity);
                 }
+//                case "relax" -> {
+//                    generator = new GenerateRelax(spotify_api, genres, age, workout_length, intensity);
+//                }
                 default -> {
                     throw new InvalidPlaylistTypeException("playlist_type must be" +
                             " \"classic\", \"interval_one\", or \"interval_two\"");
