@@ -7,7 +7,10 @@ import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
+import java.util.Arrays;
+
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
+import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkPlaylistDuration;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
@@ -35,14 +38,22 @@ import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
  */
 public class GenerateIntervalOne extends GeneratePlaylist {
 
-    private final String seed_artists;
-    private final String seed_tracks;
-    private final int target_bpm;
-    private final int seed_genres_provided;
     private final int num_intervals;
+    protected static int num_tracks = 0;
+    protected static int target_length_ms = 0;
+    protected static int min_target_length_ms;
+    protected static int max_target_length_ms;
 
-    private int desired_num_seed_artists;
-    private int desired_num_seed_tracks;
+    protected static int tracks_per_interval = 0;
+    protected static int num_cool_intervals = 0;
+    protected static int num_warm_intervals = 0;
+
+    //TODO: determine ideal og offset
+    protected static int og_offset = 5;
+
+    protected enum DURATION_RESULT {
+        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
+    }
 
     /**
      * Constructor for generating a classic style playlist
@@ -55,15 +66,26 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         super(spotify_api, genres, age, workout_length, intensity);
 
-        target_bpm = getTargetBPM();
-
         num_intervals = getNumIntervals();
+        num_tracks = Math.round(workout_length_min / avg_song_len);
 
-        seed_genres_provided = (int) genres.chars().filter(ch -> ch == ',').count();
-        determineSeedLimits();
+        target_length_ms = workout_length_ms;
+        setTargetLengths(margin_of_error);
 
-        seed_artists = getSeedArtists();
-        seed_tracks = getSeedTracks();
+        tracks_per_interval = num_tracks / num_intervals;
+        num_cool_intervals = (num_intervals - 1) / 2 + 1;
+        num_warm_intervals = (num_intervals - 1) / 2;
+    }
+
+    /**
+     * Sets the min and max Target lengths based on the provided margin of error
+     *
+     * @param margin_of_error margin of error used in setting the min and max target lengths
+     */
+    private void setTargetLengths(float margin_of_error) {
+        // MilliSeconds of length that is acceptable for the target sequence based on our MOE
+        min_target_length_ms = target_length_ms - (int) (target_length_ms * margin_of_error);
+        max_target_length_ms = target_length_ms + (int) (target_length_ms * margin_of_error);
     }
 
     /**
@@ -95,124 +117,36 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         User user = getCurrentUsersProfile(spotify_api);
 
         // get cool tracks
-        String[] cool_tracks = findCoolTracks();
+        TrackSimplified[] cool_tracks = findCoolTracks();
         // get warm tracks
-        String[] warm_tracks = findWarmTracks();
+        TrackSimplified[] warm_tracks = findWarmTracks();
 
         // concat tracks
-        String[] playlist_track_uris = concatTracks(cool_tracks, warm_tracks);
+        // TODO: implement this function
+        TrackSimplified[][] playlist_track_uris = getTracks(cool_tracks, warm_tracks);
+        // TODO: arrange tracks properly
+        TrackSimplified[] final_playlist = concatTracks(playlist_track_uris[0], playlist_track_uris[1]);
 
-        // return playlist
+        // TODO: return playlist
         return null;
-    }
-
-    @Override
-    protected int getTargetBPM() {
-        return 0;
-    }
-
-    /**
-     * Based on the number of seed genres provided set the limits for seed artists and seed tracks.
-     * This is important as the recommendation endpoint only allows 5 seed values in any combination
-     * of genres, tracks, and artists
-     */
-    private void determineSeedLimits() {
-        switch (seed_genres_provided) {
-            case 1 -> {
-                desired_num_seed_artists = 2;
-                desired_num_seed_tracks = 2;
-            }
-            case 2 -> {
-                desired_num_seed_artists = 1;
-                desired_num_seed_tracks = 2;
-            }
-            case 3 -> {
-                desired_num_seed_artists = 1;
-                desired_num_seed_tracks = 1;
-            }
-        }
-    }
-
-    /**
-     * Gets the users top artist(s) and returns a comma seperated string of their IDS
-     *
-     * @return comma seperated string of IDs of the users top artist(s)
-     * @throws GetUsersTopArtistsRequestException if an error occurs fetching the users top artists
-     */
-    private String getSeedArtists() throws GetUsersTopArtistsRequestException {
-
-        Artist[] seed_artists = GetUsersTopArtists(spotify_api, desired_num_seed_artists);
-
-        StringBuilder string_builder = new StringBuilder();
-
-        // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
-        boolean flag = false;
-
-        for (Artist artist : seed_artists) {
-
-            // This will be false for the first iteration preventing a leading comma but true for all the rest
-            if (flag) {
-                string_builder.append(",");
-            }
-
-            string_builder.append(artist.getId());
-
-            flag = true;
-        }
-
-        return string_builder.toString();
-    }
-
-    /**
-     * Gets the users top track(s) and returns a comma seperated string of their IDS
-     *
-     * @return comma seperated string of IDs of the users top track(s)
-     * @throws GetUsersTopTracksRequestException if an error occurs fetching the users top tracks
-     */
-    private String getSeedTracks() throws GetUsersTopTracksRequestException {
-
-        Track[] seed_tracks = GetUsersTopTracks(spotify_api, desired_num_seed_tracks);
-
-        StringBuilder string_builder = new StringBuilder();
-
-        // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
-        boolean flag = false;
-
-        for (Track track : seed_tracks) {
-
-            // This will be false for the first iteration preventing a leading comma but true for all the rest
-            if (flag) {
-                string_builder.append(",");
-            }
-
-            string_builder.append(track.getId());
-
-            flag = true;
-        }
-
-        return string_builder.toString();
     }
 
     /**
      * Finds tracks for the 'cool' regions of the playlist
      * @return array of track IDs
      */
-    private String[] findCoolTracks() throws GetRecommendationsException {
+    private TrackSimplified[] findCoolTracks() throws GetRecommendationsException {
 
         String[] track_ids = null;
 
-        // figure out how many tracks we need
-        int num_tracks = (num_intervals - 1)/2 + 1;
-
-        // determine the range of BPMs we want.. tbd
-        int local_offset = 5; //todo: figure out how to determine this
+        int local_offset = og_offset; //currently 5
 
         do {
-
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2,
+            // get num_tracks tracks from the resting BPM (twice as many as we need)
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks,
                     resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
 
-            if (recommended_tracks != null) return getTrackURIs(recommended_tracks);
+            if (recommended_tracks != null) return recommended_tracks;
 
             System.out.println("null");
             System.out.println(local_offset);
@@ -226,20 +160,16 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      * Finds tracks for the 'warm' regions of the playlist
      * @return array of track IDs
      */
-    private String[] findWarmTracks() throws GetRecommendationsException {
+    private TrackSimplified[] findWarmTracks() throws GetRecommendationsException {
 
-        // figure out how many tracks we need
-        int num_tracks = (num_intervals - 1)/2;
-
-        // determine the range of BPMs we want.. tbd
-        int local_offset = 5; //todo: figure out how to determine this
+        int local_offset = og_offset; // currently 5
 
         do {
-
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2,
+            // get num_tracks tracks from the resting BPM (twice as many as we need)
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks,
                     target_bpm - local_offset, target_bpm + local_offset, target_bpm);
 
-            if (recommended_tracks != null) return getTrackURIs(recommended_tracks);
+            if (recommended_tracks != null) return recommended_tracks;
 
             System.out.println("null");
             System.out.println(local_offset);
@@ -250,14 +180,80 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     }
 
     /**
-     * Concatenates the cool and warm tracks into a single array of the proper length
+     * Narrows down cool and warm tracks so when they are combined they will be the proper length
+     * DOES NOT CONCATENATE OR ORGANIZE INTO INTERVALS
+     *
      * @param cool_tracks tracks for the cool regions of the playlist
      * @param warm_tracks tracks for the warm regions of the playlist
-     * @return array of track IDs
+     *
+     * @return ARRAY OF arrays of track IDs - cool tracks and then warm tracks
      */
-    private String[] concatTracks(String[] cool_tracks, String[] warm_tracks) {
+    private TrackSimplified[][] getTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+
+        // Determine the number cool and warm songs we need
+        int num_warm_tracks = num_warm_intervals * tracks_per_interval;
+        int num_cool_tracks = num_cool_intervals * tracks_per_interval;
+
+        // edge case: try the shortest possible combination of songs
+        // TODO: probably not good to make a copy of the array...
+        // TODO: ask dalton about using Deques instead of arrays..
+        DURATION_RESULT shortest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks));
+
+        // if by an off chance this is perfect....
+        // TODO: do i need to leave this in?
+        if (shortest_duration == DURATION_RESULT.ACCEPTABLE) {
+            return new TrackSimplified[][]{Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks)};
+        }
+
+        // while the shortest duration is too short, add a song to the cool tracks
+        while (shortest_duration == DURATION_RESULT.TOO_SHORT) {
+            num_tracks++;
+            tracks_per_interval = num_tracks / num_intervals;
+            num_warm_tracks = num_warm_intervals * tracks_per_interval;
+            num_cool_tracks = num_cool_intervals * tracks_per_interval;
+
+            shortest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks));
+        }
+
+        // edge case: try the longest possible combination of songs
+        DURATION_RESULT longest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
+                cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1));
+
+        // if by an off chance this is perfect....
+        // TODO: do i need to leave this in?
+        if (longest_duration == DURATION_RESULT.ACCEPTABLE) {
+            return new TrackSimplified[][]{Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
+                    cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1)};
+        }
+
+        // while duration is too long, remove songs from total num tracks
+        while (longest_duration == DURATION_RESULT.TOO_LONG) {
+            num_tracks--;
+            tracks_per_interval = num_tracks / num_intervals;
+            num_warm_tracks = num_warm_intervals * tracks_per_interval;
+            num_cool_tracks = num_cool_intervals * tracks_per_interval;
+
+            longest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
+                    cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1));
+        }
+
+        // TODO: we can keep checking and upping the starting and ending index until we find a good combination
 
 
+        return null;
+    }
+
+    /**
+     * Concatenates the cool and warm tracks into one playlist with the proper
+     * varying tempo and intervals
+     *
+     * @param cool_tracks tracks for the cool regions of the playlist
+     * @param warm_tracks tracks for the warm regions of the playlist
+     * @return the final array of track IDS
+     */
+    private TrackSimplified[] concatTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+
+        //TODO: placeholder
 
         return null;
     }
