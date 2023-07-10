@@ -10,10 +10,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Arrays;
 
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
 import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkPlaylistDuration;
-import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
-import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 /**
@@ -125,11 +122,13 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         // concat tracks
         // TODO: implement this function
-        TrackSimplified[][] playlist_track_uris = getTracks(cool_tracks, warm_tracks);
+        TrackSimplified[][] playlist_track_uris = narrowTracks(cool_tracks, warm_tracks);
         // TODO: arrange tracks properly
+        // TODO: make sure not null
         TrackSimplified[] final_playlist = concatTracks(playlist_track_uris[0], playlist_track_uris[1]);
 
-        // TODO: return playlist
+        // TODO: create playlist & return id
+
         return null;
     }
 
@@ -190,7 +189,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      *
      * @return ARRAY OF arrays of track IDs - cool tracks and then warm tracks
      */
-    private TrackSimplified[][] getTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+    private TrackSimplified[][] narrowTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
 
         // Determine the number cool and warm songs we need
         int num_warm_tracks = num_warm_intervals * tracks_per_interval;
@@ -255,7 +254,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      */
     private TrackSimplified[] concatTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
 
-        //TODO: placeholder
+        //TODO: placeholder. should be straightforward
+
 
         return null;
     }
