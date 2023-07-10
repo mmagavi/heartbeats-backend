@@ -3,6 +3,7 @@ package SpotifyUtilities;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForSeveralTracksException;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
 import ExceptionClasses.TrackExceptions.GetTrackException;
+import org.jetbrains.annotations.Contract;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -16,10 +17,24 @@ import java.util.Comparator;
 public class TrackUtilities {
     private static final String[] ids = new String[]{"01iyCAUm8EvOFqVWYJ3dVX"};
 
-    // Compares tracks by duration which we want to sort all tracks by (in ascending order)
+    // Compares tracks by duration
     public static final Comparator<TrackSimplified> duration_comparator =
             (TrackSimplified track_one, TrackSimplified track_two)
                     -> Integer.compare(track_one.getDurationMs(), track_two.getDurationMs());
+
+    // Compares AudioFeatures by tempo
+    public static final Comparator<AudioFeatures> tempo_comparator =
+            (AudioFeatures feature_one, AudioFeatures feature_two)
+                    -> compareTempoDescending(feature_one.getTempo(), feature_two.getTempo());
+
+    @Contract(pure = true)
+    public static int compareTempoDescending(float tempo_one, float tempo_two){
+
+        if(tempo_one == tempo_two) return 0;
+        else if(tempo_one < tempo_two) return 1;
+        return -1;
+
+    }
 
 
     /**

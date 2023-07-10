@@ -41,7 +41,6 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     private final int target_bpm;
     private final int seed_genres_provided;
     private final int num_intervals;
-
     private int desired_num_seed_artists;
     private int desired_num_seed_tracks;
 

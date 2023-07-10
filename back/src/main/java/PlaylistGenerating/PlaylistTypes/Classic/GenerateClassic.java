@@ -66,7 +66,6 @@ public class GenerateClassic extends GeneratePlaylist {
             transition_length_min = 3.5f; // If the workout is short the transition will take up more
         }
 
-
         // Number of intervals in which there is one song per interval (For warmup/wind-down only)
         // We will round up to avoid intervals needing to have exceptionally long songs
         num_intervals = Math.round(transition_length_min / avg_song_len);
