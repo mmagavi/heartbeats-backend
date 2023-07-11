@@ -1,6 +1,7 @@
 package PlaylistGenerating.PlaylistTypes;
 
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
+import ExceptionClasses.TrackExceptions.GetAudioFeaturesForSeveralTracksException;
 import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
 import SpotifyUtilities.RecommendationArguments;
 import SpotifyUtilities.TrackUtilities;
@@ -8,6 +9,7 @@ import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.Recommendations;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.util.Arrays;
@@ -16,18 +18,37 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
-import static SpotifyUtilities.TrackUtilities.duration_comparator;
-import static SpotifyUtilities.TrackUtilities.getAudioFeaturesForTrack;
+import static SpotifyUtilities.TrackUtilities.*;
 
 public class CommonUtilities {
 
     /**
      * Loops through all the given tracks and stores their URIs in a string array which is then returned
      *
-     * @param tracks array of tracks to fetch the id from
-     * @return String array of all the given track's ids, returns null if tracks is null
+     * @param tracks array of tracks to fetch the URI from
+     * @return String array of all the given track's URIs, returns null if tracks is null
      */
     public static String[] getTrackURIs(TrackSimplified[] tracks) {
+
+        if (tracks == null) return null;
+
+        int size = tracks.length;
+
+        String[] uris = new String[size];
+
+        for (int index = 0; index < size; index++) {
+            uris[index] = tracks[index].getUri();
+        }
+        return uris;
+    }
+
+    /**
+     * Loops through all the given tracks and stores their IDs in a string array which is then returned
+     *
+     * @param tracks array of tracks to fetch the ID from
+     * @return String array of all the given track's IDs, returns null if tracks is null
+     */
+    public static String[] getTrackIDs(TrackSimplified[] tracks) {
 
         if (tracks == null) return null;
 
@@ -36,10 +57,29 @@ public class CommonUtilities {
         String[] ids = new String[size];
 
         for (int index = 0; index < size; index++) {
-            ids[index] = tracks[index].getUri();
-            //ids[index] = tracks[index].getId();
+            ids[index] = tracks[index].getId();
         }
         return ids;
+    }
+
+    /**
+     * Loops through all the given features and stores their URIs in a string array which is then returned
+     *
+     * @param features array of features to fetch the URI from
+     * @return String array of all the given track's URIs, returns null if features is null
+     */
+    public static String[] getTrackURIsFromAudioFeatures(AudioFeatures[] features) {
+
+        if (features == null) return null;
+
+        int size = features.length;
+
+        String[] uris = new String[size];
+
+        for (int index = 0; index < size; index++) {
+            uris[index] = features[index].getUri();
+        }
+        return uris;
     }
 
     /**
@@ -55,6 +95,40 @@ public class CommonUtilities {
         }
 
         return stream.toArray(TrackSimplified[]::new);
+    }
+
+    /**
+     * Recursively searches for the greatest common factor GCF between the two given numbers
+     * @param num_one first number
+     * @param num_two second number
+     * @return the GCF of num_one and num_two
+     */
+    public static int GCF(int num_one, int num_two){
+
+        if(num_two == 0){
+            return num_one;
+        } else{
+            return GCF(num_two, num_one % num_two);
+        }
+
+    }
+
+    /**
+     * Prints out the tempo of each track provided in the tracks array
+     *
+     * @param spotify_api api object used to make api calls
+     * @param tracks TrackSimplified array from which to print the tempo of each song
+     * @throws GetAudioFeaturesForSeveralTracksException If an error is encountered with Spotify's API
+     */
+    public static void printTempos(SpotifyApi spotify_api, TrackSimplified[] tracks)
+            throws GetAudioFeaturesForSeveralTracksException {
+
+        String[] track_ids = getTrackIDs(tracks);
+        AudioFeatures[] features = getAudioFeaturesForSeveralTracks(spotify_api, track_ids);
+
+        for(AudioFeatures feature: features){
+            System.out.println(feature.getTempo());
+        }
     }
 
     public static TrackSimplified[] eliminateDupesAndNonPlayable(SpotifyApi spotify_api, TrackSimplified[] tracks,

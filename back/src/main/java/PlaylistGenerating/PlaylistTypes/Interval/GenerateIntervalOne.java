@@ -68,7 +68,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         num_intervals = getNumIntervals();
         num_tracks = Math.round(workout_length_min / avg_song_len);
 
-        target_length_ms = workout_length_ms;
+        target_length_ms = workout_len_ms;
         setTargetLengths(margin_of_error);
 
         tracks_per_interval = num_tracks / num_intervals;

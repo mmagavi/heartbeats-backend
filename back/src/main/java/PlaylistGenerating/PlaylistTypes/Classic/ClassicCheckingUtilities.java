@@ -17,17 +17,17 @@ public class ClassicCheckingUtilities {
      * @param tracks tracks to be checked for their duration
      * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
      */
-    protected static GenerateClassic.DURATION_RESULT checkTransitionDuration(TrackSimplified[] tracks) {
+    protected static DURATION_RESULT checkTransitionDuration(TrackSimplified[] tracks) {
         int duration_ms = 0;
 
         for (TrackSimplified track : tracks) {
             duration_ms += track.getDurationMs();
         }
 
-        System.out.println("Duration: " + duration_ms);
-        System.out.println("Transition Duration: " + transition_length_ms);
-        System.out.println("Min Duration: " + min_transition_length_ms);
-        System.out.println("Max Duration: " + max_transition_length_ms);
+//        System.out.println("Duration: " + duration_ms);
+//        System.out.println("Transition Duration: " + transition_length_ms);
+//        System.out.println("Min Duration: " + min_transition_length_ms);
+//        System.out.println("Max Duration: " + max_transition_length_ms);
 
         int thirty_seconds_ms = 30_000;
 
@@ -51,24 +51,24 @@ public class ClassicCheckingUtilities {
      * @param tracks tracks to be checked for their duration
      * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
      */
-    protected static GenerateClassic.DURATION_RESULT checkTargetDuration(Deque<TrackSimplified> tracks) {
+    protected static DURATION_RESULT checkTargetDuration(Deque<TrackSimplified> tracks) {
         int duration_ms = 0;
 
         for (TrackSimplified track : tracks) {
             duration_ms += track.getDurationMs();
         }
 
-        System.out.println("Duration: " + duration_ms);
-        System.out.println("Target Duration: " + target_length_ms);
-        System.out.println("Min Duration: " + min_target_length_ms);
-        System.out.println("Max Duration: " + max_target_length_ms);
+//        System.out.println("Duration: " + duration_ms);
+//        System.out.println("Target Duration: " + target_length_ms);
+//        System.out.println("Min Duration: " + min_target_length_ms);
+//        System.out.println("Max Duration: " + max_target_length_ms);
 
         if (duration_ms < min_target_length_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_SHORT;
+            return DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_target_length_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_LONG;
+            return DURATION_RESULT.TOO_LONG;
         } else {
-            return GenerateClassic.DURATION_RESULT.ACCEPTABLE;
+            return DURATION_RESULT.ACCEPTABLE;
         }
     }
 

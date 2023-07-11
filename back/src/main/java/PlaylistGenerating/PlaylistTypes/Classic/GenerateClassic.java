@@ -16,7 +16,6 @@ import static PlaylistGenerating.PlaylistTypes.Classic.ClassicCheckingUtilities.
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicTrackUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
-import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 public class GenerateClassic extends GeneratePlaylist {
 
@@ -28,11 +27,6 @@ public class GenerateClassic extends GeneratePlaylist {
     protected static int target_length_ms = 0;
     protected static int min_target_length_ms;
     protected static int max_target_length_ms;
-
-    protected enum DURATION_RESULT {
-        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
-    }
-
     private final float bpm_difference;
     private HashMap<Integer, TrackSimplified[]> intervals;
     private final float transition_moe = .02f;
@@ -74,7 +68,7 @@ public class GenerateClassic extends GeneratePlaylist {
         transition_length_ms = (int) (transition_length_min * 60_000); // conversion
         setTransitionLengths(transition_moe);
 
-        target_length_ms = workout_length_ms - (transition_length_ms * 2);
+        target_length_ms = workout_len_ms - (transition_length_ms * 2);
         setTargetLengths(margin_of_error);
     }
 

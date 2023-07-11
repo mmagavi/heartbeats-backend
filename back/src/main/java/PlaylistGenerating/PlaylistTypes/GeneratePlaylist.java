@@ -12,6 +12,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 import java.util.Arrays;
 
 import static PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges.getTargetHeartRateRange;
+import static SpotifyUtilities.BrowsingUtilities.getRecommendationTempoRange;
 import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
@@ -20,13 +21,16 @@ import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 abstract public class GeneratePlaylist {
 
+    public static enum DURATION_RESULT {
+        ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
+    }
+
     protected final String genres;
     // The spotifyAPI containing the user's information
     protected final SpotifyApi spotify_api;
     protected final int age;
     protected final int workout_length_min;
-
-    protected final int workout_length_ms; // Length of the workout in MilliSeconds
+    protected final int workout_len_ms; // Length of the workout in MilliSeconds
     protected final String intensity;
     protected final int resting_bpm = 69; // assuming an average resting bpm
     protected final float margin_of_error; // percent a playlist can be off the target by and still be acceptable
@@ -47,7 +51,7 @@ abstract public class GeneratePlaylist {
         this.genres = genres;
         this.age = age;
         this.workout_length_min = workout_length;
-        this.workout_length_ms = workout_length * 60_000;
+        this.workout_len_ms = workout_length * 60_000;
         this.intensity = intensity;
         this.margin_of_error = .02f;
         this.user = getCurrentUsersProfile(spotify_api);
@@ -110,7 +114,7 @@ abstract public class GeneratePlaylist {
     }
 
     /**
-     * Calls the recommendation endpoint and sorts the returned response
+     * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
      *
      * @param limit number of songs to fetch
      * @param min_tempo min tempo of songs to fetch
@@ -127,6 +131,32 @@ abstract public class GeneratePlaylist {
                 min_tempo, max_tempo, target_tempo, user.getCountry());
 
         Recommendations recommendations = getRecommendations(current_arguments);
+
+        TrackSimplified[] recommended_tracks = recommendations.getTracks();
+
+        Arrays.sort(recommended_tracks, duration_comparator);
+
+        return recommended_tracks;
+    }
+
+    /**
+     * Calls recommendation endpoint and sorts the returned response (excludes target tempo to capture a large range)
+     *
+     * @param limit number of songs to fetch
+     * @param min_tempo min tempo of songs to fetch
+     * @param max_tempo max tempo of songs to fetch
+     * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
+     * @throws GetRecommendationsException if an error occurs when fetching the recommendation
+     */
+    protected TrackSimplified[] getSortedRecommendationRange(int limit, float min_tempo, float max_tempo)
+            throws GetRecommendationsException {
+
+        // Target tempo will not be used, 0 is used as a placeholder
+        RecommendationArguments current_arguments = new RecommendationArguments(
+                spotify_api, limit, genres, seed_artists, seed_tracks,
+                min_tempo, max_tempo, 0, user.getCountry());
+
+        Recommendations recommendations = getRecommendationTempoRange(current_arguments);
 
         TrackSimplified[] recommended_tracks = recommendations.getTracks();
 
