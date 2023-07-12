@@ -91,7 +91,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      * @param margin_of_error margin of error used in setting the min and max interval lengths
      */
     private void setIntervalLengths(float margin_of_error) {
-        // MilliSeconds of length that is acceptable for the target sequence based on our MOE
+        // Milliseconds of length that is acceptable for the target sequence based on our MOE
         min_interval_length_ms = interval_length_ms - (int) (interval_length_ms * margin_of_error);
         max_interval_length_ms = interval_length_ms + (int) (interval_length_ms * margin_of_error);
     }
@@ -132,49 +132,34 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         String playlist_id = playlist.getId();
         String[] playlist_track_uris = getTrackURIs(final_playlist_tracks);
 
-        System.out.println("Creating Playlist");
+        System.out.println("Creating Interval One Playlist");
         PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, playlist_track_uris);
 
         return playlist_id;
     }
 
     /**
-     * Finds tracks for the lower-bpm regions of the playlist
+     * Finds tracks for a given interval of the playlist
      * Gets twice the expected number of tracks for a given interval
+     * @param interval_type true if warm, false if cool
      * @return array of track IDs
      */
-    private TrackSimplified[] findSlowTracks() throws GetRecommendationsException {
+    private TrackSimplified[] findTracks(boolean interval_type) throws GetRecommendationsException {
 
         int local_offset = og_offset; //currently 5
 
         do {
             // get num_tracks tracks from the resting BPM (twice as many as we need)
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
-                    resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
 
-            if (recommended_tracks != null) return recommended_tracks;
+            TrackSimplified[] recommended_tracks;
 
-            System.out.println("null");
-            System.out.println(local_offset);
-
-            local_offset++;
-
-        } while (true);
-    }
-
-    /**
-     * Finds tracks for the higher BPM regions of the playlist
-     * Gets twice the expected number of tracks for a given interval
-     * @return array of track IDs
-     */
-    private TrackSimplified[] findFastTracks() throws GetRecommendationsException {
-
-        int local_offset = og_offset; // currently 5
-
-        do {
-            // get num_tracks tracks from the resting BPM (twice as many as we need)
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
-                    target_bpm - local_offset, target_bpm + local_offset, target_bpm);
+            if (!interval_type) {
+                recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
+                        resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
+            } else {
+                recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
+                        target_bpm - local_offset, target_bpm + local_offset, target_bpm);
+            }
 
             if (recommended_tracks != null) return recommended_tracks;
 
@@ -200,64 +185,32 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         // For each interval, get tracks and add them to the playlist
         for (int i = 0; i < num_intervals; i++) {
 
-            // If we are in a 'cool' interval
-            if (i % 2 == 0) {
+            // Get tracks for the warm interval
+            TrackSimplified[] broad_tracks = findTracks(i % 2 == 1);
 
-                // Get tracks for the cool interval
-                TrackSimplified[] broad_tracks = findSlowTracks();
+            TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
 
-                TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+            int count = 0;
 
-                int count = 0;
+            while (best_fit_tracks == null) {
 
-                while (best_fit_tracks == null) {
+                // If we have tried more than 5 times, throw an exception
+                if (count > 5) throw new GetRecommendationsException("Could not find tracks for fast interval");
 
-                    // If we have tried more than 5 times, throw an exception
-                    if (count > 5) throw new GetRecommendationsException("Could not find tracks for cool interval");
+                // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
 
-                    // Todo: increase the offset ? Dont wanna infinite loop
+                // Get new tracks
+                broad_tracks = findTracks(true);
 
-                    // Get new tracks
-                    broad_tracks = findSlowTracks();
-
-                    // Try again
-                    best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
-                    count++;
-                }
-
-                // add best fit tracks to final_playlist
-                if (tracks_per_interval >= 0)
-                    System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
-
-            } else {
-
-                // Get tracks for the warm interval
-                TrackSimplified[] broad_tracks = findFastTracks();
-
-                TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
-
-                int count = 0;
-
-                while (best_fit_tracks == null) {
-
-                    // If we have tried more than 5 times, throw an exception
-                    if (count > 5) throw new GetRecommendationsException("Could not find tracks for warm interval");
-
-                    // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
-
-                    // Get new tracks
-                    broad_tracks = findSlowTracks();
-
-                    // Try again
-                    best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
-                    count++;
-                }
-
-                // add best fit tracks to final_playlist
-                if (tracks_per_interval >= 0)
-                    System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
-
+                // Try again
+                best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+                count++;
             }
+
+            // add best fit tracks to final_playlist
+            if (tracks_per_interval >= 0)
+                System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
+
         }
 
         // Todo: error check this call
