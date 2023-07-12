@@ -2,24 +2,22 @@ package PlaylistGenerating.PlaylistTypes.Interval;
 
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
+import java.util.Deque;
+
 import static PlaylistGenerating.PlaylistTypes.Interval.GenerateIntervalOne.*;
 
 public class IntervalCheckingUtilities {
 
     /**
-     * Checks a combination of warm and cool songs to verify that they have a proper total
+     * Checks a combination of tracks to verify that they have a proper total
      * duration
-     * @param warm_tracks - the warm tracks to check - aka songs for the high intensity part of the workout
-     * @param cool_tracks - the 'cool' tracks to check - aka songs for the low intensity part of the workout
+     * @param tracks tracks to be checked for their duration
      * @return DURATION_RESULT enum value representing the result of the check
      */
-    protected static GenerateIntervalOne.DURATION_RESULT checkPlaylistDuration(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+    protected static GenerateIntervalOne.DURATION_RESULT checkTotalDuration(TrackSimplified[] tracks) {
         int duration_ms = 0;
 
-        for (TrackSimplified track : cool_tracks) {
-            duration_ms += track.getDurationMs();
-        }
-        for (TrackSimplified track : warm_tracks) {
+        for (TrackSimplified track : tracks) {
             duration_ms += track.getDurationMs();
         }
 
@@ -36,6 +34,34 @@ public class IntervalCheckingUtilities {
         } else if (duration_ms < min_target_length_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_target_length_ms) {
+            return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
+        } else {
+            return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;
+        }
+    }
+
+    /**
+     * Checks if the track array provided is within the allowable duration range
+     * SPECIFICALLY FOR INTERVALS
+     *
+     * @param tracks tracks to be checked for their duration
+     * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
+     */
+    protected static GenerateIntervalOne.DURATION_RESULT checkIntervalDuration(Deque<TrackSimplified> tracks) {
+        int duration_ms = 0;
+
+        for (TrackSimplified track : tracks) {
+            duration_ms += track.getDurationMs();
+        }
+
+        System.out.println("Duration: " + duration_ms);
+        System.out.println("Target Duration: " + interval_length_ms);
+        System.out.println("Min Duration: " + min_interval_length_ms);
+        System.out.println("Max Duration: " + max_interval_length_ms);
+
+        if (duration_ms < min_interval_length_ms) {
+            return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
+        } else if (duration_ms > max_interval_length_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
         } else {
             return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;

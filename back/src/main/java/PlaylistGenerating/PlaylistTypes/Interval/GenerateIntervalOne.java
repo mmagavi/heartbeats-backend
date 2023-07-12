@@ -4,35 +4,23 @@ import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
+import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
+import SpotifyUtilities.PlaylistUtilities;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
-import java.util.Arrays;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkPlaylistDuration;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.eliminateDupesAndNonPlayable;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
+import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkIntervalDuration;
+import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 /**
  * This class is used to generate a playlist for an interval style workout
- *
- * Plan:
- * First, determine the number of intervals we need:
- * 20 minute playlist -> 5-6 intervals?
- * 180 minute playlist -> ~12 intervals?
- * OR ask user how many intervals they want
- * OR set at 10 intervals? >60min
- * OR do by song length?
- *
- * <30 min -> do by num songs we can fit in
- *
- * Next, determine the length of each interval??
- * try combos?
- *
- * Next, pull songs at resting BPM and at target BPM
- * Two groups of songs, one for resting and one for target
- *
- *
  */
 public class GenerateIntervalOne extends GeneratePlaylist {
 
@@ -42,11 +30,15 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     protected static int min_target_length_ms;
     protected static int max_target_length_ms;
 
+    protected static int interval_length_ms = 0;
+    protected static int min_interval_length_ms;
+    protected static int max_interval_length_ms;
+
     protected static int tracks_per_interval = 0;
     protected static int num_cool_intervals = 0;
     protected static int num_warm_intervals = 0;
 
-    //TODO: determine ideal og offset
+    //Todo: determine ideal og offset
     protected static int og_offset = 5;
 
     protected enum DURATION_RESULT {
@@ -71,9 +63,15 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         target_length_ms = workout_length_ms;
         setTargetLengths(margin_of_error);
 
+        // unsure if necessary?
         tracks_per_interval = num_tracks / num_intervals;
         num_cool_intervals = (num_intervals - 1) / 2 + 1;
         num_warm_intervals = (num_intervals - 1) / 2;
+
+        //Todo: is this the right way to divide?
+        //Todo: should we keep using the same margin  of error for intervals?
+        interval_length_ms = target_length_ms / num_intervals;
+        setIntervalLengths(margin_of_error);
     }
 
     /**
@@ -88,11 +86,22 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     }
 
     /**
+     * Sets the min and max Interval lengths based on the provided margin of error
+     *
+     * @param margin_of_error margin of error used in setting the min and max interval lengths
+     */
+    private void setIntervalLengths(float margin_of_error) {
+        // MilliSeconds of length that is acceptable for the target sequence based on our MOE
+        min_interval_length_ms = interval_length_ms - (int) (interval_length_ms * margin_of_error);
+        max_interval_length_ms = interval_length_ms + (int) (interval_length_ms * margin_of_error);
+    }
+
+    /**
      * Determine the number of intervals we need based on the length of the workout
      * @return number of intervals we need
      */
     private int getNumIntervals() {
-        // TODO: test & adjust this function
+        // Todo: test & adjust this function
         // currently truncating anything after the decimal point... should we round up?
 
         if (workout_length_min <= 30) {
@@ -115,36 +124,32 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         User user = getCurrentUsersProfile(spotify_api);
 
-        // get cool tracks
-        TrackSimplified[] cool_tracks = findCoolTracks();
-        // get warm tracks
-        TrackSimplified[] warm_tracks = findWarmTracks();
+        // Build playlist (get & organize tracks)
+        TrackSimplified[] final_playlist_tracks = buildPlaylist();
 
-        // concat tracks
-        // TODO: implement this function
-        TrackSimplified[][] playlist_track_uris = narrowTracks(cool_tracks, warm_tracks);
-        // TODO: arrange tracks properly
-        // TODO: make sure not null
-        TrackSimplified[] final_playlist = concatTracks(playlist_track_uris[0], playlist_track_uris[1]);
+        // Create a playlist on the user's account
+        Playlist playlist = createPlaylist(spotify_api, user.getId(), user.getDisplayName());
+        String playlist_id = playlist.getId();
+        String[] playlist_track_uris = getTrackURIs(final_playlist_tracks);
 
-        // TODO: create playlist & return id
+        System.out.println("Creating Playlist");
+        PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, playlist_track_uris);
 
-        return null;
+        return playlist_id;
     }
 
     /**
-     * Finds tracks for the 'cool' regions of the playlist
+     * Finds tracks for the lower-bpm regions of the playlist
+     * Gets twice the expected number of tracks for a given interval
      * @return array of track IDs
      */
-    private TrackSimplified[] findCoolTracks() throws GetRecommendationsException {
-
-        String[] track_ids = null;
+    private TrackSimplified[] findSlowTracks() throws GetRecommendationsException {
 
         int local_offset = og_offset; //currently 5
 
         do {
             // get num_tracks tracks from the resting BPM (twice as many as we need)
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks,
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
                     resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
 
             if (recommended_tracks != null) return recommended_tracks;
@@ -158,16 +163,17 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     }
 
     /**
-     * Finds tracks for the 'warm' regions of the playlist
+     * Finds tracks for the higher BPM regions of the playlist
+     * Gets twice the expected number of tracks for a given interval
      * @return array of track IDs
      */
-    private TrackSimplified[] findWarmTracks() throws GetRecommendationsException {
+    private TrackSimplified[] findFastTracks() throws GetRecommendationsException {
 
         int local_offset = og_offset; // currently 5
 
         do {
             // get num_tracks tracks from the resting BPM (twice as many as we need)
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks,
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
                     target_bpm - local_offset, target_bpm + local_offset, target_bpm);
 
             if (recommended_tracks != null) return recommended_tracks;
@@ -181,81 +187,133 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     }
 
     /**
-     * Narrows down cool and warm tracks so when they are combined they will be the proper length
-     * DOES NOT CONCATENATE OR ORGANIZE INTO INTERVALS
+     * Gets tracks and builds a playlist with the proper
+     * varying tempo and intervals
      *
-     * @param cool_tracks tracks for the cool regions of the playlist
-     * @param warm_tracks tracks for the warm regions of the playlist
-     *
-     * @return ARRAY OF arrays of track IDs - cool tracks and then warm tracks
+     * @return the final array of track IDS
      */
-    private TrackSimplified[][] narrowTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+    private TrackSimplified[] buildPlaylist() throws GetRecommendationsException, GetAudioFeaturesForTrackException {
 
-        // Determine the number cool and warm songs we need
-        int num_warm_tracks = num_warm_intervals * tracks_per_interval;
-        int num_cool_tracks = num_cool_intervals * tracks_per_interval;
+        // Make an array to hold the final playlist
+        TrackSimplified[] final_playlist = new TrackSimplified[num_tracks];
 
-        // edge case: try the shortest possible combination of songs
-        // TODO: probably not good to make a copy of the array...
-        // TODO: ask dalton about using Deques instead of arrays..
-        DURATION_RESULT shortest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks));
+        // For each interval, get tracks and add them to the playlist
+        for (int i = 0; i < num_intervals; i++) {
 
-        // if by an off chance this is perfect....
-        // TODO: do i need to leave this in?
-        if (shortest_duration == DURATION_RESULT.ACCEPTABLE) {
-            return new TrackSimplified[][]{Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks)};
+            // If we are in a 'cool' interval
+            if (i % 2 == 0) {
+
+                // Get tracks for the cool interval
+                TrackSimplified[] broad_tracks = findSlowTracks();
+
+                TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+
+                int count = 0;
+
+                while (best_fit_tracks == null) {
+
+                    if (count > 5) throw new GetRecommendationsException("Could not find tracks for cool interval");
+
+                    // Todo: increase the offset ? Dont wanna infinite loop
+
+                    // Get new tracks
+                    broad_tracks = findSlowTracks();
+
+                    // Try again
+                    best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+                    count++;
+                }
+
+                // add best fit tracks to final_playlist
+                if (tracks_per_interval >= 0)
+                    System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
+
+            } else {
+
+                // Get tracks for the warm interval
+                TrackSimplified[] broad_tracks = findFastTracks();
+
+                TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+
+                int count = 0;
+
+                while (best_fit_tracks == null) {
+
+                    if (count > 5) throw new GetRecommendationsException("Could not find tracks for warm interval");
+
+                    // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
+
+                    // Get new tracks
+                    broad_tracks = findSlowTracks();
+
+                    // Try again
+                    best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+                    count++;
+                }
+
+                // add best fit tracks to final_playlist
+                if (tracks_per_interval >= 0)
+                    System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
+
+            }
         }
 
-        // while the shortest duration is too short, add a song to the cool tracks
-        while (shortest_duration == DURATION_RESULT.TOO_SHORT) {
-            num_tracks++;
-            tracks_per_interval = num_tracks / num_intervals;
-            num_warm_tracks = num_warm_intervals * tracks_per_interval;
-            num_cool_tracks = num_cool_intervals * tracks_per_interval;
+        // Todo: error check this call
+        // Eliminate dupes and non-playable
+        eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
 
-            shortest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, 0, num_cool_tracks), Arrays.copyOfRange(warm_tracks, 0, num_warm_tracks));
-        }
+        // Todo: check total playlist length...
+//        if (checkTotalDuration(final_playlist) == DURATION_RESULT.ACCEPTABLE) {
+//            // todo...
+//        } else if (checkTotalDuration(final_playlist) == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
+//            // idk...
+//        }
 
-        // edge case: try the longest possible combination of songs
-        DURATION_RESULT longest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
-                cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1));
-
-        // if by an off chance this is perfect....
-        // TODO: do i need to leave this in?
-        if (longest_duration == DURATION_RESULT.ACCEPTABLE) {
-            return new TrackSimplified[][]{Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
-                    cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1)};
-        }
-
-        // while duration is too long, remove songs from total num tracks
-        while (longest_duration == DURATION_RESULT.TOO_LONG) {
-            num_tracks--;
-            tracks_per_interval = num_tracks / num_intervals;
-            num_warm_tracks = num_warm_intervals * tracks_per_interval;
-            num_cool_tracks = num_cool_intervals * tracks_per_interval;
-
-            longest_duration = checkPlaylistDuration(Arrays.copyOfRange(cool_tracks, cool_tracks.length - num_cool_tracks - 1,
-                    cool_tracks.length - 1), Arrays.copyOfRange(warm_tracks, warm_tracks.length - 1 - num_warm_tracks, warm_tracks.length - 1));
-        }
-
-        // TODO: we can keep checking and upping the starting and ending index until we find a good combination
-
-
-        return null;
+        return final_playlist;
     }
 
     /**
-     * Concatenates the cool and warm tracks into one playlist with the proper
-     * varying tempo and intervals
+     * Finds the best sequence of songs that fit within the target duration window
+     * Grabs the first batch of songs from the beginning of the tracks array and shifts the selected group
+     * of songs to the right until a song is found, or we reach a point where it is clear no grouping is acceptable
      *
-     * @param cool_tracks tracks for the cool regions of the playlist
-     * @param warm_tracks tracks for the warm regions of the playlist
-     * @return the final array of track IDS
+     * @param tracks    TrackSimplified array to search for a good ordering of target songs
+     * @param num_songs number of songs we want to gather and check against the desired duration
+     * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
-    private TrackSimplified[] concatTracks(TrackSimplified[] cool_tracks, TrackSimplified[] warm_tracks) {
+    private TrackSimplified[] findBestIntervalTracks(TrackSimplified[] tracks, int num_songs) {
 
-        //TODO: placeholder. should be straightforward
+        Deque<TrackSimplified> deque = new ArrayDeque<>();
+        int index = 0;
+        GenerateIntervalOne.DURATION_RESULT result;
+        TrackSimplified current_track;
 
+        // Get the first batch of songs into the deque
+        for (; index < num_songs; index++) {
+            current_track = tracks[index];
+            deque.add(current_track);
+        }
+
+        result = checkIntervalDuration(deque);
+
+        if (result == GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
+        // If the shortest combination of tracks is too long there is no suitable combination so return null
+        if (result == GenerateIntervalOne.DURATION_RESULT.TOO_LONG) return null;
+
+        for (; index < tracks.length; index++) {
+
+            current_track = tracks[index];
+
+            // This essentially shifts the group of tracks we are analyzing to the right (longer) side
+            deque.removeFirst(); // remove the shortest track
+            deque.add(current_track); // add the next track in line
+
+            result = checkIntervalDuration(deque);
+
+            if (result == GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE) return deque.toArray(TrackSimplified[]::new);
+
+            if (result == GenerateIntervalOne.DURATION_RESULT.TOO_LONG) return null; // If now too long there is no acceptable combination
+        }
 
         return null;
     }
