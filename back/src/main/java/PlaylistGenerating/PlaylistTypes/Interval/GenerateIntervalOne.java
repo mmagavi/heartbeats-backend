@@ -11,10 +11,10 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.eliminateDupesAndNonPlayable;
-import static PlaylistGenerating.PlaylistTypes.CommonUtilities.getTrackURIs;
+import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkIntervalDuration;
 import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
@@ -35,8 +35,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     protected static int max_interval_length_ms;
 
     protected static int tracks_per_interval = 0;
-    protected static int num_slow_intervals = 0;
-    protected static int num_fast_intervals = 0;
+    protected static int num_cool_intervals = 0;
+    protected static int num_warm_intervals = 0;
 
     //Todo: determine ideal og offset
     protected static int og_offset = 5;
@@ -65,8 +65,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         // unsure if necessary?
         tracks_per_interval = num_tracks / num_intervals;
-        num_slow_intervals = (num_intervals - 1) / 2 + 1;
-        num_fast_intervals = (num_intervals - 1) / 2;
+        num_cool_intervals = (num_intervals - 1) / 2 + 1;
+        num_warm_intervals = (num_intervals - 1) / 2;
 
         //Todo: is this the right way to divide?
         //Todo: should we keep using the same margin  of error for intervals?
@@ -127,6 +127,9 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         // Build playlist (get & organize tracks)
         TrackSimplified[] final_playlist_tracks = buildPlaylist();
 
+        eliminateDupesAndNonPlayable(spotify_api, final_playlist_tracks, genres,
+                seed_artists, seed_tracks, user.getCountry());
+
         // Create a playlist on the user's account
         Playlist playlist = createPlaylist(spotify_api, user.getId(), user.getDisplayName());
         String playlist_id = playlist.getId();
@@ -147,6 +150,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     private TrackSimplified[] findTracks(boolean interval_type) throws GetRecommendationsException {
 
         int local_offset = og_offset; //currently 5
+        int limit = 21;
 
         do {
             // get num_tracks tracks from the resting BPM (twice as many as we need)
@@ -154,10 +158,10 @@ public class GenerateIntervalOne extends GeneratePlaylist {
             TrackSimplified[] recommended_tracks;
 
             if (!interval_type) {
-                recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
+                recommended_tracks = getSortedRecommendations(limit,
                         resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
             } else {
-                recommended_tracks = getSortedRecommendations(tracks_per_interval * 2,
+                recommended_tracks = getSortedRecommendations(limit,
                         target_bpm - local_offset, target_bpm + local_offset, target_bpm);
             }
 
@@ -179,43 +183,45 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      */
     private TrackSimplified[] buildPlaylist() throws GetRecommendationsException, GetAudioFeaturesForTrackException {
 
-        // Make an array to hold the final playlist
-        TrackSimplified[] final_playlist = new TrackSimplified[num_tracks];
+        // Make an ArrayList to hold the final playlist
+        ArrayList<TrackSimplified> final_playlist = new ArrayList<>();
+        TrackSimplified[] broad_tracks;
+        TrackSimplified[] best_fit_tracks;
+
+        boolean isSlowInterval = true;
+        float local_moe; // Keeps track of moe for duration purposes which we will be altering here
 
         // For each interval, get tracks and add them to the playlist
         for (int i = 0; i < num_intervals; i++) {
 
-            // Get tracks for the warm interval
-            TrackSimplified[] broad_tracks = findTracks(i % 2 == 1);
+            local_moe = margin_of_error;
+            //int count = 0;
 
-            TrackSimplified[] best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
-
-            int count = 0;
-
-            while (best_fit_tracks == null) {
+            do {
 
                 // If we have tried more than 5 times, throw an exception
-                if (count > 5) throw new GetRecommendationsException("Could not find tracks for fast interval");
-
+                //if (count > 5) throw new GetRecommendationsException("Could not find tracks for fast interval");
                 // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
 
                 // Get new tracks
-                broad_tracks = findTracks(i % 2 == 1);
-
-                // Try again
+                broad_tracks = findTracks(isSlowInterval);
+                // Find a good ordering
                 best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
-                count++;
-            }
 
-            // add best fit tracks to final_playlist
-            if (tracks_per_interval >= 0)
-                System.arraycopy(best_fit_tracks, 0, final_playlist, i * tracks_per_interval, tracks_per_interval);
+                //count++;
+                setIntervalLengths(local_moe += .01); // loosen MOE
 
+            } while (best_fit_tracks == null);
+
+            setIntervalLengths(margin_of_error); // restore moe
+            isSlowInterval = !isSlowInterval; // Swap flag value
+
+            addAll(final_playlist, best_fit_tracks); // add best fit tracks to final_playlist
         }
 
-        // Todo: error check this call ?
+        // Todo: error check this call
         // Eliminate dupes and non-playable
-        eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
+        //eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
 
         // Todo: check total playlist length...
 //        if (checkTotalDuration(final_playlist) == DURATION_RESULT.ACCEPTABLE) {
@@ -224,7 +230,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 //            // idk...
 //        }
 
-        return final_playlist;
+        return final_playlist.toArray(TrackSimplified[]::new);
     }
 
     /**

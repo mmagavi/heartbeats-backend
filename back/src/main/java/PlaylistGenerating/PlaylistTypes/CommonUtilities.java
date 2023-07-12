@@ -12,6 +12,7 @@ import se.michaelthelin.spotify.model_objects.specification.Recommendations;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -83,6 +84,24 @@ public class CommonUtilities {
     }
 
     /**
+     * Adds all the elements in the provided array into the provided array list and finally returning the array list
+     *
+     * @param array_list array list to be added to
+     * @param array array whose elements will be added to the provided array_list
+     * @return ArrayList<TrackSimplified> with the elements of array added to it, null if either argument is null
+     */
+    public static ArrayList<TrackSimplified> addAll(ArrayList<TrackSimplified> array_list, TrackSimplified[] array){
+
+        if(array_list == null || array == null) return new ArrayList<TrackSimplified>();
+
+        TrackSimplified current_track;
+
+        array_list.addAll(Arrays.asList(array));
+
+        return array_list;
+    }
+
+    /**
      * @param arrays array arguments to concat
      * @return String array of the concatenated arguments
      */
@@ -150,7 +169,7 @@ public class CommonUtilities {
             if (track_map.get(track) == null && is_playable) {
                 track_map.put(track, index);
             } else {
-                replacement_map.put(track, index); // If null was not returned above we know we have a dupe/non-playable
+                replacement_map.put(track, index); // We know we have a dupe/non-playable so it needs replacing
             }
         }
 
@@ -162,6 +181,7 @@ public class CommonUtilities {
             int track_index = replacement_map.get(duplicate_track); // The index we need to put the new non-duplicate song into
 
             tracks[track_index] = replacement; // Replace the song
+            track_map.put(replacement, track_index); // make sure to update the track map so we dont duplicate with replacments
         }
         return tracks;
     }
@@ -189,34 +209,34 @@ public class CommonUtilities {
             TrackSimplified[] recommended_tracks = recommendations.getTracks();
 
             // relax constraints
-            if(recommended_tracks.length == 0){
+            if(recommended_tracks.length < limit){
                 offset++;
                 continue;
             }
 
             Arrays.sort(recommended_tracks, duration_comparator);
 
-            TrackSimplified closest_track = recommended_tracks[0];
+            TrackSimplified closest_track = null;
 
-            for(int index = 1; index < recommended_tracks.length; index++){
+            for (TrackSimplified current_track : recommended_tracks) {
 
-                TrackSimplified current_track = recommended_tracks[index];
                 boolean is_playable = current_track.getIsPlayable();
 
                 // If the track we are considering is a duplicate or not playable continue to the next candidate
-                if(track_map.get(current_track) != null || !is_playable) continue;
+                if (track_map.get(current_track) != null || !is_playable) continue;
 
-                AudioFeatures current_features = getAudioFeaturesForTrack(spotify_api, current_track.getId());
+                // AudioFeatures current_features = getAudioFeaturesForTrack(spotify_api, current_track.getId());
 
                 // Compare the durations of the closest track and the current, replacing the closest track with the
                 // current if the current track is closer to the desired duration
                 closest_track = getTrackWithClosestDuration(target_duration_ms, closest_track, current_track);
+
             }
 
             if(isGoodDuration(target_duration_ms, closest_track, margin_of_error)) return closest_track;
 
             offset++; // relax constraints
-            margin_of_error += .05;
+            margin_of_error += .01;
         }
     }
 
@@ -245,6 +265,8 @@ public class CommonUtilities {
      * @return TrackSimplified object which has the closest duration to the provided duration, track1 if equal duration
      */
     private static TrackSimplified getTrackWithClosestDuration(int duration_ms, TrackSimplified track1, TrackSimplified track2){
+
+        if(track1 == null) return track2; // expected on first run
 
         int track1_duration = track1.getDurationMs();
         int track2_duration = track2.getDurationMs();

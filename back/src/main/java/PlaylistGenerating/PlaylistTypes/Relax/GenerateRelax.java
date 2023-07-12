@@ -89,24 +89,28 @@ public class GenerateRelax extends GeneratePlaylist {
 
         // difference between target bpm for each interval
         int bpm_difference = ((target_bpm - resting_bpm) / num_intervals);
-
         int local_max_bpm = target_bpm;
         int local_min_bpm = target_bpm - bpm_difference;
         // local target is halfway between local max and min
         int local_target_bpm = local_max_bpm - ((local_max_bpm - local_min_bpm) / 2);
 
         TrackSimplified[] tracks_to_add;
+        float local_moe; // Keeps track of moe for duration purposes which we will be altering here
 
         for (int interval = 0; interval < num_intervals; interval++) {
 
+            local_moe = margin_of_error;
 
             do {
                 TrackSimplified[] recommended_tracks = getRecommendedTracks(local_min_bpm, local_max_bpm, local_target_bpm);
 
                 tracks_to_add = getIntervalTracks(recommended_tracks);
 
+                setIntervalLengths(local_moe += .01);
+
             } while (tracks_to_add == null);
 
+            setIntervalLengths(margin_of_error); // restore moe
             track_list = addAll(track_list, tracks_to_add); // add the new tracks to the track list
 
             // Update bpm targets for next interval
@@ -171,24 +175,6 @@ public class GenerateRelax extends GeneratePlaylist {
         if(selected_songs.get(uri) == null) return false;
 
         return true;
-    }
-
-    /**
-     * Adds all the elements in the provided array into the provided array list and finally returning the array list
-     *
-     * @param array_list array list to be added to
-     * @param array array whose elements will be added to the provided array_list
-     * @return ArrayList<TrackSimplified> with the elements of array added to it, null if either argument is null
-     */
-    private ArrayList<TrackSimplified> addAll(ArrayList<TrackSimplified> array_list, TrackSimplified[] array){
-
-        if(array_list == null || array == null) return new ArrayList<TrackSimplified>();
-
-        TrackSimplified current_track;
-
-        array_list.addAll(Arrays.asList(array));
-
-        return array_list;
     }
 
     /**
