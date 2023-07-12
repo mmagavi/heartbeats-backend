@@ -35,8 +35,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     protected static int max_interval_length_ms;
 
     protected static int tracks_per_interval = 0;
-    protected static int num_cool_intervals = 0;
-    protected static int num_warm_intervals = 0;
+    protected static int num_slow_intervals = 0;
+    protected static int num_fast_intervals = 0;
 
     //Todo: determine ideal og offset
     protected static int og_offset = 5;
@@ -65,8 +65,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         // unsure if necessary?
         tracks_per_interval = num_tracks / num_intervals;
-        num_cool_intervals = (num_intervals - 1) / 2 + 1;
-        num_warm_intervals = (num_intervals - 1) / 2;
+        num_slow_intervals = (num_intervals - 1) / 2 + 1;
+        num_fast_intervals = (num_intervals - 1) / 2;
 
         //Todo: is this the right way to divide?
         //Todo: should we keep using the same margin  of error for intervals?
@@ -200,7 +200,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
                 // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
 
                 // Get new tracks
-                broad_tracks = findTracks(true);
+                broad_tracks = findTracks(i % 2 == 1);
 
                 // Try again
                 best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
@@ -213,7 +213,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         }
 
-        // Todo: error check this call
+        // Todo: error check this call ?
         // Eliminate dupes and non-playable
         eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
 
