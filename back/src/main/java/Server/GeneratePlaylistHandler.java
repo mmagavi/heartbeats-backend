@@ -139,6 +139,7 @@ public class GeneratePlaylistHandler implements Route {
     public static void verifyPlaylistType(String playlist_type) throws InvalidPlaylistTypeException {
 
         if (playlist_type.equalsIgnoreCase("classic")) return;
+        if (playlist_type.equalsIgnoreCase("relax")) return;
         if (playlist_type.equalsIgnoreCase("interval_one")) return;
         if (playlist_type.equalsIgnoreCase("interval_two")) return;
 

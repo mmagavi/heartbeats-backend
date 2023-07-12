@@ -60,7 +60,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
         num_intervals = getNumIntervals();
         num_tracks = Math.round(workout_length_min / avg_song_len);
 
-        target_length_ms = workout_length_ms;
+        target_length_ms = workout_len_ms;
         setTargetLengths(margin_of_error);
 
         // unsure if necessary?
@@ -212,6 +212,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
                 while (best_fit_tracks == null) {
 
+                    // If we have tried more than 5 times, throw an exception
                     if (count > 5) throw new GetRecommendationsException("Could not find tracks for cool interval");
 
                     // Todo: increase the offset ? Dont wanna infinite loop
@@ -239,6 +240,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
                 while (best_fit_tracks == null) {
 
+                    // If we have tried more than 5 times, throw an exception
                     if (count > 5) throw new GetRecommendationsException("Could not find tracks for warm interval");
 
                     // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
@@ -277,7 +279,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      * Grabs the first batch of songs from the beginning of the tracks array and shifts the selected group
      * of songs to the right until a song is found, or we reach a point where it is clear no grouping is acceptable
      *
-     * @param tracks    TrackSimplified array to search for a good ordering of target songs
+     * @param tracks TrackSimplified array to search for a good ordering of target songs
      * @param num_songs number of songs we want to gather and check against the desired duration
      * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
