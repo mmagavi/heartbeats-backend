@@ -25,7 +25,7 @@ interface logoutPageProps {
 function LogoutPage(props : logoutPageProps){
 
     return (
-        <div className="loginBody" aria-label={LogoutPage_AriaLabel}>
+        <div className="logoutBody" aria-label={LogoutPage_AriaLabel}>
             <br/><br/>
             Are you sure you would like to log out?
             <br/><br/>

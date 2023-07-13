@@ -10,7 +10,7 @@ function Header() {
   return <div role={Header_Role}
           className="title" 
           aria-label={Header_AriaLabel}>
-      💌 &nbsp;heartBeats
+      💌 &nbsp; heartBeats
          </div>;
 }
 

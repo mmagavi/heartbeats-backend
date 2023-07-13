@@ -44,7 +44,6 @@ td {
   flex-direction: row;
   flex-wrap: wrap;
 }
-
 .navContainer {
   display: flex;
   flex-direction: row;
@@ -93,20 +92,21 @@ td {
 }
 
 .formSubmitButton {
-  border-radius: 1vw;
+  border-radius: 20px;
   color: white;
   border: none;
-  margin-bottom: 20vh;
+  margin-bottom: 10vh;
   max-width: 10vw;
   font-size: 20px;
-  font-family: Avenir, serif;
+  /*font-family: Avenir, serif;*/
+  background-image: linear-gradient(to top right, rgb(246, 65, 65), rgb(255, 123, 123));
   background-color: transparent;
-  padding: 1vh;
+  padding: 2vh 3vh;
 }
 .formSubmitButton:hover {
   background-color: rgba(147, 147, 147, 0.2);
-  padding:2vh;
-  border-radius: 30px;
+  padding:3vh 4vh;
+  border-radius: 5vw;
   transition: 1s;
 }
 
@@ -131,13 +131,15 @@ td {
 .aboutBody {
   animation: fadeIn 2s;
   font-family: Avenir, serif;
-  padding: 12vh 18vw;
-  font-size: 18px;
+  font-size: 20px;
   color: white;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  padding-top: 15vh;
+  padding-left: 12vw;
+  padding-right: 12vw;
 }
 
 .reviewBody {
@@ -232,9 +234,22 @@ iframe {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center;
+  text-align: left;
   padding-top: 12vh;
+  padding-left: 12vw;
+  padding-right: 12vw;
+  align-items: flex-start;
+}
+
+.logoutBody {
+  animation: fadeIn 2s;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  padding-top: 10vh;
+  font-size: 20px;
 }
 
 .footer {
@@ -242,14 +257,37 @@ iframe {
 }
 
 .subtitle {
-  font-size: 40px;
-  margin-bottom: 30px;
+  font-size: 60px;
+  margin-bottom: 40px;
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  white-space: nowrap; /* Keeps the content on a single line */
+  width: fit-content;
+  height: 9vh;
+  border-right: .15em solid #c92b2b; /* The typwriter cursor */
+  animation:
+          typing 2s steps(23, end),
+          blink-caret .75s step-end infinite;
 }
+
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 66% }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #c92b2b; }
+}
+
 .subtext {
-  font-family: Avenir, serif;
-  padding-top: 3vh;
-  padding-right: 35vw;
-  padding-left: 35vw;
+  /*font-family: Avenir, serif;*/
+  padding-top: 0;
+  padding-bottom: 5vh;
+  font-size: 20px;
+  /*padding-right: 35vw;*/
+  /*padding-left: 35vw;*/
 }
 .serverStatusDiv {
   color: white;
@@ -297,6 +335,8 @@ iframe {
   border-radius: 20px;
   margin-bottom: 10px;
   background-color: #ffffff;
+  box-shadow: #bdbdbd 0 -0.5vh 0 inset;
+  border-color: #bbbbbb;
 }
 
 .commandsList {
@@ -448,12 +488,20 @@ input:focus-visible:hover,
 .resultPageButton {
   height: 100%;
   padding: 1.4vh;
-  border-radius: 13px;
+  border-radius: 15px;
   background-color: #625f5f;
   border-color: #807c7c;
   border-width: 0;
   margin: 2px;
+  box-shadow: rgba(189, 189, 189, 0.79) 0 -0.5vh 0 inset;
+  border-color: rgba(187, 187, 187, 0.78);
 }
+
+.resultPageButton:hover {
+  box-shadow: none;
+  border-color: #bbbbbb;
+}
+
 .resultPageButton:link {
   color: black;
 }
@@ -518,17 +566,27 @@ input:focus-visible:hover,
     text-align: center;
     padding-top: 12vh;
     align-items: center;
+    padding-left: 0vh;
+    padding-right: 0vh;
   }
   .subtext {
     font-family: Avenir;
+    font-size: 15px;
     padding-top: 3vh;
     padding-right: 10vw;
     padding-left: 10vw;
   }
   .subtitle {
-    font-size: 30px;
+    font-size: 28px;
     margin-bottom: 30px;
+    height: fit-content;
   }
+  /* The typing effect */
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 95% }
+  }
+
   .title {
     width: fit-content;
     font-size: min(10vh, 30px);
@@ -568,10 +626,10 @@ input:focus-visible:hover,
   }
 
   .formSubmitButton {
-    border-radius: 1vw;
+    border-radius: 10px;
     color: white;
     border: none;
-    margin-bottom: 20vh;
+    margin-bottom: 10vh;
     margin-top: 10vh;
     max-width: 30vw;
     font-size: 20px;
@@ -586,5 +644,23 @@ input:focus-visible:hover,
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+  }
+  .footer {
+    margin-bottom: 10vh;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    margin-left: 5vw;
+    margin-right: 5vw;
+  }
+  .logoutBody {
+    animation: fadeIn 2s;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10vh;
+    font-size: 18px;
   }
 }
