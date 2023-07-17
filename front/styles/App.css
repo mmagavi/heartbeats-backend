@@ -95,18 +95,15 @@ td {
   border-radius: 20px;
   color: white;
   border: none;
-  margin-bottom: 10vh;
+  margin-bottom: 15vh;
   max-width: 10vw;
   font-size: 20px;
-  /*font-family: Avenir, serif;*/
   background-image: linear-gradient(to top right, rgb(246, 65, 65), rgb(255, 123, 123));
   background-color: transparent;
-  padding: 2vh 3vh;
+  padding: 2vh 2vw 2vh;
 }
 .formSubmitButton:hover {
   background-color: rgba(147, 147, 147, 0.2);
-  padding:3vh 4vh;
-  border-radius: 5vw;
   transition: 1s;
 }
 
@@ -126,20 +123,54 @@ td {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  padding-top: 5vh;
+  padding-top: 3vh;
 }
 .aboutBody {
   animation: fadeIn 2s;
   font-family: Avenir, serif;
-  font-size: 20px;
+  font-size: 18px;
   color: white;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  padding: 5vh 12vw 18vh;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 48px, black calc(100% - 48px), transparent 100%);
+}
+.aboutDiv {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
   justify-content: center;
-  padding-top: 15vh;
-  padding-left: 12vw;
-  padding-right: 12vw;
+  background-image: linear-gradient(to top right, rgba(147, 147, 147, 0.47), rgba(148, 148, 148, 0.24));
+  border-radius: 25px;
+  margin-bottom: 2vh;
+  margin-top: 2vh;
+  padding: 40px;
+}
+.aboutDiv:hover {
+  margin-bottom: 3vh;
+  margin-top: 3vh;
+  transition: 1s;
+}
+.aboutEmail {
+  display: inline;
+  color: red;
+  white-space: nowrap;
+  text-decoration-line: none;
+}
+.aboutEmail:link {
+  white-space: nowrap;
+  text-decoration-line: none;
+}
+.aboutEmail:hover {
+  color: darkred;
+  transition: 1s;
+}
+.aboutHeader {
+  font-family: "Iceberg", serif;
+  animation: fadeIn 2s;
+  font-size: 30px;
+  padding-top: 0;
 }
 
 .reviewBody {
@@ -163,12 +194,12 @@ td {
 }
 
 .iframeResult {
-  width: 40%;
-  margin: 0 2% 0 10vw;
-  height: 420px;
+  width: 55%;
+  margin: 0 2% 0 0vw;
+  height: 500px;
 }
 .iframeResTxt {
-  width: 35%;
+  width: 20%;
   margin: 0 2%;
   height: 420px;
 }
@@ -217,10 +248,13 @@ iframe {
 }
 
 .footer {
-    margin-bottom: 10vh;
-  font-size: 20px;
-    color: white;
+  font-family: Avenir, serif;
+  margin-bottom: 10vh;
+  font-size: 18px;
+  color: white;
   text-align: center;
+  margin-right: 15vw;
+  margin-left: 15vw;
 }
 .questionsPage {
   display: flex;
@@ -265,14 +299,14 @@ iframe {
   height: 9vh;
   border-right: .15em solid #c92b2b; /* The typwriter cursor */
   animation:
-          typing 2s steps(23, end),
-          blink-caret .75s step-end infinite;
+          typing 2s steps(24, end),
+          blink-caret 1s step-end infinite;
 }
 
 /* The typing effect */
 @keyframes typing {
   from { width: 0 }
-  to { width: 66% }
+  to { width: 64% }
 }
 
 /* The typewriter cursor effect */
@@ -282,12 +316,9 @@ iframe {
 }
 
 .subtext {
-  /*font-family: Avenir, serif;*/
   padding-top: 0;
   padding-bottom: 5vh;
   font-size: 20px;
-  /*padding-right: 35vw;*/
-  /*padding-left: 35vw;*/
 }
 .serverStatusDiv {
   color: white;
@@ -493,17 +524,19 @@ input:focus-visible:hover,
   border-color: #807c7c;
   border-width: 0;
   margin: 2px;
-  box-shadow: rgba(189, 189, 189, 0.79) 0 -0.5vh 0 inset;
-  border-color: rgba(187, 187, 187, 0.78);
 }
 
 .resultPageButton:hover {
   box-shadow: none;
   border-color: #bbbbbb;
+  transition-duration: 1s;
 }
 
 .resultPageButton:link {
   color: black;
+}
+.aboutBody:link {
+  color: white;
 }
 
 @media only screen and (max-width: 600px) {
@@ -549,7 +582,7 @@ input:focus-visible:hover,
   .aboutBody {
     animation: fadeIn 2s;
     font-family: Avenir, serif;
-    padding: 5vh 14vw;
+    padding: 3vh 10vw 5vh;
     font-size: 14px;
     color: white;
     display: flex;
@@ -606,7 +639,7 @@ input:focus-visible:hover,
     padding: 0.7vw 4vw;
     margin-right: 5vw;
     margin-left: 5vw;
-    margin-top: 6vh;
+    margin-top: 3vh;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -660,7 +693,17 @@ input:focus-visible:hover,
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-top: 10vh;
+    padding-top: 12vh;
     font-size: 18px;
+  }
+  .aboutHeader {
+    font-family: "Iceberg", serif;
+    animation: fadeIn 2s;
+    font-size: 22px;
+    padding-top: 0;
+  }
+  .aboutDiv {
+    padding-right: 30px;
+    padding-left: 30px;
   }
 }

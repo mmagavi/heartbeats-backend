@@ -22,20 +22,20 @@ interface SubmitButtonProps {
 
 interface ServerResponse{
     data: JSON
-  }
-  
-  export function isServerResponse(geoJSON: any) : geoJSON is ServerResponse{
-  
-  if(geoJSON === undefined) return false;
+}
+
+export function isServerResponse(geoJSON: any) : geoJSON is ServerResponse{
+
+    if(geoJSON === undefined) return false;
 //   if (!("access_token" in geoJSON)) return false;
 //   if (!("refresh_token" in geoJSON)) return false;
 //   if (!("request" in geoJSON)) return false;
-  
-  return true
-  }
 
-  let access_token : string | undefined = "";
-  let refresh_token : string | undefined = "";
+    return true
+}
+
+let access_token : string | undefined = "";
+let refresh_token : string | undefined = "";
 
 /**
  * Submit button component. Handles sending data to the createPlaylist endpoint
@@ -53,15 +53,15 @@ function SubmitButton(props: SubmitButtonProps) {
 
         if(access_token === "" && refresh_token === ""){
 
-        const token_response : string | Map<string, string> =
-         await checkResponse(await makeRequest("register-user-code?code=" + params.get("code")))
+            const token_response : string | Map<string, string> =
+                await checkResponse(await makeRequest("register-user-code?code=" + params.get("code")))
 
-        if (token_response instanceof Map) {
-            access_token = token_response.get("access_token");
-            refresh_token = token_response.get("refresh_token");
+            if (token_response instanceof Map) {
+                access_token = token_response.get("access_token");
+                refresh_token = token_response.get("refresh_token");
+            }
         }
-    }
-    
+
         let et = "";
 
         if(props.playlist_type === "exercise"){
@@ -69,15 +69,15 @@ function SubmitButton(props: SubmitButtonProps) {
         }
 
         let playlist_request: string ="generate-playlist?access_token=" + access_token
-        + "&refresh_token=" + refresh_token
-        + "&playlist_type=interval_one"
-        + "&intensity=low"
-        + "&genres=" + props.genres
-        + "&age=" + props.age
-        + "&workout_length=" + props.workout_length
+            + "&refresh_token=" + refresh_token
+            + "&playlist_type=interval_one"
+            + "&intensity=low"
+            + "&genres=" + props.genres
+            + "&age=" + props.age
+            + "&workout_length=" + props.workout_length
 
         const playlist_response: string | Map<string, string> =
-        await checkResponse(await makeRequest(playlist_request))
+            await checkResponse(await makeRequest(playlist_request))
         console.log(playlist_request)
 
         let playlist_id : string | undefined
