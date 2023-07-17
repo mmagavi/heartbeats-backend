@@ -95,18 +95,15 @@ td {
   border-radius: 20px;
   color: white;
   border: none;
-  margin-bottom: 10vh;
+  margin-bottom: 15vh;
   max-width: 10vw;
   font-size: 20px;
-  /*font-family: Avenir, serif;*/
   background-image: linear-gradient(to top right, rgb(246, 65, 65), rgb(255, 123, 123));
   background-color: transparent;
-  padding: 2vh 5vh;
+  padding: 2vh 2vw 2vh;
 }
 .formSubmitButton:hover {
   background-color: rgba(147, 147, 147, 0.2);
-  /*padding:3vh 4vh;*/
-  /*border-radius: 5vw;*/
   transition: 1s;
 }
 
@@ -126,7 +123,7 @@ td {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  padding-top: 5vh;
+  padding-top: 3vh;
 }
 .aboutBody {
   animation: fadeIn 2s;
@@ -197,12 +194,12 @@ td {
 }
 
 .iframeResult {
-  width: 40%;
-  margin: 0 2% 0 10vw;
-  height: 420px;
+  width: 55%;
+  margin: 0 2% 0 0vw;
+  height: 500px;
 }
 .iframeResTxt {
-  width: 35%;
+  width: 20%;
   margin: 0 2%;
   height: 420px;
 }
@@ -251,8 +248,9 @@ iframe {
 }
 
 .footer {
+  font-family: Avenir, serif;
   margin-bottom: 10vh;
-  font-size: 20px;
+  font-size: 18px;
   color: white;
   text-align: center;
   margin-right: 15vw;

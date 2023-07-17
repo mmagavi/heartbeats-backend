@@ -199,10 +199,6 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
             do {
 
-                // If we have tried more than 5 times, throw an exception
-                //if (count > 5) throw new GetRecommendationsException("Could not find tracks for fast interval");
-                // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
-
                 // Get new tracks
                 broad_tracks = findTracks(isSlowInterval);
                 // Find a good ordering

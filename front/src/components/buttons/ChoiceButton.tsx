@@ -33,11 +33,10 @@ export default function ChoiceButton(props: choiceProps) {
   // style CSS for question display text
   const styleCSS = {
     // letterSpacing: checked ? "5px" : undefined,
-    // color: checked ? "#FF0000" : "white",
+    color: checked ? "#FF0000" : "white",
     background: checked ? "rgba(98, 95, 95, 0.88)" : undefined,
   };
 
-  // TODO: Update!!
   // on-click function
   function onChangeHelper() {
     props.setValue(props.id, props.val)
@@ -63,8 +62,7 @@ export default function ChoiceButton(props: choiceProps) {
 
   // return button
   return (
-      <div className="choice" style={styleCSS} tabIndex={0}>
-        <label key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
+        <label className="choice" style={styleCSS} tabIndex={0} key={props.id + ":" + props.val} aria-label={props.text} role={Choice_Role}>
           <input
               type="radio"
               value={props.val}
@@ -75,6 +73,5 @@ export default function ChoiceButton(props: choiceProps) {
           &#x2665;
           <div className="questionText"><p>{props.text}</p></div>
         </label>
-      </div>
   );
 }
