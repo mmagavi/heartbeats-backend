@@ -150,6 +150,16 @@ public class CommonUtilities {
         }
     }
 
+    static class DuplicateTrack {
+
+        public DuplicateTrack(TrackSimplified track, int track_index){
+            this.track = track;
+            this.track_index = track_index;
+        }
+        TrackSimplified track;
+        int track_index;
+    }
+
     public static TrackSimplified[] eliminateDupesAndNonPlayable(SpotifyApi spotify_api, TrackSimplified[] tracks,
                                                                  String genres, String seed_artists, String seed_tracks,
                                                                  CountryCode market)
@@ -157,7 +167,7 @@ public class CommonUtilities {
 
         HashMap<TrackSimplified, Integer> track_map = new HashMap<>();
         // Store all the tracks that need replacement here
-        HashMap<TrackSimplified, Integer> replacement_map = new HashMap<>();
+        ArrayList<DuplicateTrack> duplicates = new ArrayList<>();
 
         // Find which tracks are duplicates and place them in our duplicate map
         for (int index = 0; index < tracks.length; index++) {
@@ -167,21 +177,22 @@ public class CommonUtilities {
 
             // If the track is not already in the map it will return null from the .get() method
             if (track_map.get(track) == null && is_playable) {
-                track_map.put(track, index);
+                track_map.put(track, index); // Place the good track in the map for future dupe checking
             } else {
-                replacement_map.put(track, index); // We know we have a dupe/non-playable so it needs replacing
+                DuplicateTrack current_duplicate = new DuplicateTrack(track, index);
+                duplicates.add(current_duplicate); // We know we have a dupe/non-playable, so it needs replacing
             }
         }
 
-        for (TrackSimplified duplicate_track : replacement_map.keySet()) {
-            //Track track = TrackUtilities.getTrack(spotify_api, uri);
+        for (DuplicateTrack duplicate : duplicates) {
+            TrackSimplified duplicate_track = duplicate.track;
             TrackSimplified replacement =
                     replaceTrack(spotify_api, track_map, duplicate_track, genres, seed_artists, seed_tracks, market);
 
-            int track_index = replacement_map.get(duplicate_track); // The index we need to put the new non-duplicate song into
+            int track_index = duplicate.track_index; // The index we need to put the new non-duplicate song into
 
             tracks[track_index] = replacement; // Replace the song
-            track_map.put(replacement, track_index); // make sure to update the track map so we dont duplicate with replacments
+            track_map.put(replacement, track_index); // update the track map, so we don't duplicate with replacements
         }
         return tracks;
     }
@@ -209,7 +220,7 @@ public class CommonUtilities {
             TrackSimplified[] recommended_tracks = recommendations.getTracks();
 
             // relax constraints
-            if(recommended_tracks.length < limit){
+            if(recommended_tracks == null || recommended_tracks.length < limit){
                 offset++;
                 continue;
             }
@@ -223,7 +234,9 @@ public class CommonUtilities {
                 boolean is_playable = current_track.getIsPlayable();
 
                 // If the track we are considering is a duplicate or not playable continue to the next candidate
-                if (track_map.get(current_track) != null || !is_playable) continue;
+                if (track_map.get(current_track) != null || !is_playable) {
+                    continue;
+                }
 
                 // AudioFeatures current_features = getAudioFeaturesForTrack(spotify_api, current_track.getId());
 

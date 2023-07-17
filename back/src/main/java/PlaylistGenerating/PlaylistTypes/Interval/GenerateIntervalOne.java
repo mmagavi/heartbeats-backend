@@ -13,6 +13,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.Interval.IntervalCheckingUtilities.checkIntervalDuration;
@@ -37,12 +38,13 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     protected static int tracks_per_interval = 0;
     protected static int num_cool_intervals = 0;
     protected static int num_warm_intervals = 0;
-
-    //Todo: determine ideal og offset
-    protected static int og_offset = 5;
-
+    protected static int og_offset = 3;
     protected enum DURATION_RESULT {
         ACCEPTABLE, TOO_SHORT, TOO_LONG, WITHIN_THIRTY_SECONDS_SHORT, WITHIN_THIRTY_SECONDS_LONG
+    }
+
+    protected enum INTERVAL_TYPE {
+        SLOW_INTERVAL, FAST_INTERVAL
     }
 
     /**
@@ -144,33 +146,35 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     /**
      * Finds tracks for a given interval of the playlist
      * Gets twice the expected number of tracks for a given interval
-     * @param interval_type true if warm, false if cool
+     * @param interval_type slow_interval or fast_interval
      * @return array of track IDs
      */
-    private TrackSimplified[] findTracks(boolean interval_type) throws GetRecommendationsException {
+    private TrackSimplified[] findTracks(INTERVAL_TYPE interval_type) throws GetRecommendationsException {
 
-        int local_offset = og_offset; //currently 5
-        int limit = 21;
+        //int local_offset = og_offset; //currently 3
+        int limit = 30 * num_intervals; // Is 30 per interval enough?
 
         do {
-            // get num_tracks tracks from the resting BPM (twice as many as we need)
 
             TrackSimplified[] recommended_tracks;
 
-            if (!interval_type) {
+            if (interval_type == INTERVAL_TYPE.SLOW_INTERVAL) {
                 recommended_tracks = getSortedRecommendations(limit,
-                        resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
+                        resting_bpm - og_offset, resting_bpm + og_offset, resting_bpm);
             } else {
                 recommended_tracks = getSortedRecommendations(limit,
-                        target_bpm - local_offset, target_bpm + local_offset, target_bpm);
+                        target_bpm - og_offset, target_bpm + og_offset, target_bpm);
             }
 
-            if (recommended_tracks != null) return recommended_tracks;
+            if (recommended_tracks == null || recommended_tracks.length < limit){
+                //System.out.println("null");
+                //System.out.println(local_offset);
 
-            System.out.println("null");
-            System.out.println(local_offset);
+                og_offset++;
+                continue;
+            }
 
-            local_offset++;
+            return recommended_tracks;
 
         } while (true);
     }
@@ -185,7 +189,8 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
         // Make an ArrayList to hold the final playlist
         ArrayList<TrackSimplified> final_playlist = new ArrayList<>();
-        TrackSimplified[] broad_tracks;
+        TrackSimplified[] slow_tracks;
+        TrackSimplified[] fast_tracks;
         TrackSimplified[] best_fit_tracks;
 
         boolean isSlowInterval = true;
@@ -199,14 +204,11 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
             do {
 
-                // If we have tried more than 5 times, throw an exception
-                //if (count > 5) throw new GetRecommendationsException("Could not find tracks for fast interval");
-                // Todo: increase the offset ? Dont wanna get stuck in an infinite loop
-
                 // Get new tracks
-                broad_tracks = findTracks(isSlowInterval);
+                slow_tracks = findTracks(INTERVAL_TYPE.SLOW_INTERVAL);
+                fast_tracks = findTracks(INTERVAL_TYPE.FAST_INTERVAL);
                 // Find a good ordering
-                best_fit_tracks = findBestIntervalTracks(broad_tracks, tracks_per_interval);
+                best_fit_tracks = findBestIntervalTracks(slow_tracks, fast_tracks, tracks_per_interval);
 
                 //count++;
                 setIntervalLengths(local_moe += .01); // loosen MOE
@@ -218,18 +220,6 @@ public class GenerateIntervalOne extends GeneratePlaylist {
 
             addAll(final_playlist, best_fit_tracks); // add best fit tracks to final_playlist
         }
-
-        // Todo: error check this call
-        // Eliminate dupes and non-playable
-        //eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
-
-        // Todo: check total playlist length...
-//        if (checkTotalDuration(final_playlist) == DURATION_RESULT.ACCEPTABLE) {
-//            // todo...
-//        } else if (checkTotalDuration(final_playlist) == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
-//            // idk...
-//        }
-
         return final_playlist.toArray(TrackSimplified[]::new);
     }
 
@@ -238,21 +228,47 @@ public class GenerateIntervalOne extends GeneratePlaylist {
      * Grabs the first batch of songs from the beginning of the tracks array and shifts the selected group
      * of songs to the right until a song is found, or we reach a point where it is clear no grouping is acceptable
      *
-     * @param tracks TrackSimplified array to search for a good ordering of target songs
+     * @param slow_tracks TrackSimplified array to search for a good ordering of target songs in the slow interval
+     * @param fast_tracks TrackSimplified array to search for a good ordering of target songs in the fast interval
      * @param num_songs number of songs we want to gather and check against the desired duration
      * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
-    private TrackSimplified[] findBestIntervalTracks(TrackSimplified[] tracks, int num_songs) {
+    private TrackSimplified[] findBestIntervalTracks(TrackSimplified[] slow_tracks,
+                                                     TrackSimplified[] fast_tracks, int num_songs) {
 
-        Deque<TrackSimplified> deque = new ArrayDeque<>();
+        Deque<TrackSimplified> slow_deque = new ArrayDeque<>();
+        Deque<TrackSimplified> fast_deque = new ArrayDeque<>();
+        HashMap<TrackSimplified, Integer> selected_songs = new HashMap<>();
         int index = 0;
         GenerateIntervalOne.DURATION_RESULT result;
-        TrackSimplified current_track;
+        TrackSimplified current_slow_track;
+        TrackSimplified current_fast_track;
 
-        // Get the first batch of songs into the deque
-        for (; index < num_songs; index++) {
-            current_track = tracks[index];
-            deque.add(current_track);
+        for(int interval = 0; interval < num_intervals; interval++) {
+
+
+
+        }
+
+        // Get the first batch of songs into the slow deque
+        for (int i = 0; i < num_songs; i++) {
+
+            current_slow_track = slow_tracks[index];
+
+            //
+            if(selected_songs.get(current_slow_track) != null){
+
+            }
+
+            slow_deque.add(current_slow_track);
+        }
+
+        // Get the first batch of songs into the slow deque
+        for (int i = 0; i < num_songs; i++) {
+
+            current_fast_track = fast_tracks[index];
+
+            fast_deque.add(current_fast_track);
         }
 
         result = checkIntervalDuration(deque);
