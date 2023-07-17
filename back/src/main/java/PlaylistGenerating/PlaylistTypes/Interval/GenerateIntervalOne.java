@@ -144,7 +144,7 @@ public class GenerateIntervalOne extends GeneratePlaylist {
     /**
      * Finds tracks for a given interval of the playlist
      * Gets twice the expected number of tracks for a given interval
-     * @param interval_type true if warm, false if cool
+     * @param interval_type slow_interval or fast_interval
      * @return array of track IDs
      */
     private TrackSimplified[] findTracks(boolean interval_type) throws GetRecommendationsException {
