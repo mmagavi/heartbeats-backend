@@ -29,7 +29,7 @@ function App(this: any) {
             <Router>
                 <Navbar fixed="top" className="header">
                     <Navbar.Brand>
-                        <Header />
+                        {/*<Header />*/}
                     </Navbar.Brand>
                     <div className="navContainer">
                         <NavComponent loggedIn={loggedIn}/>

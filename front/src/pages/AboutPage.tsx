@@ -12,8 +12,8 @@ function AboutPage(){
             you are listening to can increase your heart rate and lead to a more productive and successful workout.
             HeartBeats is designed to help users wind down and relax or stay motivated to run!
             <br/><br/>
-            We have users sign in with Spotify so that we can create playlists tailored to your preferences.
-            Don't worry, none of this information will be saved after you've logged out or closed the window :)
+            We ask users to sign in with Spotify so that we can create playlists tailored to your preferences.
+            Don't worry, none of your information is saved after you've logged out or closed the window :)
         </div>)
 }
 
