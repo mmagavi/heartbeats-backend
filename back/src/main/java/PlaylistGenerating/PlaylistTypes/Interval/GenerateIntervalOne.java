@@ -215,17 +215,6 @@ public class GenerateIntervalOne extends GeneratePlaylist {
             addAll(final_playlist, best_fit_tracks); // add best fit tracks to final_playlist
         }
 
-        // Todo: error check this call
-        // Eliminate dupes and non-playable
-        //eliminateDupesAndNonPlayable(spotify_api, final_playlist, genres, seed_artists, seed_tracks, user.getCountry());
-
-        // Todo: check total playlist length...
-//        if (checkTotalDuration(final_playlist) == DURATION_RESULT.ACCEPTABLE) {
-//            // todo...
-//        } else if (checkTotalDuration(final_playlist) == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
-//            // idk...
-//        }
-
         return final_playlist.toArray(TrackSimplified[]::new);
     }
 

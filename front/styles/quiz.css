@@ -10,6 +10,7 @@
 
 a {
   color: black;
+  wrap-option: nowrap;
 }
 a:hover {
   color: black;

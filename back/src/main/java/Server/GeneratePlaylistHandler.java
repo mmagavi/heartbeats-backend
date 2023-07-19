@@ -3,7 +3,7 @@ package Server;
 import ExceptionClasses.InvalidInputExceptions.*;
 import PlaylistGenerating.PlaylistTypes.Classic.GenerateClassic;
 import PlaylistGenerating.PlaylistTypes.Interval.GenerateIntervalOne;
-import PlaylistGenerating.PlaylistTypes.PyramidInterval.GenerateIntervalTwo;
+import PlaylistGenerating.PlaylistTypes.Interval.GenerateIntervalTwo;
 import PlaylistGenerating.PlaylistTypes.GeneratePlaylist;
 import PlaylistGenerating.PlaylistTypes.Relax.GenerateRelax;
 import com.squareup.moshi.JsonAdapter;

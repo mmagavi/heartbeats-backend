@@ -96,11 +96,11 @@ td {
   color: white;
   border: none;
   margin-bottom: 15vh;
-  max-width: 10vw;
+  max-width: 20vw;
   font-size: 20px;
   background-image: linear-gradient(to top right, rgb(246, 65, 65), rgb(255, 123, 123));
   background-color: transparent;
-  padding: 2vh 2vw 2vh;
+  padding: 2vh 4vw 2vh;
 }
 .formSubmitButton:hover {
   background-color: rgba(147, 147, 147, 0.2);
@@ -141,26 +141,24 @@ td {
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
-  background-image: linear-gradient(to top right, rgba(147, 147, 147, 0.47), rgba(148, 148, 148, 0.24));
   border-radius: 25px;
   margin-bottom: 2vh;
   margin-top: 2vh;
   padding: 40px;
+  background-color: rgba(147, 147, 147, 0.05);
 }
-.aboutDiv:hover {
-  margin-bottom: 3vh;
-  margin-top: 3vh;
-  transition: 1s;
-}
+
 .aboutEmail {
-  display: inline;
+  display: inline-block;
   color: red;
   white-space: nowrap;
   text-decoration-line: none;
+    width: fit-content;
 }
 .aboutEmail:link {
   white-space: nowrap;
   text-decoration-line: none;
+  width: fit-content;
 }
 .aboutEmail:hover {
   color: darkred;
@@ -194,14 +192,14 @@ td {
 }
 
 .iframeResult {
-  width: 55%;
-  margin: 0 2% 0 0vw;
-  height: 500px;
+  width: 50%;
+  margin: 0 2% 0 2vw;
+  height: 480px;
 }
 .iframeResTxt {
   width: 20%;
-  margin: 0 2%;
   height: 420px;
+  margin: 2vh 2% 0;
 }
 
 .iframeTitle {
@@ -232,7 +230,7 @@ iframe {
 
 .slider {
   margin-bottom: 15vh;
-  margin-top: 8vh;
+  margin-top: 6vh;
   width: 300px;
   padding-right: 13vw;
   padding-left: 13vw;

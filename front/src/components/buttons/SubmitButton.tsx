@@ -52,14 +52,14 @@ function SubmitButton(props: SubmitButtonProps) {
 
         if(access_token === "" && refresh_token === ""){
 
-        const token_response : string | Map<string, string> =
-         await checkResponse(await makeRequest("register-user-code?code=" + params.get("code")))
+            const token_response : string | Map<string, string> =
+             await checkResponse(await makeRequest("register-user-code?code=" + params.get("code")))
 
-        if (token_response instanceof Map) {
-            access_token = token_response.get("access_token");
-            refresh_token = token_response.get("refresh_token");
+            if (token_response instanceof Map) {
+                access_token = token_response.get("access_token");
+                refresh_token = token_response.get("refresh_token");
+            }
         }
-    }
     
         let et = "";
 
@@ -69,7 +69,7 @@ function SubmitButton(props: SubmitButtonProps) {
 
         let playlist_request: string ="generate-playlist?access_token=" + access_token
         + "&refresh_token=" + refresh_token
-        + "&playlist_type=interval_one"
+        + "&playlist_type=classic"
         + "&intensity=low"
         + "&genres=" + props.genres
         + "&age=" + props.age

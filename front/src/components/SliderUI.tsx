@@ -17,9 +17,6 @@ interface SliderProps {
     id: number;
 }
 
-//Q: How do I change the color of the marks?
-//A: https://mui.com/components/slider/#custom-mark-labels
-
 /**
  * Value label component for the SliderUI component
  * Shows the current value of the slider
@@ -88,10 +85,8 @@ export default function SliderUI(props: SliderProps): ReactComponent {
                   color: "red"
               }
           }}
-        valueLabelDisplay="on"
-        // slots={{
-        //   valueLabel: ValueLabelComponent,
-        // }}
+          //valueLabelDisplay="on" ?
+        valueLabelDisplay="auto"
         aria-label="custom thumb label"
         defaultValue={DEFAULT}
         role={ROLE}

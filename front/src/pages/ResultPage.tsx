@@ -27,7 +27,7 @@ function copyLink(link: string) {
  * @constructor
  */
 export default function ResultPage(props: ResultPageProps) {
-  console.log(props.playlistID);
+  console.log("playlist id:" + props.playlistID);
 
   // link to playlist for sharing
   const playlistLink = "https://open.spotify.com/playlist/" + props.playlistID;
@@ -41,18 +41,8 @@ export default function ResultPage(props: ResultPageProps) {
 
   const iframe = (
     <div className="iframeResult">
-      {/* taken from Spotify Dev front page */}
-    {/*  <iframe*/}
-    {/*title="Your HeartBeats Result Playlist"*/}
-    {/*src={embedLink}*/}
-    {/*width={"100%"}*/}
-    {/*height={"100%"}*/}
-    {/*// allowTransparency={true}*/}
-    {/*allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"*/}
-    {/*loading="lazy"*/}
-    {/*/>*/}
       <iframe
-    src="https://open.spotify.com/embed/playlist/5CMBrLem4qr8xGGlsmK4vT?utm_source=generator&theme=0"
+    src={embedLink}
     width="100%" height="100%" frameBorder="0"
     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     loading="lazy"/>

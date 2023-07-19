@@ -18,8 +18,8 @@ function AboutPage(){
                     <div className="aboutHeader"> Who we are </div><br/>
                     heartBeats was originally created by a team of four students at Brown University for CSCI0320: Introduction to Software Engineering.
                     It has been extended for widespread use by two of the original creators, and is currently available completely free of charge!
-                    This is the first trial version, so please feel free to reach out and send us any feedback.
-                <a href="mailto:heartbeats.feedback@gmail.com?subject=Feedback" className="aboutEmail">heartbeats.feedback@gmail.com</a>
+                    This is the first trial version, so please feel free to reach out and send us any feedback at
+                <a href="mailto:heartbeats.feedback@gmail.com?subject=Feedback" className="aboutEmail">heartbeats.feedback@gmail.com</a>.
             </div>
             <div className="aboutDiv">
                 <div className="aboutHeader"> Our data storage policy </div><br/>
