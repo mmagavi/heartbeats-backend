@@ -134,6 +134,8 @@ abstract public class GeneratePlaylist {
 
         TrackSimplified[] recommended_tracks = recommendations.getTracks();
 
+        if(recommended_tracks == null) return null;
+
         Arrays.sort(recommended_tracks, duration_comparator);
 
         return recommended_tracks;

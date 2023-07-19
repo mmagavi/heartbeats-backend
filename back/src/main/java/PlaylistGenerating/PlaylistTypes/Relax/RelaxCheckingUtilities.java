@@ -1,6 +1,5 @@
 package PlaylistGenerating.PlaylistTypes.Relax;
 
-import PlaylistGenerating.PlaylistTypes.Classic.GenerateClassic;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.util.Deque;
@@ -31,11 +30,11 @@ public class RelaxCheckingUtilities {
 
 
         if (duration_ms < min_interval_len_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_SHORT;
+            return DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_interval_len_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_LONG;
+            return DURATION_RESULT.TOO_LONG;
         } else {
-            return GenerateClassic.DURATION_RESULT.ACCEPTABLE;
+            return DURATION_RESULT.ACCEPTABLE;
         }
     }
 
@@ -60,11 +59,11 @@ public class RelaxCheckingUtilities {
 
 
         if (duration_ms < min_target_len_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_SHORT;
+            return DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_target_len_ms) {
-            return GenerateClassic.DURATION_RESULT.TOO_LONG;
+            return DURATION_RESULT.TOO_LONG;
         } else {
-            return GenerateClassic.DURATION_RESULT.ACCEPTABLE;
+            return DURATION_RESULT.ACCEPTABLE;
         }
     }
 }

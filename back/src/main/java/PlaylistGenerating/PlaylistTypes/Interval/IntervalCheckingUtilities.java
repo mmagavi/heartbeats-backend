@@ -22,18 +22,18 @@ public class IntervalCheckingUtilities {
         }
 
         System.out.println("Duration: " + duration_ms);
-        System.out.println("Min Duration: " + min_target_length_ms);
-        System.out.println("Max Duration: " + max_target_length_ms);
+        System.out.println("Min Duration: " + min_target_len_ms);
+        System.out.println("Max Duration: " + max_target_len_ms);
 
         int thirty_seconds_ms = 30_000;
 
-        if (duration_ms < min_target_length_ms && duration_ms >= min_target_length_ms - thirty_seconds_ms) {
+        if (duration_ms < min_target_len_ms && duration_ms >= min_target_len_ms - thirty_seconds_ms) {
             return GenerateIntervalOne.DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT;
-        } else if (duration_ms > max_target_length_ms && duration_ms <= max_target_length_ms + thirty_seconds_ms) {
+        } else if (duration_ms > max_target_len_ms && duration_ms <= max_target_len_ms + thirty_seconds_ms) {
             return GenerateIntervalOne.DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG;
-        } else if (duration_ms < min_target_length_ms) {
+        } else if (duration_ms < min_target_len_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
-        } else if (duration_ms > max_target_length_ms) {
+        } else if (duration_ms > max_target_len_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
         } else {
             return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;
@@ -55,13 +55,13 @@ public class IntervalCheckingUtilities {
         }
 
         System.out.println("Duration: " + duration_ms);
-        System.out.println("Target Duration: " + interval_length_ms);
-        System.out.println("Min Duration: " + min_interval_length_ms);
-        System.out.println("Max Duration: " + max_interval_length_ms);
+        System.out.println("Target Duration: " + interval_len_ms);
+        System.out.println("Min Duration: " + min_interval_len_ms);
+        System.out.println("Max Duration: " + max_interval_len_ms);
 
-        if (duration_ms < min_interval_length_ms) {
+        if (duration_ms < min_interval_len_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
-        } else if (duration_ms > max_interval_length_ms) {
+        } else if (duration_ms > max_interval_len_ms) {
             return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
         } else {
             return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;

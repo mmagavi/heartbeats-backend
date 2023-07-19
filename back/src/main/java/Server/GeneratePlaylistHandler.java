@@ -47,6 +47,8 @@ public class GeneratePlaylistHandler implements Route {
         try {
             verifyNonNullParameters(request);
 
+            String s = request.queryString();
+
             // Fetch all the parameters
             String access_token = request.queryParams("access_token");
             String refresh_token = request.queryParams("refresh_token");
