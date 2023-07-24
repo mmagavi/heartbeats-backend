@@ -14,7 +14,7 @@ public class IntervalCheckingUtilities {
      * @param tracks tracks to be checked for their duration
      * @return DURATION_RESULT enum value representing the result of the check
      */
-    protected static GenerateIntervalOne.DURATION_RESULT checkTotalDuration(TrackSimplified[] tracks) {
+    protected static DURATION_RESULT checkTotalDuration(TrackSimplified[] tracks) {
         int duration_ms = 0;
 
         for (TrackSimplified track : tracks) {
@@ -28,15 +28,15 @@ public class IntervalCheckingUtilities {
         int thirty_seconds_ms = 30_000;
 
         if (duration_ms < min_target_len_ms && duration_ms >= min_target_len_ms - thirty_seconds_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT;
+            return DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT;
         } else if (duration_ms > max_target_len_ms && duration_ms <= max_target_len_ms + thirty_seconds_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG;
+            return DURATION_RESULT.WITHIN_THIRTY_SECONDS_LONG;
         } else if (duration_ms < min_target_len_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
+            return DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_target_len_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
+            return DURATION_RESULT.TOO_LONG;
         } else {
-            return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;
+            return DURATION_RESULT.ACCEPTABLE;
         }
     }
 
@@ -47,7 +47,7 @@ public class IntervalCheckingUtilities {
      * @param tracks tracks to be checked for their duration
      * @return appropriately named enum (TOO_SHORT if too short, TOO_LONG if too long, and ACCEPTABLE if acceptable)
      */
-    protected static GenerateIntervalOne.DURATION_RESULT checkIntervalDuration(Deque<TrackSimplified> tracks) {
+    protected static DURATION_RESULT checkIntervalDuration(Deque<TrackSimplified> tracks) {
         int duration_ms = 0;
 
         for (TrackSimplified track : tracks) {
@@ -60,11 +60,11 @@ public class IntervalCheckingUtilities {
         System.out.println("Max Duration: " + max_interval_len_ms);
 
         if (duration_ms < min_interval_len_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.TOO_SHORT;
+            return DURATION_RESULT.TOO_SHORT;
         } else if (duration_ms > max_interval_len_ms) {
-            return GenerateIntervalOne.DURATION_RESULT.TOO_LONG;
+            return DURATION_RESULT.TOO_LONG;
         } else {
-            return GenerateIntervalOne.DURATION_RESULT.ACCEPTABLE;
+            return DURATION_RESULT.ACCEPTABLE;
         }
     }
 }
