@@ -43,6 +43,10 @@ public class GenerateIntervalTwo extends GenerateInterval {
         // Build playlist (get & organize tracks)
         TrackSimplified[] final_playlist_tracks = buildPlaylist();
 
+        for (TrackSimplified track : final_playlist_tracks) {
+            System.out.println(track.getName());
+        }
+
         eliminateDupesAndNonPlayable(spotify_api, final_playlist_tracks, genres,
                 seed_artists, seed_tracks, user.getCountry());
 
@@ -193,7 +197,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
 
         if(interval_type == INTERVAL_TYPE.SLOW_INTERVAL){
             intervals_to_fill = num_slow_intervals;
-        } // elsse if we are dealing with fast intervals...
+        } // else if we are dealing with fast intervals...
         else{
             // If we are at the highest level and we have an uneven number of fast intervals,
             // we only need to fill one interval. Else we need to fill two.
@@ -283,11 +287,11 @@ public class GenerateIntervalTwo extends GenerateInterval {
             num_tracks_needed = num_slow_tracks - tracks.size();
             query_bpm = resting_bpm;
         }else{
-            // todo: what is going on here?
+            // todo: Potentially misunderstanding what this is trying to do?
             if (level == num_levels && (num_fast_intervals % 2) == 1) {
-                num_tracks_needed = tracks_per_interval;
+                num_tracks_needed = tracks_per_interval - tracks.size();
             } else {
-                num_tracks_needed = tracks_per_interval * 2;
+                num_tracks_needed = tracks_per_interval * 2 - tracks.size();
             }
             query_bpm = getIntervalBPM(level);
         }
