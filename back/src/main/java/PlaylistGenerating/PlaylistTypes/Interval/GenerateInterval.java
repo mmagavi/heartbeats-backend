@@ -254,13 +254,13 @@ public class GenerateInterval extends GeneratePlaylist {
     }
 
     /**
-     * Finds tracks for a given interval of the playlist
-     * Gets twice the expected number of tracks for a given interval
+     * Finds tracks for a given bpm, returns the provided limit number of tracks
      *
-     * @param interval_type slow_interval or fast_interval
+     * @param query_bpm BPM to query the Spotify recommendations endpoint with
+     * @param limit how many tracks to return
      * @return arrayList of track IDs
      */
-    protected ArrayList<TrackSimplified> getRecommendedIntervalTracks(INTERVAL_TYPE interval_type, int limit)
+    protected ArrayList<TrackSimplified> getRecommendedIntervalTracks(int query_bpm, int limit)
             throws GetRecommendationsException {
 
         int local_offset = og_offset; //currently 3
@@ -271,13 +271,9 @@ public class GenerateInterval extends GeneratePlaylist {
 
             TrackSimplified[] recommended_tracks;
 
-            if (interval_type == INTERVAL_TYPE.SLOW_INTERVAL) {
                 recommended_tracks = getSortedRecommendations(limit,
-                        resting_bpm - local_offset, resting_bpm + local_offset, resting_bpm);
-            } else {
-                recommended_tracks = getSortedRecommendations(limit,
-                        target_bpm - local_offset, target_bpm + local_offset, target_bpm);
-            }
+                        query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+
 
             // Hash set can take the null element which we want to avoid
             if(recommended_tracks != null) {
@@ -307,7 +303,7 @@ public class GenerateInterval extends GeneratePlaylist {
      *
      * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
-    protected ArrayList<TrackSimplified> findRoughIntervals(ArrayList<TrackSimplified> track_pool, INTERVAL_TYPE interval_type)
+    protected ArrayList<TrackSimplified> findRoughIntervals(ArrayList<TrackSimplified> track_pool, int intervals_to_fill)
             throws GetRecommendationsException {
 
         // track_pool should have 100 song
@@ -328,14 +324,6 @@ public class GenerateInterval extends GeneratePlaylist {
         }
 
         int intervals_filled = 0;
-        int intervals_to_fill;
-
-        if(interval_type == INTERVAL_TYPE.SLOW_INTERVAL){
-            intervals_to_fill = num_slow_intervals;
-        }
-        else{
-            intervals_to_fill = num_fast_intervals;
-        }
 
         // Pick up where we left off
         for (; index < track_pool.size() ; index++) {
@@ -396,29 +384,24 @@ public class GenerateInterval extends GeneratePlaylist {
      * Takes the given tracks ArrayList and adds the correct number of tracks to it
      *
      * @param tracks ArrayList of tracks to add to
-     * @param interval_type slow_interval or fast_interval
+     * @param query_bpm bpm to find tracks to fill the intervals with
+     * @param total_tracks_needed TOTAL number of tracks needed for the ENTIRE interval range
+     * (often num_fast_intervals or num_slow_intervals)
      * @return ArrayList of tracks with the correct number of tracks added
      * @throws GetRecommendationsException if there is an error getting recommendations
      */
-    protected ArrayList<TrackSimplified> fillIntervals(ArrayList<TrackSimplified> tracks,
-                                             INTERVAL_TYPE interval_type) throws GetRecommendationsException {
+    protected ArrayList<TrackSimplified> fillIntervals(ArrayList<TrackSimplified> tracks, int total_tracks_needed,
+                                                       int query_bpm) throws GetRecommendationsException {
 
         TrackSimplified[] recommended_tracks;
         TrackSimplified[] tracks_to_add = null;
         int num_tracks_needed;
-        int query_bpm;
 
         float local_moe; // Keeps track of moe for duration purposes which we will be altering here
         int limit = 21;
 
-        // Find how many tracks we need to find and at what bpm we should find tracks
-        if(interval_type == INTERVAL_TYPE.SLOW_INTERVAL){
-            num_tracks_needed = num_slow_tracks - tracks.size();
-            query_bpm = resting_bpm;
-        }else{
-            num_tracks_needed = num_fast_tracks - tracks.size();
-            query_bpm = target_bpm;
-        }
+        // Find how many tracks we need to find
+        num_tracks_needed = total_tracks_needed - tracks.size();
 
         System.out.println("Tracks Needed: " + num_tracks_needed);
 

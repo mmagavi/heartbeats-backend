@@ -81,21 +81,21 @@ public class GenerateIntervalOne extends GenerateInterval {
 
             System.out.println("Getting Recommended Tracks");
             // Get recommended tracks
-            recommended_slow_tracks = getRecommendedIntervalTracks(INTERVAL_TYPE.SLOW_INTERVAL, 100);
-            recommended_fast_tracks = getRecommendedIntervalTracks(INTERVAL_TYPE.FAST_INTERVAL, 100);
+            recommended_slow_tracks = getRecommendedIntervalTracks(resting_bpm, 100);
+            recommended_fast_tracks = getRecommendedIntervalTracks(target_bpm, 100);
 
             System.out.println("Finding Rough Intervals");
             // Fill the intervals the best we can with the given 100 tracks
-            slow_intervals = findRoughIntervals(recommended_slow_tracks, INTERVAL_TYPE.SLOW_INTERVAL);
-            fast_intervals = findRoughIntervals(recommended_fast_tracks, INTERVAL_TYPE.FAST_INTERVAL);
+            slow_intervals = findRoughIntervals(recommended_slow_tracks, num_slow_intervals);
+            fast_intervals = findRoughIntervals(recommended_fast_tracks, num_fast_intervals);
 
             // If enough of the intervals have been found, fill the gaps and sort them into one correctly ordered array
             if(slow_intervals != null && fast_intervals != null){
 
                 System.out.println("Filling Intervals");
                 // Find a good ordering of each interval
-                slow_intervals = fillIntervals(slow_intervals, INTERVAL_TYPE.SLOW_INTERVAL);
-                fast_intervals = fillIntervals(fast_intervals, INTERVAL_TYPE.FAST_INTERVAL);
+                slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm);
+                fast_intervals = fillIntervals(fast_intervals, num_fast_tracks, resting_bpm);
 
                 System.out.println("Ordering Tracks");
                 // Order the tracks correctly
