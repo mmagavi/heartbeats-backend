@@ -27,7 +27,6 @@ public class GenerateRelax extends GeneratePlaylist {
     protected static int min_target_len_ms;
     protected static int max_target_len_ms;
     private final int limit = 21;
-    private final int songs_per_interval;
     protected static int interval_len_ms;
     protected static int min_interval_len_ms;
     protected static int max_interval_len_ms;
@@ -40,7 +39,7 @@ public class GenerateRelax extends GeneratePlaylist {
         super(spotify_api, genres, age, workout_length, intensity);
 
         num_intervals = findNumIntervals();
-        songs_per_interval = Math.round(((float) workout_length / (float) num_intervals) / avg_song_len);
+        tracks_per_interval = Math.round(((float) workout_length / (float) num_intervals) / avg_song_len);
 
         target_len_ms = workout_len_ms;
         interval_len_ms = workout_len_ms / num_intervals;
@@ -133,7 +132,7 @@ public class GenerateRelax extends GeneratePlaylist {
         TrackSimplified current_track;
 
         // Get the first batch of songs into the deque
-        for (; index < songs_per_interval; index++) {
+        for (; index < tracks_per_interval; index++) {
             current_track = tracks[index];
             deque.add(current_track);
         }

@@ -38,6 +38,7 @@ abstract public class GeneratePlaylist {
     protected int seed_genres_provided = 0;
     protected int desired_num_seed_artists;
     protected int desired_num_seed_tracks;
+    protected int tracks_per_interval;
     protected String seed_artists;
     protected String seed_tracks;
     protected final int target_bpm;
