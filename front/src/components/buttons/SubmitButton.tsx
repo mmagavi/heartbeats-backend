@@ -69,7 +69,7 @@ function SubmitButton(props: SubmitButtonProps) {
 
         let playlist_request: string ="generate-playlist?access_token=" + access_token
         + "&refresh_token=" + refresh_token
-        + "&playlist_type=interval_two"
+        + "&playlist_type=classic"
         + "&intensity=low"
         + "&genres=" + props.genres
         + "&age=" + props.age
