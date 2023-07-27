@@ -81,8 +81,8 @@ public class GenerateIntervalOne extends GenerateInterval {
 
             System.out.println("Getting Recommended Tracks");
             // Get recommended tracks
-            recommended_slow_tracks = getRecommendedIntervalTracks(resting_bpm, 100);
-            recommended_fast_tracks = getRecommendedIntervalTracks(target_bpm, 100);
+            recommended_slow_tracks = getRecommendedTracks(resting_bpm, 100);
+            recommended_fast_tracks = getRecommendedTracks(target_bpm, 100);
 
             System.out.println("Finding Rough Intervals");
             // Fill the intervals the best we can with the given 100 tracks
