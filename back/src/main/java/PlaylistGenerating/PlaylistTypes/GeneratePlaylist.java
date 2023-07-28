@@ -143,6 +143,33 @@ abstract public class GeneratePlaylist {
     }
 
     /**
+     * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
+     *
+     * @param limit number of songs to fetch
+     * @param min_tempo min tempo of songs to fetch
+     * @param max_tempo max tempo of songs to fetch
+     * @param target_tempo target tempo of songs to fetch
+     * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
+     * @throws GetRecommendationsException if an error occurs when fetching the recommendation
+     */
+    protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+            throws GetRecommendationsException {
+
+        RecommendationArguments current_arguments = new RecommendationArguments(
+                spotify_api, limit, genres, seed_artists, seed_tracks,
+                min_tempo, max_tempo, target_tempo, user.getCountry());
+
+        Recommendations recommendations = getRecommendations(current_arguments);
+
+        TrackSimplified[] recommended_tracks = recommendations.getTracks();
+
+        if(recommended_tracks == null) return null;
+
+
+        return recommended_tracks;
+    }
+
+    /**
      * Calls recommendation endpoint and sorts the returned response (excludes target tempo to capture a large range)
      *
      * @param limit number of songs to fetch

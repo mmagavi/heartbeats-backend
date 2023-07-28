@@ -1,4 +1,5 @@
 package PlaylistGenerating.PlaylistTypes.Interval;
+
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
@@ -10,6 +11,7 @@ import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import java.util.*;
 
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.addAll;
+import static SpotifyUtilities.TrackUtilities.duration_comparator;
 
 public class GenerateInterval extends GeneratePlaylist {
 
@@ -47,7 +49,7 @@ public class GenerateInterval extends GeneratePlaylist {
 
         int num_intervals = getNumIntervals();
 
-        if(num_intervals % 2 == 0) num_intervals++; // Ensure we have an odd number of intervals
+        if (num_intervals % 2 == 0) num_intervals++; // Ensure we have an odd number of intervals
 
         num_slow_intervals = (num_intervals / 2) + 1; // We want to start and end with a slow interval
         num_fast_intervals = num_intervals - num_slow_intervals; // Will always be odd if workout len >= 21
@@ -100,9 +102,10 @@ public class GenerateInterval extends GeneratePlaylist {
 
     /**
      * Determine the number of tracks per interval based on the length of the workout
+     *
      * @return number of tracks per interval
      */
-    private int getTracksPerInterval(){
+    private int getTracksPerInterval() {
         if (workout_length_min <= 30) {
             // if workout is less than 30 minutes, do 1-song intervals
             return 1;
@@ -188,23 +191,28 @@ public class GenerateInterval extends GeneratePlaylist {
 
         do {
 
-            recommended_tracks = getSortedRecommendations(limit, min_bpm - local_offset,
+            recommended_tracks = getUnsortedRecommendations(limit, min_bpm - local_offset,
                     max_bpm + local_offset, target_bpm);
 
 
             // Hash set can take the null element which we want to avoid
-            if(recommended_tracks != null) {
+            if (recommended_tracks != null) {
                 track_set.addAll(List.of(recommended_tracks));
 
-                if (track_set.size() < limit) {
-                    local_offset++; // increase offset to find more tracks as the current bpm may be too restrictive
-                    continue;
+                // If the limit has been met
+                if (track_set.size() >= limit) {
+
+                    System.out.println("Track Set Size: " + track_set.size());
+
+
+                    TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
+                    Arrays.sort(track_array, duration_comparator); // Sort the tracks in ascending duration
+
+                    return track_array;
                 }
             }
 
-            System.out.println("Track Set Size: " + track_set.size());
-
-            return track_set.toArray(TrackSimplified[]::new);
+            local_offset++; // Loosen bpm/tempo restrictions
 
         } while (true);
 
@@ -212,10 +220,11 @@ public class GenerateInterval extends GeneratePlaylist {
 
     /**
      * Gets tracks for a single interval
+     *
      * @param tracks - tracks to be used for the interval
      * @return - tracks for the interval
      */
-    protected TrackSimplified[] getIntervalTracks(TrackSimplified[] tracks){
+    protected TrackSimplified[] getIntervalTracks(TrackSimplified[] tracks) {
 
         Deque<TrackSimplified> deque = new ArrayDeque<>();
 
@@ -257,13 +266,13 @@ public class GenerateInterval extends GeneratePlaylist {
      * Finds tracks for a given bpm, returns the provided limit number of tracks
      *
      * @param query_bpm BPM to query the Spotify recommendations endpoint with
-     * @param limit how many tracks to return
+     * @param limit     how many tracks to return (MAX 100)
      * @return arrayList of track IDs
      */
-    protected ArrayList<TrackSimplified> getRecommendedIntervalTracks(int query_bpm, int limit)
+    protected ArrayList<TrackSimplified> getRecommendedTracks(int query_bpm, int limit)
             throws GetRecommendationsException {
 
-        int local_offset = og_offset; //currently 3
+        int local_offset = 0; // Was og_offset (3) for a while
         // 100 is the max for recommendation endpoint
         HashSet<TrackSimplified> track_set = new HashSet<>();
 
@@ -271,29 +280,32 @@ public class GenerateInterval extends GeneratePlaylist {
 
             TrackSimplified[] recommended_tracks;
 
-                recommended_tracks = getSortedRecommendations(limit,
-                        query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+            // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
+            recommended_tracks = getUnsortedRecommendations(limit,
+                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
-
-            // Hash set can take the null element which we want to avoid
-            if(recommended_tracks != null) {
+            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
+            if (recommended_tracks != null && recommended_tracks.length != 0) {
                 track_set.addAll(List.of(recommended_tracks));
 
-                //TODO: look at this 100 and see if another value is better
-                //if (recommended_tracks == null || recommended_tracks.length < 90) {
-                if (track_set.size() < limit) {
-                    local_offset++;
-                    continue;
+                // If the limit has been met
+                if (track_set.size() >= limit) {
+
+                    System.out.println("Track Set Size: " + track_set.size());
+
+
+                    TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
+                    Arrays.sort(track_array, duration_comparator); // Sort the tracks in ascending duration
+
+                    return new ArrayList<>(Arrays.asList(track_array));
                 }
             }
 
-            System.out.println("Track Set Size: " + track_set.size());
-
-            // We used to return recommended tracks as an ArrayList
-            TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
-            return new ArrayList<>(Arrays.asList(track_array));
+            local_offset++; // Loosen bpm/tempo restrictions
+            System.out.println(local_offset);
 
         } while (true);
+
     }
 
     /**
@@ -326,16 +338,16 @@ public class GenerateInterval extends GeneratePlaylist {
         int intervals_filled = 0;
 
         // Pick up where we left off
-        for (; index < track_pool.size() ; index++) {
+        for (; index < track_pool.size(); index++) {
 
             result = checkIntervalDuration(deque);
 
-            if(result == DURATION_RESULT.ACCEPTABLE){
+            if (result == DURATION_RESULT.ACCEPTABLE) {
 
-                int deque_size = deque.size(); // Store size here as in the loop size will be altered by .pop()
+                int deque_size = deque.size(); // Store size here as in the loop size, will be altered by .pop()
 
                 // Empty the deque, add tracks to the selected tracks, remove songs from track pool
-                for(int i = 0; i < deque_size; i++){
+                for (int i = 0; i < deque_size; i++) {
                     current_track = deque.pop();
 
                     selected_tracks.add(current_track); // Place it in our collection of selected tracks
@@ -345,12 +357,12 @@ public class GenerateInterval extends GeneratePlaylist {
                 intervals_filled++;
 
                 // If we have filled all intervals break out of this loop
-                if(intervals_filled == intervals_to_fill) break;
+                if (intervals_filled == intervals_to_fill) break;
 
                 index = 0; // restart index at 0 since we altered the track pool and can consider new combinations
 
                 // Refill the deque
-                for(; index < tracks_per_interval; index++){
+                for (; index < tracks_per_interval; index++) {
                     current_track = track_pool.get(index);
                     deque.add(current_track);
                 }
@@ -359,8 +371,7 @@ public class GenerateInterval extends GeneratePlaylist {
             // If the combination is too long there are no combinations remaining that will fit into our intervals
             else if (result == DURATION_RESULT.TOO_LONG) {
                 break;
-            }
-            else {
+            } else {
 
                 // If duration was not acceptable shift tracks over to find better length
                 current_track = track_pool.get(index);
@@ -372,10 +383,10 @@ public class GenerateInterval extends GeneratePlaylist {
         }
 
         // If we did not fill enough of the intervals return null, so we can try again with looser margins
-        float percent_filled = ((float)intervals_filled / intervals_to_fill) * 100;
+        float percent_filled = ((float) intervals_filled / intervals_to_fill) * 100;
         System.out.println("Percent Filled: " + percent_filled + "%");
 
-        if( percent_filled < acceptable_percent_filled) return null;
+        if (percent_filled < acceptable_percent_filled) return null;
 
         return selected_tracks;
     }
@@ -383,10 +394,10 @@ public class GenerateInterval extends GeneratePlaylist {
     /**
      * Takes the given tracks ArrayList and adds the correct number of tracks to it
      *
-     * @param tracks ArrayList of tracks to add to
-     * @param query_bpm bpm to find tracks to fill the intervals with
+     * @param tracks              ArrayList of tracks to add to
+     * @param query_bpm           bpm to find tracks to fill the intervals with
      * @param total_tracks_needed TOTAL number of tracks needed for the ENTIRE interval range
-     * (often num_fast_intervals or num_slow_intervals)
+     *                            (often num_fast_intervals or num_slow_intervals)
      * @return ArrayList of tracks with the correct number of tracks added
      * @throws GetRecommendationsException if there is an error getting recommendations
      */
@@ -405,7 +416,7 @@ public class GenerateInterval extends GeneratePlaylist {
 
         System.out.println("Tracks Needed: " + num_tracks_needed);
 
-        for(int i = 0; i < num_tracks_needed; i++){
+        for (int i = 0; i < num_tracks_needed; i++) {
 
             local_moe = margin_of_error;
 
@@ -431,26 +442,27 @@ public class GenerateInterval extends GeneratePlaylist {
 
     /**
      * Orders the slow and fast tracks into the correct ordering desired for the final playlist
+     *
      * @param slow_tracks tracks in the slow interval
      * @param fast_tracks tracks in the fast interval
      * @return ordered playlist
      */
     protected TrackSimplified[] orderTracks(ArrayList<TrackSimplified> slow_tracks,
-                                  ArrayList<TrackSimplified> fast_tracks){
+                                            ArrayList<TrackSimplified> fast_tracks) {
 
         TrackSimplified[] ordered_playlist = new TrackSimplified[num_tracks];
         ArrayList<TrackSimplified> current_tracks = slow_tracks;
         boolean is_slow_interval = true; // Every playlist will start with a slow interval
 
-        for(int index = 0; index < num_tracks; index++){
+        for (int index = 0; index < num_tracks; index++) {
 
             // If we have added enough tracks for the current interval, ignore first check when index is 0
-            if( index % tracks_per_interval == 0 && index != 0){
+            if (index % tracks_per_interval == 0 && index != 0) {
 
-                if(is_slow_interval){
+                if (is_slow_interval) {
                     current_tracks = fast_tracks;
 
-                }else{
+                } else {
                     current_tracks = slow_tracks;
                 }
 
