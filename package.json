@@ -4,7 +4,8 @@
   "description": "npm install @material-ui/core",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "(cd front && npm run dev)"
   },
   "engines": {
     "node": "19.7.0",
@@ -16,15 +17,6 @@
     "vite": "4.0.0"
   },
   "devDependencies": {
-    "@material-ui/core": "^4.11.4",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.58",
-    "@material-ui/styles": "^4.11.4",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "react-scripts": "4.0.3",
-    "web-vitals": "^1.0.1",
     "vite": "4.0.0"
   },
   "keywords": [],
