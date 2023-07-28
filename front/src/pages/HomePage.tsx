@@ -1,4 +1,3 @@
-import QuestionComponent from "../components/QuestionComponent";
 import { useState } from "react";
 import QuestionsPage from "./QuestionsPage";
 import ResultPage from "./ResultPage";
