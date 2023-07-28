@@ -15,11 +15,10 @@ interface QuestionsPageProps {
   submitButton: (submit: () => void) => null | JSX.Element;
   questionsRaw: questionsType[];
   setGenres: (genres: (e: any) => any) => void;
-  setDesiredWarmup: (warmup: string) => void;
-  setDesiredCoolDown: (coolDown: string) => void;
   setDesiredAge: (age : number) => void;
   setDesiredLength: (length : number) => void;
   setDesiredBPM: (bpm : number) => void;
+  setDesiredIntensity: (warmup: string) => void;
 }
 
 /**
@@ -93,7 +92,7 @@ export default function QuestionsPage(props: QuestionsPageProps) {
 
   // map of questions
   const questions = props.questionsRaw.map((q) => (
-      <QuestionComponent {...q} setChoice={setChoice} getChoice={getChoice} setDesiredWarmup={props.setDesiredWarmup} setDesiredCoolDown={props.setDesiredCoolDown} setDesiredAge={props.setDesiredAge} setDesiredLength={props.setDesiredLength} setDesiredBPM={props.setDesiredBPM}/>
+      <QuestionComponent {...q} setChoice={setChoice} getChoice={getChoice} setDesiredAge={props.setDesiredAge} setDesiredIntensity={props.setDesiredIntensity} setDesiredLength={props.setDesiredLength} setDesiredBPM={props.setDesiredBPM}/>
   ));
 
   // create a genre component with setGenre, getGenre, and set genres on submit

@@ -34,14 +34,14 @@ public class Server {
         if (processBuilder.environment().get("PORT") != null) {
             return Integer.parseInt(processBuilder.environment().get("PORT"));
         }
-        return 3232; //return default port if heroku-port isn't set (i.e. on localhost)
+        return 5173; // Change this to the port number you want to use locally
     }
 
     public static void main(String[] args) {
 
         // set spark port!
-        Spark.port(getHerokuAssignedPort());
-
+        //Spark.port(getHerokuAssignedPort());
+        Spark.port(3232);
 
         /*
             Setting CORS headers to allow cross-origin requests from the client; this is necessary for the client to

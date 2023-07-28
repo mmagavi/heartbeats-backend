@@ -13,11 +13,10 @@ interface questionProps {
   choices?: choice[];
   setChoice: (n: number, v: any) => void; // stand in for now
   getChoice: (n: number, v: any) => boolean;
-  setDesiredWarmup: (warmup: string) => void;
-  setDesiredCoolDown: (coolDown: string) => void;
   setDesiredAge: (age : number) => void;
   setDesiredLength: (length : number) => void;
   setDesiredBPM: (bpm : number) => void;
+  setDesiredIntensity: (warmup: string) => void;
 }
 
 /**
@@ -60,11 +59,10 @@ export default function QuestionComponent(props: questionProps) {
           id={props.id}
           setValue={props.setChoice}
           checkChoice={checkChoice}
-          setDesiredWarmup={props.setDesiredWarmup}
-          setDesiredCoolDown={props.setDesiredCoolDown}
           setDesiredAge={props.setDesiredAge}
           setDesiredLength={props.setDesiredLength}
           setDesiredBPM={props.setDesiredBPM}
+          setDesiredIntensity={props.setDesiredIntensity}
         />
       ))
     ) : (

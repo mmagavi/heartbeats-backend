@@ -9,8 +9,7 @@ interface SubmitButtonProps {
     userCode : String; // access code
     genres : String;
     playlist_type : String;
-    desired_warmup : String;
-    desired_cool_down : String;
+    desired_intensity : String;
     age : number;
     workout_length: number;
     current_bpm: number;
@@ -69,11 +68,13 @@ function SubmitButton(props: SubmitButtonProps) {
 
         let playlist_request: string ="generate-playlist?access_token=" + access_token
         + "&refresh_token=" + refresh_token
-        + "&playlist_type=classic"
-        + "&intensity=low"
+        + "&playlist_type=" + props.playlist_type
+        + "&intensity=" + props.desired_intensity
         + "&genres=" + props.genres
         + "&age=" + props.age
         + "&workout_length=" + props.workout_length
+
+        console.log(props.playlist_type)
 
         const playlist_response: string | Map<string, string> =
         await checkResponse(await makeRequest(playlist_request))

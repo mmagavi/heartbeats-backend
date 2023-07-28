@@ -18,11 +18,10 @@ interface modeProps {
     text: string;
     setValue: (i: number, val: any) => void;
     checkChoice: (val: any) => boolean;
-    setDesiredWarmup: (warmup: string) => void;
-    setDesiredCoolDown: (coolDown: string) => void;
     setDesiredAge: (age : number) => void;
     setDesiredLength: (length : number) => void;
     setDesiredBPM: (bpm : number) => void;
+    setDesiredIntensity: (warmup: string) => void;
 }
 
 /**
@@ -44,18 +43,12 @@ export default function ModeButton(props: modeProps) {
     function onChangeHelper() {
         props.setValue(props.id, props.val)
         if (props.id == 1) {
-            if (props.val == "quick") {
-                props.setDesiredWarmup("start_quickly");
-            }
-            else if (props.val == "full") {
-                props.setDesiredWarmup("start_with_warmup");
-            }
-        } if (props.id == 2) {
-            if (props.val == "quick") {
-                props.setDesiredCoolDown("short_cool_down");
-            }
-            else if (props.val == "slow") {
-                props.setDesiredCoolDown("long_cool_down");
+            if (props.val == "low") {
+                props.setDesiredIntensity("beginner");
+            } else if (props.val == "medium") {
+                props.setDesiredIntensity("intermediate");
+            } else if (props.val == "high") {
+                props.setDesiredIntensity("advanced");
             }
         } if (props.id == 3) {
             // CHANGE THIS !!

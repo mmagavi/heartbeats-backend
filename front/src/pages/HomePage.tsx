@@ -36,9 +36,8 @@ export default function HomePage(props: homePageProps) {
   const [resultsPage, setResultsPage] = useState(false);
   const [playlistType, setPlaylistType] = useState<string>("");
   const [genres, setGenres] = useState<string>("");
-  const [desiredWarmup, setDesiredWarmup] = useState<string>("");
-  const [desiredCoolDown, setDesiredCoolDown] = useState<string>("");
   const [desiredAge, setDesiredAge] = useState<number>(-1);
+  const [desiredIntensity, setDesiredIntensity] = useState<string>("");
   const [desiredLength, setDesiredLength] = useState<number>(-1);
   const [currentBPM, setCurrentBPM] = useState<number>(-1);
   const [playlist_id, setPlaylistID] = useState<string | undefined>("")
@@ -84,8 +83,7 @@ export default function HomePage(props: homePageProps) {
           <SubmitButton userCode={props.userCode}
                         genres={genres}
                         playlist_type={playlistType}
-                        desired_warmup={desiredWarmup}
-                        desired_cool_down={desiredCoolDown}
+                        desired_intensity={desiredIntensity}
                         age={desiredAge}
                         workout_length={desiredLength}
                         current_bpm={currentBPM}
@@ -110,25 +108,25 @@ export default function HomePage(props: homePageProps) {
       {
         text: "Standard",
         img: "standardMode",
-        val: "standard",
+        val: "classic",
         key: 200,
       },
       {
         text: "Wind-Down",
         img: "windDownMode",
-        val: "windDown",
+        val: "relax",
         key: 201,
       },
       {
         text: "Standard Interval",
         img: "standardIntervalMode",
-        val: "standardInterval",
+        val: "interval_one",
         key: 202,
       },
       {
         text: "Pyramid Interval",
         img: "pyramidIntervalMode",
-        val: "pyramidInterval",
+        val: "interval_two",
         key: 203,
       },
     ],
@@ -148,11 +146,10 @@ export default function HomePage(props: homePageProps) {
   ) : playlistType == "" ? ( // first screen
       <div className="mainBody">
         <ModeQuestionComponent {...playlistQuestion}
-                           setDesiredWarmup={setDesiredWarmup}
-                           setDesiredCoolDown={setDesiredCoolDown}
                            setDesiredAge={setDesiredAge}
                            setDesiredLength={setDesiredLength}
-                           setDesiredBPM={setCurrentBPM}/>
+                           setDesiredBPM={setCurrentBPM}
+                               setDesiredIntensity={setDesiredIntensity}/>
       </div>
   ) : (
       // questions
@@ -164,8 +161,7 @@ export default function HomePage(props: homePageProps) {
             submitButton={getSubmitButton}
             questionsRaw={playlistChoices["exercise"]}
             setGenres={setGenres}
-            setDesiredWarmup={setDesiredWarmup}
-            setDesiredCoolDown={setDesiredCoolDown}
+            setDesiredIntensity={setDesiredIntensity}
             setDesiredAge={setDesiredAge}
             setDesiredLength={setDesiredLength}
             setDesiredBPM={setCurrentBPM}
