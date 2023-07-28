@@ -1,1 +1,1 @@
-web: (cd front && npm ci && npm start)
+web: (cd src/main/java/Server && javac Server.java && java Server)
