@@ -29,10 +29,20 @@ public class Server {
             .setRedirectUri(redirectUri)
             .build();
 
+    static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 3232; //return default port if heroku-port isn't set (i.e. on localhost)
+    }
+
     public static void main(String[] args) {
 
         // set spark port!
-        Spark.port(3232);
+        Spark.port(getHerokuAssignedPort());
+
+
         /*
             Setting CORS headers to allow cross-origin requests from the client; this is necessary for the client to
             be able to make requests to the server.
