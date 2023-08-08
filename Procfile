@@ -1,1 +1,1 @@
-web: java -cp target/heartBeats-jar-with-dependencies.jar
+web: java -cp target/heartBeats.jar
