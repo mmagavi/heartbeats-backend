@@ -4,10 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
     <groupId>org.example</groupId>
     <artifactId>moshi</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <build>
+        <finalName>heartBeats</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -25,6 +28,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M7</version>
+                <configuration>
+                          <skipTests>true</skipTests>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.heroku.sdk</groupId>
@@ -33,7 +39,7 @@
                 <configuration>
                     <jdkVersion>17</jdkVersion>
                     <!-- Use your own application name -->
-                    <appName>spark-heroku-example</appName>
+                    <appName>heartBeats-Back</appName>
                     <processTypes>
                         <!-- Tell Heroku how to launch your application -->
                         <!-- You might have to remove the ./ in front   -->

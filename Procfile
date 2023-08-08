@@ -1,1 +1,1 @@
-web: (cd src/main/java/Server && javac Server.java && java Server)
+web: java -Xms150M -jar target/heartBeats-jar-with-dependencies.jar
