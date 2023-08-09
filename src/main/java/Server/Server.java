@@ -45,9 +45,11 @@ public class Server {
             System.out.println(arg);
         }
 
+        int port = Integer.parseInt(args[0]);
+
         // set spark port!
         //Spark.port(getHerokuAssignedPort());
-        Spark.port(3232);
+        Spark.port(port);
 
         /*
             Setting CORS headers to allow cross-origin requests from the client; this is necessary for the client to
