@@ -1,1 +1,1 @@
-web: java -jar target/heartBeats.jar
+web: java -jar target/heartBeats.jar --server.port=$PORT

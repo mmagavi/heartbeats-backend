@@ -39,6 +39,12 @@ public class Server {
 
     public static void main(String[] args) {
 
+        System.out.println("Num Args: " + args.length);
+
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+
         // set spark port!
         //Spark.port(getHerokuAssignedPort());
         Spark.port(3232);
