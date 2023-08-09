@@ -21,7 +21,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                src.main.java.Server.Server.java
+                                Server.Server
                             </mainClass>
                         </manifest>
                     </archive>
