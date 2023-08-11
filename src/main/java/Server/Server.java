@@ -19,7 +19,8 @@ public class Server {
 
     private static final String client_id = "c48e6da922b24fb782bb5d83356b247f";
     private static final String client_secret = "0420a04c99804dc8b7b681b56a813495";
-    private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:5173/music");
+    //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:5173/music");
+    private static final URI redirectUri = SpotifyHttpManager.makeUri("https://dalton-simonson.github.io/music");
 
     public static String code = "";
 
@@ -39,16 +40,15 @@ public class Server {
 
     public static void main(String[] args) {
 
-        System.out.println("Num Args: " + args.length);
-
-        for (String arg : args) {
-            System.out.println(arg);
-        }
+//        System.out.println("Num Args: " + args.length);
+//
+//        for (String arg : args) {
+//            System.out.println(arg);
+//        }
 
         int port = Integer.parseInt(args[0]);
 
-        // set spark port!
-        //Spark.port(getHerokuAssignedPort());
+
         Spark.port(port);
 
         /*
