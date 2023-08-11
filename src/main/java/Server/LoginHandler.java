@@ -21,10 +21,13 @@ public class LoginHandler implements Route {
     @Override
     public Object handle(Request request, Response response) throws Exception {
 
+        System.out.println("URI: " + Server.redirectUri);
+
         AuthorizationCodeUriRequest authorizationCodeUriRequest =
                 Server.spotify_api.authorizationCodeUri()
                         .scope(scope)
                         .show_dialog(true)
+                       // .redirect_uri(Server.redirectUri)
                         .build();
 
         final URI uri = authorizationCodeUriRequest.execute();
