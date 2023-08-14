@@ -7,6 +7,8 @@ import spark.Route;
 
 import java.net.URI;
 
+import static Server.Server.redirectUri;
+
 public class LoginHandler implements Route {
 
     private  String scope =
@@ -15,7 +17,6 @@ public class LoginHandler implements Route {
                     " user-library-modify, user-library-read, user-follow-read";
 
     public LoginHandler(){
-
     }
 
     @Override
@@ -25,6 +26,7 @@ public class LoginHandler implements Route {
                 Server.spotify_api.authorizationCodeUri()
                         .scope(scope)
                         .show_dialog(true)
+                        .redirect_uri(redirectUri)
                         .build();
 
         final URI uri = authorizationCodeUriRequest.execute();
