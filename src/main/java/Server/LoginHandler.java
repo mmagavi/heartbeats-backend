@@ -26,7 +26,6 @@ public class LoginHandler implements Route {
                 Server.spotify_api.authorizationCodeUri()
                         .scope(scope)
                         .show_dialog(true)
-                        .redirect_uri(redirectUri)
                         .build();
 
         final URI uri = authorizationCodeUriRequest.execute();
