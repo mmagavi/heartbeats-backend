@@ -7,6 +7,8 @@ import spark.Route;
 
 import java.net.URI;
 
+import static Server.Server.redirectUri;
+
 public class LoginHandler implements Route {
 
     private  String scope =
@@ -15,7 +17,6 @@ public class LoginHandler implements Route {
                     " user-library-modify, user-library-read, user-follow-read";
 
     public LoginHandler(){
-
     }
 
     @Override
