@@ -20,7 +20,7 @@ public class Server {
     private static final String client_id = "c48e6da922b24fb782bb5d83356b247f";
     private static final String client_secret = "0420a04c99804dc8b7b681b56a813495";
     protected static final URI redirectUri =
-            SpotifyHttpManager.makeUri("https://dulcet-pavlova-55e566.netlify.app/#/music");
+            SpotifyHttpManager.makeUri("https://dulcet-pavlova-55e566.netlify.app/music");
 
     public static String code = "";
 
