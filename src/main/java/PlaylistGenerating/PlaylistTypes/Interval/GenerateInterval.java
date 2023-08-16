@@ -30,6 +30,8 @@ public class GenerateInterval extends GeneratePlaylist {
     protected static int num_fast_tracks;
     protected static int num_levels = -1;
 
+    protected static int query_limit;
+
     /**
      * Constructor for generating a classic style playlist
      *
@@ -64,6 +66,10 @@ public class GenerateInterval extends GeneratePlaylist {
         setIntervalLengths(margin_of_error);
 
         num_levels = num_fast_intervals / 2 + 1;
+
+        //TODO: Make sure this is the ideal calculation, we might want a different ratio
+        float length_percentage = workout_length_min / 180f;
+        query_limit = Math.round(length_percentage * 100);
     }
 
     @Override
@@ -275,18 +281,24 @@ public class GenerateInterval extends GeneratePlaylist {
         do {
 
             TrackSimplified[] recommended_tracks, recommended_genre_tracks;
+            //If this is a personalized playlist getUnsortedRecommendations will pull seed values from the users account
+            //Otherwise we will not do this and only query the recommendations endpoint with genre seed values
 
-            // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
-//            recommended_tracks = getUnsortedRecommendations(limit,
-//                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+            if (is_personalized) {
+                // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
+                recommended_tracks = getUnsortedRecommendations(limit,
+                        query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
+                // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
+                if (recommended_tracks != null && recommended_tracks.length != 0) {
+                    track_set.addAll(List.of(recommended_tracks));
+                }
+
+            }
+
+            // We will always pull some by the provided genre
             recommended_genre_tracks = getUnsortedGenreRecommendations(limit,
                     query_bpm - local_offset, query_bpm + local_offset, query_bpm);
-
-            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
-//            if (recommended_tracks != null && recommended_tracks.length != 0) {
-//                track_set.addAll(List.of(recommended_tracks));
-//            }
 
             if (recommended_genre_tracks != null && recommended_genre_tracks.length != 0) {
                 track_set.addAll(List.of(recommended_genre_tracks));
@@ -319,8 +331,7 @@ public class GenerateInterval extends GeneratePlaylist {
      *
      * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
-    protected ArrayList<TrackSimplified> findRoughIntervals(ArrayList<TrackSimplified> track_pool, int intervals_to_fill)
-    {
+    protected ArrayList<TrackSimplified> findRoughIntervals(ArrayList<TrackSimplified> track_pool, int intervals_to_fill) {
 
         // track_pool should have 100 song
         Deque<TrackSimplified> deque = new ArrayDeque<>();

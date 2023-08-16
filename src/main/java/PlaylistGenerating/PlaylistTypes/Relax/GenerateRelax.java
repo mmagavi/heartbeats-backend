@@ -26,7 +26,7 @@ public class GenerateRelax extends GeneratePlaylist {
     protected static int target_len_ms;
     protected static int min_target_len_ms;
     protected static int max_target_len_ms;
-    private final int limit = 21;
+    private final int limit = 21; //TODO: find out if this limit should be dynamic like the interval ones
     protected static int interval_len_ms;
     protected static int min_interval_len_ms;
     protected static int max_interval_len_ms;

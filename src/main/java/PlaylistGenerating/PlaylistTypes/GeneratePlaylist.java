@@ -45,7 +45,10 @@ abstract public class GeneratePlaylist {
 
     protected User user;
 
+    protected final boolean is_personalized = true; //TODO: remove comments and make this dynamic
+
     public GeneratePlaylist(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
+        // , boolean is_personalized)
             throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
 
         this.spotify_api = spotify_api;
@@ -56,6 +59,7 @@ abstract public class GeneratePlaylist {
         this.intensity = intensity;
         this.margin_of_error = .02f;
         this.user = getCurrentUsersProfile(spotify_api);
+        // this.is_personalized = is_personalized;
 
         target_bpm = getTargetBPM();
 
@@ -97,7 +101,7 @@ abstract public class GeneratePlaylist {
      * This is important as the recommendation endpoint only allows 5 seed values in any combination
      * of genres, tracks, and artists
      */
-    private  void determineSeedLimits() {
+    private void determineSeedLimits() {
         switch (seed_genres_provided) {
             case 1 -> {
                 desired_num_seed_artists = 2;
@@ -117,9 +121,9 @@ abstract public class GeneratePlaylist {
     /**
      * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
      *
-     * @param limit number of songs to fetch
-     * @param min_tempo min tempo of songs to fetch
-     * @param max_tempo max tempo of songs to fetch
+     * @param limit        number of songs to fetch
+     * @param min_tempo    min tempo of songs to fetch
+     * @param max_tempo    max tempo of songs to fetch
      * @param target_tempo target tempo of songs to fetch
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
@@ -127,15 +131,10 @@ abstract public class GeneratePlaylist {
     protected TrackSimplified[] getSortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
             throws GetRecommendationsException {
 
-        RecommendationArguments current_arguments = new RecommendationArguments(
-                spotify_api, limit, genres, seed_artists, seed_tracks,
-                min_tempo, max_tempo, target_tempo, user.getCountry());
 
-        Recommendations recommendations = getRecommendations(current_arguments);
+        TrackSimplified[] recommended_tracks = getUnsortedRecommendations(limit, min_tempo, max_tempo, target_tempo);
 
-        TrackSimplified[] recommended_tracks = recommendations.getTracks();
-
-        if(recommended_tracks == null) return null;
+        if (recommended_tracks == null) return null;
 
         Arrays.sort(recommended_tracks, duration_comparator);
 
@@ -145,9 +144,9 @@ abstract public class GeneratePlaylist {
     /**
      * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
      *
-     * @param limit number of songs to fetch
-     * @param min_tempo min tempo of songs to fetch
-     * @param max_tempo max tempo of songs to fetch
+     * @param limit        number of songs to fetch
+     * @param min_tempo    min tempo of songs to fetch
+     * @param max_tempo    max tempo of songs to fetch
      * @param target_tempo target tempo of songs to fetch
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
@@ -159,7 +158,15 @@ abstract public class GeneratePlaylist {
                 spotify_api, limit, genres, seed_artists, seed_tracks,
                 min_tempo, max_tempo, target_tempo, user.getCountry());
 
-        Recommendations recommendations = getRecommendations(current_arguments);
+        Recommendations recommendations;
+
+        // If we want a more personalized playlist we will pull from the users account as well as the genres provided
+        // otherwise we will only use the genres provided as seed values
+        if (is_personalized) {
+            recommendations = getRecommendations(current_arguments); // Mix of genre and personal account
+        } else {
+            recommendations = getGenreRecommendations(current_arguments); // Purely genre based
+        }
 
         return recommendations.getTracks();
     }
@@ -168,9 +175,9 @@ abstract public class GeneratePlaylist {
      * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
      * (ONLY USES GENRE)
      *
-     * @param limit number of songs to fetch
-     * @param min_tempo min tempo of songs to fetch
-     * @param max_tempo max tempo of songs to fetch
+     * @param limit        number of songs to fetch
+     * @param min_tempo    min tempo of songs to fetch
+     * @param max_tempo    max tempo of songs to fetch
      * @param target_tempo target tempo of songs to fetch
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
@@ -178,8 +185,10 @@ abstract public class GeneratePlaylist {
     protected TrackSimplified[] getUnsortedGenreRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
             throws GetRecommendationsException {
 
-        GenreRecommendationArguments current_arguments = new GenreRecommendationArguments(
-                spotify_api, limit, genres, min_tempo, max_tempo, target_tempo, user.getCountry());
+        // Dont need seed artist and tracks and they will not be accessed so passing null is okay here
+        RecommendationArguments current_arguments = new RecommendationArguments(
+                spotify_api, limit, genres, null, null, min_tempo,
+                max_tempo, target_tempo, user.getCountry());
 
         Recommendations recommendations = getGenreRecommendations(current_arguments);
 
@@ -189,7 +198,7 @@ abstract public class GeneratePlaylist {
     /**
      * Calls recommendation endpoint and sorts the returned response (excludes target tempo to capture a large range)
      *
-     * @param limit number of songs to fetch
+     * @param limit     number of songs to fetch
      * @param min_tempo min tempo of songs to fetch
      * @param max_tempo max tempo of songs to fetch
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint

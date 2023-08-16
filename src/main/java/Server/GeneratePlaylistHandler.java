@@ -1,5 +1,6 @@
 package Server;
 
+import ExceptionClasses.EndpointParamExceptions.NotBooleanException;
 import ExceptionClasses.InvalidInputExceptions.*;
 import PlaylistGenerating.PlaylistTypes.Classic.GenerateClassic;
 import PlaylistGenerating.PlaylistTypes.Interval.GenerateIntervalOne;
@@ -57,6 +58,7 @@ public class GeneratePlaylistHandler implements Route {
             String genres = request.queryParams("genres"); // british,hip-hop,country  etc
             int age = Integer.parseInt(request.queryParams("age")); // 13-100
             int workout_length = Integer.parseInt(request.queryParams("workout_length")); // 15-180 (minutes)
+            // boolean is_personalized = verifyIsPersonalized(request.queryParams("is_personalized"));
 
             // Verify all the parameters
             verifyPlaylistType(playlist_type);
@@ -130,6 +132,9 @@ public class GeneratePlaylistHandler implements Route {
 
         if (request.queryParams("workout_length") == null)
             throw new NullParameterException("Parameter \"workout_length\" was not provided");
+
+//        if(request.queryParams("is_personalized") == null)
+//            throw new NullParameterException("Parameter \"is_personalized\" was not provided");
     }
 
     /**
@@ -206,6 +211,13 @@ public class GeneratePlaylistHandler implements Route {
         if (workout_length < 15 || workout_length > 180) {
             throw new InvalidWorkoutLength("workout_length must be in the range 15-180");
         }
+    }
+
+    public static boolean verifyIsPersonalized(String is_personalized) throws NotBooleanException{
+        if(is_personalized.equalsIgnoreCase("true")) return true;
+        if(is_personalized.equalsIgnoreCase("false")) return false;
+
+        throw new NotBooleanException("is_personalized must be boolean value (case insensitive) \"true\" or \"false\"");
     }
 
     /**

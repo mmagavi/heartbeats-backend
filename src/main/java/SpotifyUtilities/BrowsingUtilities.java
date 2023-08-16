@@ -48,7 +48,7 @@ public class BrowsingUtilities {
      * @return Recommendations object with the fetched tracks
      * @throws GetRecommendationsException if exception encountered in getRecommendationsRequest.execute()
      */
-    public static Recommendations getGenreRecommendations(GenreRecommendationArguments args)
+    public static Recommendations getGenreRecommendations(RecommendationArguments args)
             throws GetRecommendationsException {
 
         try {
