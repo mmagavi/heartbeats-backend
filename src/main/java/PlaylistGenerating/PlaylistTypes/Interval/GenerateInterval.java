@@ -277,16 +277,16 @@ public class GenerateInterval extends GeneratePlaylist {
             TrackSimplified[] recommended_tracks, recommended_genre_tracks;
 
             // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
-            recommended_tracks = getUnsortedRecommendations(limit,
-                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+//            recommended_tracks = getUnsortedRecommendations(limit,
+//                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
             recommended_genre_tracks = getUnsortedGenreRecommendations(limit,
                     query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
-            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
-            if (recommended_tracks != null && recommended_tracks.length != 0) {
-                track_set.addAll(List.of(recommended_tracks));
-            }
+//            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
+//            if (recommended_tracks != null && recommended_tracks.length != 0) {
+//                track_set.addAll(List.of(recommended_tracks));
+//            }
 
             if (recommended_genre_tracks != null && recommended_genre_tracks.length != 0) {
                 track_set.addAll(List.of(recommended_genre_tracks));
