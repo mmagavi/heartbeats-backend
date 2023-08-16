@@ -30,10 +30,6 @@ public class GenerateInterval extends GeneratePlaylist {
     protected static int num_fast_tracks;
     protected static int num_levels = -1;
 
-    protected enum INTERVAL_TYPE {
-        SLOW_INTERVAL, FAST_INTERVAL
-    }
-
     /**
      * Constructor for generating a classic style playlist
      *
@@ -272,39 +268,47 @@ public class GenerateInterval extends GeneratePlaylist {
     protected ArrayList<TrackSimplified> getRecommendedTracks(int query_bpm, int limit)
             throws GetRecommendationsException {
 
-        int local_offset = 0; // Was og_offset (3) for a while
+        int local_offset = og_offset; // Was og_offset (3) for a while
         // 100 is the max for recommendation endpoint
         HashSet<TrackSimplified> track_set = new HashSet<>();
 
         do {
 
-            TrackSimplified[] recommended_tracks;
+            TrackSimplified[] recommended_tracks, recommended_genre_tracks;
 
             // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
             recommended_tracks = getUnsortedRecommendations(limit,
                     query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
+            recommended_genre_tracks = getUnsortedGenreRecommendations(limit,
+                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+
             // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
             if (recommended_tracks != null && recommended_tracks.length != 0) {
                 track_set.addAll(List.of(recommended_tracks));
+            }
 
-                // If the limit has been met
-                if (track_set.size() >= limit) {
+            if (recommended_genre_tracks != null && recommended_genre_tracks.length != 0) {
+                track_set.addAll(List.of(recommended_genre_tracks));
+            }
 
-                    System.out.println("Track Set Size: " + track_set.size());
-
-
-                    TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
-                    Arrays.sort(track_array, duration_comparator); // Sort the tracks in ascending duration
-
-                    return new ArrayList<>(Arrays.asList(track_array));
-                }
+            // If the limit has been met
+            if (track_set.size() >= limit) {
+                break;
             }
 
             local_offset++; // Loosen bpm/tempo restrictions
             System.out.println(local_offset);
 
         } while (true);
+
+        System.out.println("Track Set Size: " + track_set.size());
+
+
+        TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
+        Arrays.sort(track_array, duration_comparator); // Sort the tracks in ascending duration
+
+        return new ArrayList<>(Arrays.asList(track_array));
 
     }
 
@@ -316,7 +320,7 @@ public class GenerateInterval extends GeneratePlaylist {
      * @return TrackSimplified array of songs that fit in the target duration window, null otherwise
      */
     protected ArrayList<TrackSimplified> findRoughIntervals(ArrayList<TrackSimplified> track_pool, int intervals_to_fill)
-            throws GetRecommendationsException {
+    {
 
         // track_pool should have 100 song
         Deque<TrackSimplified> deque = new ArrayDeque<>();
@@ -405,7 +409,7 @@ public class GenerateInterval extends GeneratePlaylist {
                                                        int query_bpm) throws GetRecommendationsException {
 
         TrackSimplified[] recommended_tracks;
-        TrackSimplified[] tracks_to_add = null;
+        TrackSimplified[] tracks_to_add;
         int num_tracks_needed;
 
         float local_moe; // Keeps track of moe for duration purposes which we will be altering here

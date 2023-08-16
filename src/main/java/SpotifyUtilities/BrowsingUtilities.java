@@ -41,6 +41,35 @@ public class BrowsingUtilities {
             throw new GetRecommendationsException(ex.getMessage());
         }
     }
+
+    /**
+     * Gets recommendations using Spotify's recommendation endpoint
+     *
+     * @return Recommendations object with the fetched tracks
+     * @throws GetRecommendationsException if exception encountered in getRecommendationsRequest.execute()
+     */
+    public static Recommendations getGenreRecommendations(GenreRecommendationArguments args)
+            throws GetRecommendationsException {
+
+        try {
+            GetRecommendationsRequest getRecommendationsRequest =
+                    args.spotify_api().getRecommendations()
+                            .limit(args.limit())
+                            .seed_genres(args.seed_genres())
+                            .min_tempo(args.min_tempo())
+                            .max_tempo(args.max_tempo())
+                            .target_tempo(args.target_tempo())
+                            .market(args.market())
+                            .build();
+
+            return getRecommendationsRequest.execute();
+
+        } catch (IOException | SpotifyWebApiException | ParseException ex) {
+
+            throw new GetRecommendationsException(ex.getMessage());
+        }
+    }
+
     //TODO: Overload this method in case we do not always want to use all these arguments :)
 
     /**

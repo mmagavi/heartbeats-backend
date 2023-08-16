@@ -6,14 +6,14 @@ import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestExcept
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
 import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 import SpotifyUtilities.RecommendationArguments;
+import SpotifyUtilities.GenreRecommendationArguments;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Arrays;
 
 import static PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges.getTargetHeartRateRange;
-import static SpotifyUtilities.BrowsingUtilities.getRecommendationTempoRange;
-import static SpotifyUtilities.BrowsingUtilities.getRecommendations;
+import static SpotifyUtilities.BrowsingUtilities.*;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
 import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
 import static SpotifyUtilities.TrackUtilities.duration_comparator;
@@ -32,7 +32,7 @@ abstract public class GeneratePlaylist {
     protected final int workout_length_min;
     protected final int workout_len_ms; // Length of the workout in MilliSeconds
     protected final String intensity;
-    protected final int resting_bpm = 69; // assuming an average resting bpm
+    protected final int resting_bpm = 80; // assuming an average resting bpm (formerly 69)
     protected final float margin_of_error; // percent a playlist can be off the target by and still be acceptable
     protected final float avg_song_len = 3.5f;
     protected int seed_genres_provided = 0;
@@ -46,7 +46,7 @@ abstract public class GeneratePlaylist {
     protected User user;
 
     public GeneratePlaylist(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
-    throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
+            throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
 
         this.spotify_api = spotify_api;
         this.genres = genres;
@@ -161,12 +161,29 @@ abstract public class GeneratePlaylist {
 
         Recommendations recommendations = getRecommendations(current_arguments);
 
-        TrackSimplified[] recommended_tracks = recommendations.getTracks();
+        return recommendations.getTracks();
+    }
 
-        if(recommended_tracks == null) return null;
+    /**
+     * Calls the recommendation endpoint and sorts the returned response by duration in ascending order
+     * (ONLY USES GENRE)
+     *
+     * @param limit number of songs to fetch
+     * @param min_tempo min tempo of songs to fetch
+     * @param max_tempo max tempo of songs to fetch
+     * @param target_tempo target tempo of songs to fetch
+     * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
+     * @throws GetRecommendationsException if an error occurs when fetching the recommendation
+     */
+    protected TrackSimplified[] getUnsortedGenreRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+            throws GetRecommendationsException {
 
+        GenreRecommendationArguments current_arguments = new GenreRecommendationArguments(
+                spotify_api, limit, genres, min_tempo, max_tempo, target_tempo, user.getCountry());
 
-        return recommended_tracks;
+        Recommendations recommendations = getGenreRecommendations(current_arguments);
+
+        return recommendations.getTracks();
     }
 
     /**
