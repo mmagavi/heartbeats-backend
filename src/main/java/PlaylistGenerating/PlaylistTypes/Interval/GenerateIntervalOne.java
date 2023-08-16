@@ -79,10 +79,13 @@ public class GenerateIntervalOne extends GenerateInterval {
 
         do {
 
+            float length_percentage = workout_length_min / 180f;
+            int limit = Math.round(length_percentage * 100);
+
             System.out.println("Getting Recommended Tracks");
             // Get recommended tracks
-            recommended_slow_tracks = getRecommendedTracks(resting_bpm, 100);
-            recommended_fast_tracks = getRecommendedTracks(target_bpm, 100);
+            recommended_slow_tracks = getRecommendedTracks(resting_bpm, limit);
+            recommended_fast_tracks = getRecommendedTracks(target_bpm, limit);
 
             System.out.println("Finding Rough Intervals");
             // Fill the intervals the best we can with the given 100 tracks
