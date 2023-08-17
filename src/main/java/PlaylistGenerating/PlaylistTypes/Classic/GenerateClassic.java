@@ -1,6 +1,9 @@
 package PlaylistGenerating.PlaylistTypes.Classic;
 
+import ExceptionClasses.ArtistExceptions.GetSeveralArtistsException;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
+import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
+import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import ExceptionClasses.PlaylistExceptions.AddItemsToPlaylistException;
 import ExceptionClasses.PlaylistExceptions.CreatePlaylistException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
@@ -42,18 +45,17 @@ public class GenerateClassic extends GeneratePlaylist {
      * @param workout_length Length of the workout
      * @param intensity      desired intensity (low, medium, high)
      */
-    public GenerateClassic(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
-            throws Exception {
+    public GenerateClassic(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity,
+                           boolean is_personalized) throws GetCurrentUsersProfileException,
+            GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetSeveralArtistsException {
 
-        super(spotify_api, genres, age, workout_length, intensity);
+        super(spotify_api, genres, age, workout_length, intensity, is_personalized);
 
         intervals = new HashMap<>();
 
         // warmup and wind-down are the same length and are 10% of the workout each
         float transition_length_min;
 
-        //TODO do we want to do this or let the changing MOE in findTransitionTracks deal with it?
-        // This will save quite a few API calls I imagine the way we have it now so prolly keep idk
         if (workout_length > 30) {
             transition_length_min = workout_length * .1f;
         } else {

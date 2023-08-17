@@ -40,11 +40,6 @@ public class Server {
 
     public static void main(String[] args) {
 
-//        System.out.println("Num Args: " + args.length);
-//
-//        for (String arg : args) {
-//            System.out.println(arg);
-//        }
 
         int port = Integer.parseInt(args[0]);
 
@@ -80,5 +75,9 @@ public class Server {
         Spark.init();
         Spark.awaitInitialization();
         System.out.println("Server started");
+
+        StringBuilder builder = new StringBuilder();
+
+        System.out.println(builder.toString());
     }
 }

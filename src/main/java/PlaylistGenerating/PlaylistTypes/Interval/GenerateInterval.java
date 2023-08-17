@@ -1,5 +1,6 @@
 package PlaylistGenerating.PlaylistTypes.Interval;
 
+import ExceptionClasses.ArtistExceptions.GetSeveralArtistsException;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
@@ -40,10 +41,11 @@ public class GenerateInterval extends GeneratePlaylist {
      * @param age            Age of the user
      * @param workout_length Length of the workout
      */
-    public GenerateInterval(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
-            throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
+    public GenerateInterval(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity,
+                            boolean is_personalized) throws GetUsersTopArtistsRequestException,
+            GetUsersTopTracksRequestException, GetCurrentUsersProfileException, GetSeveralArtistsException {
 
-        super(spotify_api, genres, age, workout_length, intensity);
+        super(spotify_api, genres, age, workout_length, intensity, is_personalized);
 
         int num_intervals = getNumIntervals();
 
@@ -159,11 +161,11 @@ public class GenerateInterval extends GeneratePlaylist {
             duration_ms += track.getDurationMs();
         }
 
-        System.out.println("Duration: " + duration_ms);
-        System.out.println("Interval Duration: " + interval_len_ms);
-        System.out.println("Min Duration: " + min_interval_len_ms);
-        System.out.println("Max Duration: " + max_interval_len_ms);
-        System.out.println();
+//        System.out.println("Duration: " + duration_ms);
+//        System.out.println("Interval Duration: " + interval_len_ms);
+//        System.out.println("Min Duration: " + min_interval_len_ms);
+//        System.out.println("Max Duration: " + max_interval_len_ms);
+//        System.out.println();
 
 
         if (duration_ms < min_interval_len_ms) {
@@ -280,28 +282,15 @@ public class GenerateInterval extends GeneratePlaylist {
 
         do {
 
-            TrackSimplified[] recommended_tracks, recommended_genre_tracks;
-            //If this is a personalized playlist getUnsortedRecommendations will pull seed values from the users account
-            //Otherwise we will not do this and only query the recommendations endpoint with genre seed values
+            TrackSimplified[] recommended_tracks;
 
-            if (is_personalized) {
-                // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
-                recommended_tracks = getUnsortedRecommendations(limit,
-                        query_bpm - local_offset, query_bpm + local_offset, query_bpm);
-
-                // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
-                if (recommended_tracks != null && recommended_tracks.length != 0) {
-                    track_set.addAll(List.of(recommended_tracks));
-                }
-
-            }
-
-            // We will always pull some by the provided genre
-            recommended_genre_tracks = getUnsortedGenreRecommendations(limit,
+            // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
+            recommended_tracks = getUnsortedRecommendations(limit,
                     query_bpm - local_offset, query_bpm + local_offset, query_bpm);
 
-            if (recommended_genre_tracks != null && recommended_genre_tracks.length != 0) {
-                track_set.addAll(List.of(recommended_genre_tracks));
+            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
+            if (recommended_tracks != null && recommended_tracks.length != 0) {
+                track_set.addAll(List.of(recommended_tracks));
             }
 
             // If the limit has been met

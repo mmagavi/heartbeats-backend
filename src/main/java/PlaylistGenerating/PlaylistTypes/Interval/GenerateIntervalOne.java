@@ -1,5 +1,6 @@
 package PlaylistGenerating.PlaylistTypes.Interval;
 
+import ExceptionClasses.ArtistExceptions.GetSeveralArtistsException;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
@@ -30,8 +31,10 @@ public class GenerateIntervalOne extends GenerateInterval {
      * @param workout_length Length of the workout
      * @param intensity    Intensity of the workout
      */
-    public GenerateIntervalOne(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity) throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
-        super(spotify_api, genres, age, workout_length, intensity);
+    public GenerateIntervalOne(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity,
+                               boolean is_personalized) throws GetUsersTopArtistsRequestException,
+            GetUsersTopTracksRequestException, GetCurrentUsersProfileException, GetSeveralArtistsException {
+        super(spotify_api, genres, age, workout_length, intensity, is_personalized);
     }
 
     @Override
@@ -79,12 +82,12 @@ public class GenerateIntervalOne extends GenerateInterval {
 
         do {
 
-            System.out.println("Getting Recommended Tracks");
+            //System.out.println("Getting Recommended Tracks");
             // Get recommended tracks
             recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit);
             recommended_fast_tracks = getRecommendedTracks(target_bpm, query_limit);
 
-            System.out.println("Finding Rough Intervals");
+            //System.out.println("Finding Rough Intervals");
             // Fill the intervals the best we can with the given 100 tracks
             slow_intervals = findRoughIntervals(recommended_slow_tracks, num_slow_intervals);
             fast_intervals = findRoughIntervals(recommended_fast_tracks, num_fast_intervals);
@@ -92,12 +95,12 @@ public class GenerateIntervalOne extends GenerateInterval {
             // If enough of the intervals have been found, fill the gaps and sort them into one correctly ordered array
             if(slow_intervals != null && fast_intervals != null){
 
-                System.out.println("Filling Intervals");
+                //System.out.println("Filling Intervals");
                 // Find a good ordering of each interval
                 slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm);
                 fast_intervals = fillIntervals(fast_intervals, num_fast_tracks, resting_bpm);
 
-                System.out.println("Ordering Tracks");
+                //System.out.println("Ordering Tracks");
                 // Order the tracks correctly
                 final_playlist = orderTracks(slow_intervals, fast_intervals);
             }

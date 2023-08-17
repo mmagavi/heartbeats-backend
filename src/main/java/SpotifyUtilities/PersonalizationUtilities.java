@@ -14,13 +14,24 @@ import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUser
 public class PersonalizationUtilities {
 
     /**
-     * Gets 5 of the user's top artists
+     * Gets all the user's top artists
      * @param spotify_api SpotifyApi object that has been built with the current user's access token
      * @return Artist array of the user's top artists
      * @throws GetUsersTopArtistsRequestException if an exception was thrown in getUsersSavedTracksRequest.execute()
      */
     public static Artist[] GetUsersTopArtists(SpotifyApi spotify_api) throws GetUsersTopArtistsRequestException {
-        return GetUsersTopArtists(spotify_api, 5);
+        try{
+
+            GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotify_api.getUsersTopArtists().build();
+
+            Paging<Artist> artistPaging = getUsersTopArtistsRequest.execute();
+
+            return artistPaging.getItems();
+
+        }catch(Exception ex){
+
+            throw new GetUsersTopArtistsRequestException(ex.getMessage());
+        }
     }
     public static Artist[] GetUsersTopArtists(SpotifyApi spotify_api, int limit) throws GetUsersTopArtistsRequestException {
 
@@ -40,14 +51,26 @@ public class PersonalizationUtilities {
 
 
     /**
-     * Gets 5 of the user's top tracks
+     * Gets all the user's top tracks
      * @param spotify_api SpotifyApi object that has been built with the current user's access token
      * @return Artist array of the user's top artists
      * @throws GetUsersTopTracksRequestException if an exception was thrown in getUsersSavedTracksRequest.execute()
      */
     public static Track[] GetUsersTopTracks(SpotifyApi spotify_api) throws GetUsersTopTracksRequestException {
-        return GetUsersTopTracks(spotify_api, 5);
+        try{
+
+            GetUsersTopTracksRequest getUsersTopTracksRequest = spotify_api.getUsersTopTracks().build();
+
+            Paging<Track> trackPaging = getUsersTopTracksRequest.execute();
+
+            return trackPaging.getItems();
+
+        }catch(Exception ex){
+
+            throw new GetUsersTopTracksRequestException(ex.getMessage());
+        }
     }
+
     public static Track[] GetUsersTopTracks(SpotifyApi spotify_api, int limit) throws GetUsersTopTracksRequestException {
         try{
 

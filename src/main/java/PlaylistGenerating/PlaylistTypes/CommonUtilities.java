@@ -7,10 +7,7 @@ import SpotifyUtilities.RecommendationArguments;
 import SpotifyUtilities.TrackUtilities;
 import com.neovisionaries.i18n.CountryCode;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
-import se.michaelthelin.spotify.model_objects.specification.Recommendations;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +78,22 @@ public class CommonUtilities {
             uris[index] = features[index].getUri();
         }
         return uris;
+    }
+
+    public static String[] getArtistIDs(ArtistSimplified[] artists){
+        int num_artists = artists.length;
+
+        String[] ids = new String[num_artists];
+
+        for(int index = 0; index < num_artists; index++){
+
+            ArtistSimplified current_artist = artists[index];
+            String id = current_artist.getId();
+
+            ids[index] = id;
+        }
+
+        return ids;
     }
 
     /**
@@ -158,6 +171,60 @@ public class CommonUtilities {
         }
         TrackSimplified track;
         int track_index;
+    }
+
+    public static String createCommaSeperatedString(Artist[] artists){
+
+        StringBuilder string_builder = new StringBuilder();
+
+        // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
+        boolean flag = false;
+
+        for (Artist artist : artists) {
+
+            if(artist == null) continue;
+
+            // This will be false for the first iteration preventing a leading comma but true for all the rest
+            if (flag) {
+                string_builder.append(",");
+            }
+
+            string_builder.append(artist.getId());
+
+            flag = true;
+        }
+
+        return string_builder.toString();
+    }
+
+    public static String createCommaSeperatedString(Track[] tracks){
+
+        StringBuilder string_builder = new StringBuilder();
+
+        // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
+        boolean flag = false;
+
+        for (Track track : tracks) {
+
+            if(track == null) continue;
+
+            // This will be false for the first iteration preventing a leading comma but true for all the rest
+            if (flag) {
+                string_builder.append(",");
+            }
+
+            string_builder.append(track.getId());
+
+            flag = true;
+        }
+
+        return string_builder.toString();
+    }
+
+    public static <T> void createNullArray(T[] array, int size){
+        for(int index = 0; index < size; index++){
+            array[index] = null;
+        }
     }
 
     public static TrackSimplified[] eliminateDupesAndNonPlayable(SpotifyApi spotify_api, TrackSimplified[] tracks,

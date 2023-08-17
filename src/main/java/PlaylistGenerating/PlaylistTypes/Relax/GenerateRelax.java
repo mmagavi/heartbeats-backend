@@ -1,5 +1,6 @@
 package PlaylistGenerating.PlaylistTypes.Relax;
 
+import ExceptionClasses.ArtistExceptions.GetSeveralArtistsException;
 import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
@@ -34,9 +35,10 @@ public class GenerateRelax extends GeneratePlaylist {
     private static HashMap<String, Integer> selected_songs;
 
 
-    public GenerateRelax(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity)
-            throws GetUsersTopArtistsRequestException, GetUsersTopTracksRequestException, GetCurrentUsersProfileException {
-        super(spotify_api, genres, age, workout_length, intensity);
+    public GenerateRelax(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity,
+                         boolean is_personalized) throws GetUsersTopArtistsRequestException,
+            GetUsersTopTracksRequestException, GetCurrentUsersProfileException, GetSeveralArtistsException {
+        super(spotify_api, genres, age, workout_length, intensity, is_personalized);
 
         num_intervals = findNumIntervals();
         tracks_per_interval = Math.round(((float) workout_length / (float) num_intervals) / avg_song_len);

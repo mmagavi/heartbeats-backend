@@ -58,7 +58,7 @@ public class GeneratePlaylistHandler implements Route {
             String genres = request.queryParams("genres"); // british,hip-hop,country  etc
             int age = Integer.parseInt(request.queryParams("age")); // 13-100
             int workout_length = Integer.parseInt(request.queryParams("workout_length")); // 15-180 (minutes)
-            // boolean is_personalized = verifyIsPersonalized(request.queryParams("is_personalized"));
+            boolean is_personalized = verifyIsPersonalized(request.queryParams("is_personalized"));
 
             // Verify all the parameters
             verifyPlaylistType(playlist_type);
@@ -74,16 +74,16 @@ public class GeneratePlaylistHandler implements Route {
 
             switch (playlist_type) {
                 case "classic" -> {
-                    generator = new GenerateClassic(spotify_api, genres, age, workout_length, intensity);
+                    generator = new GenerateClassic(spotify_api, genres, age, workout_length, intensity, is_personalized);
                 }
                 case "interval_one" -> {
-                    generator = new GenerateIntervalOne(spotify_api, genres, age, workout_length, intensity);
+                    generator = new GenerateIntervalOne(spotify_api, genres, age, workout_length, intensity, is_personalized);
                 }
                 case "interval_two" -> {
-                    generator = new GenerateIntervalTwo(spotify_api, genres, age, workout_length, intensity);
+                    generator = new GenerateIntervalTwo(spotify_api, genres, age, workout_length, intensity, is_personalized);
                 }
                 case "relax" -> {
-                    generator = new GenerateRelax(spotify_api, genres, age, workout_length, intensity);
+                    generator = new GenerateRelax(spotify_api, genres, age, workout_length, intensity, is_personalized);
                 }
                 default -> {
                     throw new InvalidPlaylistTypeException("playlist_type must be" +
@@ -213,9 +213,9 @@ public class GeneratePlaylistHandler implements Route {
         }
     }
 
-    public static boolean verifyIsPersonalized(String is_personalized) throws NotBooleanException{
-        if(is_personalized.equalsIgnoreCase("true")) return true;
-        if(is_personalized.equalsIgnoreCase("false")) return false;
+    public static boolean verifyIsPersonalized(String is_personalized) throws NotBooleanException {
+        if (is_personalized.equalsIgnoreCase("true")) return true;
+        if (is_personalized.equalsIgnoreCase("false")) return false;
 
         throw new NotBooleanException("is_personalized must be boolean value (case insensitive) \"true\" or \"false\"");
     }
