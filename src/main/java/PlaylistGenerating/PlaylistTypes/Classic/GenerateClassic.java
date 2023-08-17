@@ -32,7 +32,7 @@ public class GenerateClassic extends GeneratePlaylist {
     protected static int max_target_length_ms;
     private final float bpm_difference;
     private HashMap<Integer, TrackSimplified[]> intervals;
-    private final float transition_moe = .02f;
+    private final float transition_moe = .015f;
     private static final int bpm_offset = 3; // How far from the query bpm we want song tempos in the recommendations request below
 
 
@@ -125,7 +125,7 @@ public class GenerateClassic extends GeneratePlaylist {
                 tracks = getBestFit(closest_column);
             }
 
-            setTransitionLengths(local_moe += .01); // relax the moe a bit so we can find something
+            setTransitionLengths(local_moe += .005); // relax the moe a bit so we can find something
 
         } while (tracks == null); // if an acceptable ordering was not found, try again
 
