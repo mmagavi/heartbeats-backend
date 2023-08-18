@@ -77,7 +77,7 @@ abstract public class GeneratePlaylist {
 
         System.out.println("seed_genres_provided: " + seed_genres_provided);
         System.out.println("desired_num_seed_artists: " + desired_num_seed_artists);
-        System.out.println("desired_num_seed_artists: " + desired_num_seed_tracks);
+        System.out.println("desired_num_seed_tracks: " + desired_num_seed_tracks);
 
         seed_artists = getSeedArtists();
         seed_tracks = getSeedTracks();
@@ -176,9 +176,9 @@ abstract public class GeneratePlaylist {
     protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
             throws GetRecommendationsException {
 
-        System.out.println("genres: " + genres);
-        System.out.println("seed_artists: " + seed_artists);
-        System.out.println("seed_tracks: " + seed_tracks);
+//        System.out.println("genres: " + genres);
+//        System.out.println("seed_artists: " + seed_artists);
+//        System.out.println("seed_tracks: " + seed_tracks);
 
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, seed_artists, seed_tracks,
@@ -298,7 +298,7 @@ abstract public class GeneratePlaylist {
 
         // If no tracks were added the 0 element will still be null
         if(seed_tracks[0] == null){
-            seed_tracks = getUsersTopTracks(spotify_api, desired_num_seed_artists);
+            seed_tracks = getUsersTopTracks(spotify_api, desired_num_seed_tracks);
         }
 
         return createCommaSeperatedString(seed_tracks);
