@@ -82,6 +82,10 @@ abstract public class GeneratePlaylist {
 
         determineSeedLimits();
 
+        System.out.println("seed_genres_provided: " + seed_genres_provided);
+        System.out.println("desired_num_seed_artists: " + desired_num_seed_artists);
+        System.out.println("desired_num_seed_artists: " + desired_num_seed_tracks);
+
         seed_artists = getSeedArtists();
         seed_tracks = getSeedTracks();
     }
