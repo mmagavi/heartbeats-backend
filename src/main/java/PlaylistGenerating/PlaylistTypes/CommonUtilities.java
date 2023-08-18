@@ -175,6 +175,12 @@ public class CommonUtilities {
 
     public static String createCommaSeperatedString(Artist[] artists){
 
+
+
+        System.out.println("In artist comma seperated string");
+
+        for(Artist artist: artists) System.out.println(artist.getName());
+
         StringBuilder string_builder = new StringBuilder();
 
         // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
@@ -182,7 +188,12 @@ public class CommonUtilities {
 
         for (Artist artist : artists) {
 
-            if(artist == null) continue;
+            if(artist == null){
+
+                System.out.println("artist is null");
+                continue;
+            }
+
 
             // This will be false for the first iteration preventing a leading comma but true for all the rest
             if (flag) {
