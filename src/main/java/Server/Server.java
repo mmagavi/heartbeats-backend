@@ -17,8 +17,8 @@ import java.net.URI;
  */
 public class Server {
 
-    private static final String client_id = "c48e6da922b24fb782bb5d83356b247f";
-    private static final String client_secret = "0420a04c99804dc8b7b681b56a813495";
+    private static final String client_id = "60e466a61f4d4128a568f166f6a2b077";
+    private static final String client_secret = "cbac320a58cd453da172aef4d88f4997";
     protected static final URI redirectUri =
             SpotifyHttpManager.makeUri("https://heartbeatsapp.netlify.app/music");
 
