@@ -48,8 +48,6 @@ public class GeneratePlaylistHandler implements Route {
         try {
             verifyNonNullParameters(request);
 
-            String s = request.queryString();
-
             // Fetch all the parameters
             String access_token = request.queryParams("access_token");
             String refresh_token = request.queryParams("refresh_token");
@@ -174,6 +172,8 @@ public class GeneratePlaylistHandler implements Route {
      * @throws InvalidGenreException if more than 3 genres were provided or if the provided genres are not valid genres
      */
     public static void verifyGenre(String desired_genres) throws InvalidGenreException {
+
+        if(desired_genres.equals("")) return;
 
         String[] genres = desired_genres.split(",");
 
