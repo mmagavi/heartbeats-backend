@@ -121,6 +121,10 @@ abstract public class GeneratePlaylist {
         }
 
         switch (seed_genres_provided) {
+            case 0 -> {
+                desired_num_seed_artists = 3;
+                desired_num_seed_tracks = 2;
+            }
             case 1 -> {
                 desired_num_seed_artists = 2;
                 desired_num_seed_tracks = 2;
