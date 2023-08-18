@@ -172,6 +172,10 @@ abstract public class GeneratePlaylist {
     protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
             throws GetRecommendationsException {
 
+        System.out.println(genres);
+        System.out.println(seed_artists);
+        System.out.println(seed_tracks);
+
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, seed_artists, seed_tracks,
                 min_tempo, max_tempo, target_tempo, user.getCountry());
