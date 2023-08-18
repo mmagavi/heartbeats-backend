@@ -81,6 +81,9 @@ abstract public class GeneratePlaylist {
 
         seed_artists = getSeedArtists();
         seed_tracks = getSeedTracks();
+
+        System.out.println("seed_artists: " + seed_artists);
+        System.out.println("seed_tracks: " + seed_tracks);
     }
 
     public abstract String generatePlaylist() throws Exception;
