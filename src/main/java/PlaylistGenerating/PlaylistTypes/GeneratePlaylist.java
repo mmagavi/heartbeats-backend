@@ -118,6 +118,8 @@ abstract public class GeneratePlaylist {
         if (!is_personalized) {
             desired_num_seed_artists = 0;
             desired_num_seed_tracks = 0;
+
+            return;
         }
 
         switch (seed_genres_provided) {
