@@ -6,6 +6,7 @@ import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestExcep
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
 import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
+import SpotifyUtilities.PersonalizationUtilities;
 import SpotifyUtilities.RecommendationArguments;
 import se.michaelthelin.spotify.SpotifyApi;;
 import se.michaelthelin.spotify.model_objects.specification.*;
@@ -17,10 +18,9 @@ import static PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges.getTarge
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.ArtistUtilities.getSeveralArtists;
 import static SpotifyUtilities.BrowsingUtilities.*;
-import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopArtists;
-import static SpotifyUtilities.PersonalizationUtilities.GetUsersTopTracks;
+import static SpotifyUtilities.PersonalizationUtilities.getUsersTopArtists;
+import static SpotifyUtilities.PersonalizationUtilities.getUsersTopTracks;
 import static SpotifyUtilities.TrackUtilities.duration_comparator;
-import static SpotifyUtilities.TrackUtilities.getAudioFeaturesForTrack;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
 abstract public class GeneratePlaylist {
@@ -260,7 +260,7 @@ abstract public class GeneratePlaylist {
         String[] selected_genres = genres.split(",");
         ArrayList<String> genre_list = new ArrayList<>(Arrays.asList(selected_genres));
 
-        Track[] top_tracks = GetUsersTopTracks(spotify_api);
+        Track[] top_tracks = PersonalizationUtilities.getUsersTopTracks(spotify_api);
 
         for (Track track : top_tracks) {
 
@@ -296,6 +296,11 @@ abstract public class GeneratePlaylist {
             }
         }
 
+        // If no tracks were added the 0 element will still be null
+        if(seed_tracks[0] == null){
+            seed_tracks = getUsersTopTracks(spotify_api, desired_num_seed_artists);
+        }
+
         return createCommaSeperatedString(seed_tracks);
     }
 
@@ -318,7 +323,7 @@ abstract public class GeneratePlaylist {
         String[] selected_genres = genres.split(",");
         ArrayList<String> genre_list = new ArrayList<>(Arrays.asList(selected_genres));
 
-        Artist[] top_artists = GetUsersTopArtists(spotify_api);
+        Artist[] top_artists = PersonalizationUtilities.getUsersTopArtists(spotify_api);
 
         for (Artist artist : top_artists) {
 
@@ -338,6 +343,11 @@ abstract public class GeneratePlaylist {
                     break;
                 }
             }
+        }
+
+        // If no artists were added the 0 element will still be null
+        if(seed_artists[0] == null){
+            seed_artists = getUsersTopArtists(spotify_api, desired_num_seed_artists);
         }
 
         return createCommaSeperatedString(seed_artists);

@@ -1,13 +1,11 @@
 package SpotifyUtilities;
 
-import ExceptionClasses.LibraryExceptions.GetUsersSavedTracksException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
 
@@ -19,7 +17,7 @@ public class PersonalizationUtilities {
      * @return Artist array of the user's top artists
      * @throws GetUsersTopArtistsRequestException if an exception was thrown in getUsersSavedTracksRequest.execute()
      */
-    public static Artist[] GetUsersTopArtists(SpotifyApi spotify_api) throws GetUsersTopArtistsRequestException {
+    public static Artist[] getUsersTopArtists(SpotifyApi spotify_api) throws GetUsersTopArtistsRequestException {
         try{
 
             GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotify_api.getUsersTopArtists().build();
@@ -33,7 +31,7 @@ public class PersonalizationUtilities {
             throw new GetUsersTopArtistsRequestException(ex.getMessage());
         }
     }
-    public static Artist[] GetUsersTopArtists(SpotifyApi spotify_api, int limit) throws GetUsersTopArtistsRequestException {
+    public static Artist[] getUsersTopArtists(SpotifyApi spotify_api, int limit) throws GetUsersTopArtistsRequestException {
 
         try{
 
@@ -56,7 +54,7 @@ public class PersonalizationUtilities {
      * @return Artist array of the user's top artists
      * @throws GetUsersTopTracksRequestException if an exception was thrown in getUsersSavedTracksRequest.execute()
      */
-    public static Track[] GetUsersTopTracks(SpotifyApi spotify_api) throws GetUsersTopTracksRequestException {
+    public static Track[] getUsersTopTracks(SpotifyApi spotify_api) throws GetUsersTopTracksRequestException {
         try{
 
             GetUsersTopTracksRequest getUsersTopTracksRequest = spotify_api.getUsersTopTracks().build();
@@ -71,7 +69,7 @@ public class PersonalizationUtilities {
         }
     }
 
-    public static Track[] GetUsersTopTracks(SpotifyApi spotify_api, int limit) throws GetUsersTopTracksRequestException {
+    public static Track[] getUsersTopTracks(SpotifyApi spotify_api, int limit) throws GetUsersTopTracksRequestException {
         try{
 
             GetUsersTopTracksRequest getUsersTopTracksRequest = spotify_api.getUsersTopTracks().limit(limit).build();

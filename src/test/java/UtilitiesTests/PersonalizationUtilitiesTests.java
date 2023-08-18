@@ -24,7 +24,7 @@ public class PersonalizationUtilitiesTests {
     public void passingNullToGetUsersTopArtistsThrowsException(){
 
         assertThrows(GetUsersTopArtistsRequestException.class, () -> {
-            PersonalizationUtilities.GetUsersTopArtists(null);
+            PersonalizationUtilities.getUsersTopArtists(null);
         });
     }
 
@@ -32,7 +32,7 @@ public class PersonalizationUtilitiesTests {
     public void passingValidArgsToGetUsersTopArtistsDoesNotThrowException(){
 
         assertDoesNotThrow(() -> {
-            Artist[] artists = PersonalizationUtilities.GetUsersTopArtists(Server.spotify_api);
+            Artist[] artists = PersonalizationUtilities.getUsersTopArtists(Server.spotify_api);
 
             for(Artist artist: artists){
                 System.out.println(artist.getName());
@@ -44,7 +44,7 @@ public class PersonalizationUtilitiesTests {
     public void passingNullToGetUsersTopTracksThrowsException(){
 
         assertThrows(GetUsersTopTracksRequestException.class, () -> {
-            PersonalizationUtilities.GetUsersTopTracks(null);
+            PersonalizationUtilities.getUsersTopTracks(null);
         });
     }
 
@@ -52,7 +52,7 @@ public class PersonalizationUtilitiesTests {
     public void passingValidArgsToGetUsersTopTracksDoesNotThrowException(){
 
         assertDoesNotThrow(() -> {
-            Track[] tracks = PersonalizationUtilities.GetUsersTopTracks(Server.spotify_api);
+            Track[] tracks = PersonalizationUtilities.getUsersTopTracks(Server.spotify_api);
 
             for(Track track: tracks){
                 System.out.println(track.getName());
