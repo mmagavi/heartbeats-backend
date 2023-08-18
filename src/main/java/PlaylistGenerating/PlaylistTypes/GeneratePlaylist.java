@@ -5,17 +5,10 @@ import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
-import ExceptionClasses.TrackExceptions.GetAudioFeaturesForTrackException;
 import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 import SpotifyUtilities.RecommendationArguments;
-import SpotifyUtilities.GenreRecommendationArguments;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.model_objects.AbstractModelObject;
-import se.michaelthelin.spotify.model_objects.IModelObject;
-import se.michaelthelin.spotify.model_objects.IPlaylistItem;
+import se.michaelthelin.spotify.SpotifyApi;;
 import se.michaelthelin.spotify.model_objects.specification.*;
-import se.michaelthelin.spotify.requests.data.personalization.interfaces.IArtistTrackModelObject;
-import se.michaelthelin.spotify.requests.data.search.interfaces.ISearchModelObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
