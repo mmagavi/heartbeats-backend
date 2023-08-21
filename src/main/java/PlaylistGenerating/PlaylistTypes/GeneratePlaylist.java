@@ -300,7 +300,7 @@ abstract public class GeneratePlaylist {
 
         // If no tracks were added the 0 element will still be null
         if(seed_tracks[0] == null){
-            seed_tracks = getUsersTopTracks(spotify_api, desired_num_seed_tracks);
+            return "";
         }
 
         return createCommaSeperatedString(seed_tracks);
@@ -349,7 +349,7 @@ abstract public class GeneratePlaylist {
 
         // If no artists were added the 0 element will still be null
         if(seed_artists[0] == null){
-            seed_artists = getUsersTopArtists(spotify_api, desired_num_seed_artists);
+            return "";
         }
 
         return createCommaSeperatedString(seed_artists);

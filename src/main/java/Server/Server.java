@@ -46,6 +46,7 @@ public class Server {
 
         Spark.port(port);
 
+
         /*
             Setting CORS headers to allow cross-origin requests from the client; this is necessary for the client to
             be able to make requests to the server.
@@ -75,9 +76,5 @@ public class Server {
         Spark.init();
         Spark.awaitInitialization();
         System.out.println("Server started");
-
-        StringBuilder builder = new StringBuilder();
-
-        System.out.println(builder.toString());
     }
 }

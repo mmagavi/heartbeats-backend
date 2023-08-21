@@ -79,12 +79,12 @@ public class GenerateClassic extends GeneratePlaylist {
     public String generatePlaylist() throws GetCurrentUsersProfileException, GetRecommendationsException,
             CreatePlaylistException, AddItemsToPlaylistException, GetAudioFeaturesForTrackException {
 
-        TrackSimplified[] warmup_track_uris = findTransitionTracks(true);
         System.out.println("warmup");
-        TrackSimplified[] target_track_uris = getTargetTracks();
+        TrackSimplified[] warmup_track_uris = findTransitionTracks(true);
         System.out.println("target");
-        TrackSimplified[] wind_down_track_uris = findTransitionTracks(false);
+        TrackSimplified[] target_track_uris = getTargetTracks();
         System.out.println("wind-down");
+        TrackSimplified[] wind_down_track_uris = findTransitionTracks(false);
 
         TrackSimplified[] playlist_tracks = concatTracks(warmup_track_uris, target_track_uris, wind_down_track_uris);
 
@@ -155,7 +155,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         // If there is only one interval there is only one song per column so doing fine grain combination
         // searching is redundant in this case.
-        if(num_intervals < 1 ) return null;
+        if (num_intervals < 1) return null;
 
         // Otherwise proceed with fine grain searching
         if (result == DURATION_RESULT.TOO_SHORT || result == DURATION_RESULT.WITHIN_THIRTY_SECONDS_SHORT) {
@@ -345,10 +345,10 @@ public class GenerateClassic extends GeneratePlaylist {
      */
     private TrackSimplified[] getTargetTracks() throws GetRecommendationsException {
 
+
         int target_length_min = target_length_ms / 60_000;
         // number of tracks we want in the target sequence
         int num_tracks = Math.round(target_length_min / avg_song_len);
-        HashSet<TrackSimplified> track_set = new HashSet<>();
 
         int local_offset = bpm_offset;
         int local_limit = num_tracks * 2;
@@ -358,32 +358,14 @@ public class GenerateClassic extends GeneratePlaylist {
             TrackSimplified[] recommended_tracks = getSortedRecommendations(local_limit,
                     target_bpm - local_offset, target_bpm + local_offset, target_bpm);
 
+            if (recommended_tracks.length >= local_limit) {
+                TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
 
-            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
-            if (recommended_tracks != null && recommended_tracks.length != 0) {
-                track_set.addAll(List.of(recommended_tracks));
-            }
-
-            // If the limit has been met
-            if (track_set.size() >= limit) {
-
-                TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
-
-                TrackSimplified[] tracks = findBestTargetTracks(track_array, num_tracks);
-
-                if (tracks != null){
-                    Arrays.sort(tracks, duration_comparator); // Sort the tracks in ascending duration
-                    return tracks;
-                }
-
-
-                track_set.clear(); // empty the track set and increase local limit to try again
-                local_limit += 5;
-
-                if(local_limit > 100) local_limit = 100;
+                if (tracks != null) return tracks;
 
             }
 
+            System.out.println(local_offset);
             local_offset++;
 
         } while (true);
