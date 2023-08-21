@@ -23,13 +23,14 @@ public class BrowsingUtilities {
 
         try {
 
-            String seed_artists = args.seed_artists();
-            String seed_tracks = args.seed_tracks();
-            String seed_genres = args.seed_genres();
-
             System.out.println("seed artists: " + args.seed_artists());
             System.out.println("seed tracks: " + args.seed_tracks());
             System.out.println("seed genres: " + args.seed_genres());
+            System.out.println("limit: " + args.limit());
+            System.out.println("min tempo: " + args.min_tempo());
+            System.out.println("max tempo: " + args.max_tempo());
+            System.out.println("target tempo: " + args.target_tempo());
+            System.out.println("market: " + args.market());
 
             GetRecommendationsRequest getRecommendationsRequest =
                     args.spotify_api().getRecommendations()
