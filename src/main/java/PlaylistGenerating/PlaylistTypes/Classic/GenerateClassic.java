@@ -374,10 +374,14 @@ public class GenerateClassic extends GeneratePlaylist {
                 if (tracks != null){
                     Arrays.sort(tracks, duration_comparator); // Sort the tracks in ascending duration
                     return tracks;
-                }else{
-                    track_set.clear(); // empty the track set and increase local limit to try again
-                    local_limit += 5;
                 }
+
+
+                track_set.clear(); // empty the track set and increase local limit to try again
+                local_limit += 5;
+
+                if(local_limit > 100) local_limit = 100;
+
             }
 
             local_offset++;
