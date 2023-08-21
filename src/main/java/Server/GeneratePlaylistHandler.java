@@ -58,6 +58,7 @@ public class GeneratePlaylistHandler implements Route {
             int workout_length = Integer.parseInt(request.queryParams("workout_length")); // 15-180 (minutes)
             boolean is_personalized = verifyIsPersonalized(request.queryParams("is_personalized"));
 
+            System.out.println(genres);
             System.out.println("personalized: " + is_personalized);
 
             // Verify all the parameters

@@ -414,6 +414,7 @@ public class GenerateInterval extends GeneratePlaylist {
 
         float local_moe; // Keeps track of moe for duration purposes which we will be altering here
         int limit = 21;
+        int local_offset = og_offset;
 
         // Find how many tracks we need to find
         num_tracks_needed = total_tracks_needed - tracks.size();
@@ -426,12 +427,12 @@ public class GenerateInterval extends GeneratePlaylist {
 
             do {
 
-                recommended_tracks = getRecommendedTracks(limit, query_bpm - og_offset,
-                        query_bpm + og_offset, query_bpm);
+                recommended_tracks = getRecommendedTracks(limit, query_bpm - local_offset,
+                        query_bpm + local_offset, query_bpm);
 
                 tracks_to_add = getIntervalTracks(recommended_tracks);
 
-                //TODO: find good increase to local_moe
+                local_offset ++;
                 setIntervalLengths(local_moe += .005);
 
             } while (tracks_to_add == null);

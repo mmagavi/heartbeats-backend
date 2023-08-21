@@ -83,7 +83,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
             //TODO: consider reducing limit for closer tempo matches
             //System.out.println("Getting Recommended Tracks");
             // Get recommended tracks for the slow interval
-            recommended_slow_tracks = getRecommendedTracks(resting_bpm, 100);
+            recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit);
 
             //System.out.println("Finding Slow Intervals");
             // Fill the intervals the best we can with the given 100 tracks

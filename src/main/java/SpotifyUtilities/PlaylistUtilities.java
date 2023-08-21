@@ -53,10 +53,10 @@ public class PlaylistUtilities {
         try {
 
             CreatePlaylistRequest createPlaylistRequest = spotify_api.createPlaylist(user_id, user_name)
-                    .public_(is_public).
-                    name(playlist_name).
-                    description(description).
-                    build();
+                    .public_(is_public)
+                    .name(playlist_name)
+                    .description(description)
+                    .build();
 
             return createPlaylistRequest.execute();
 

@@ -19,6 +19,7 @@ import static PlaylistGenerating.PlaylistTypes.Classic.ClassicCheckingUtilities.
 import static PlaylistGenerating.PlaylistTypes.Classic.ClassicTrackUtilities.*;
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.PlaylistUtilities.createPlaylist;
+import static SpotifyUtilities.TrackUtilities.duration_comparator;
 
 public class GenerateClassic extends GeneratePlaylist {
 
@@ -347,20 +348,37 @@ public class GenerateClassic extends GeneratePlaylist {
         int target_length_min = target_length_ms / 60_000;
         // number of tracks we want in the target sequence
         int num_tracks = Math.round(target_length_min / avg_song_len);
+        HashSet<TrackSimplified> track_set = new HashSet<>();
 
         int local_offset = bpm_offset;
+        int local_limit = num_tracks * 2;
 
         do {
 
-            TrackSimplified[] recommended_tracks = getSortedRecommendations(num_tracks * 2,
+            TrackSimplified[] recommended_tracks = getSortedRecommendations(local_limit,
                     target_bpm - local_offset, target_bpm + local_offset, target_bpm);
 
-            TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
 
-            if (tracks != null) return tracks;
+            // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
+            if (recommended_tracks != null && recommended_tracks.length != 0) {
+                track_set.addAll(List.of(recommended_tracks));
+            }
 
-            System.out.println("null");
-            System.out.println(local_offset);
+            // If the limit has been met
+            if (track_set.size() >= limit) {
+
+                TrackSimplified[] track_array = track_set.toArray(TrackSimplified[]::new);
+
+                TrackSimplified[] tracks = findBestTargetTracks(track_array, num_tracks);
+
+                if (tracks != null){
+                    Arrays.sort(tracks, duration_comparator); // Sort the tracks in ascending duration
+                    return tracks;
+                }else{
+                    track_set.clear(); // empty the track set and increase local limit to try again
+                    local_limit += 5;
+                }
+            }
 
             local_offset++;
 
