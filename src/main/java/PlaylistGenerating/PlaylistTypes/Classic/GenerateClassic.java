@@ -352,6 +352,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
         int local_offset = bpm_offset;
         int local_limit = num_tracks * 2;
+        float local_moe = margin_of_error;
 
         do {
 
@@ -367,6 +368,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             System.out.println(local_offset);
             local_offset++;
+            setTargetLengths(local_moe += .005);
 
         } while (true);
     }

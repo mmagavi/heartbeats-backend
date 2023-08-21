@@ -260,13 +260,12 @@ abstract public class GeneratePlaylist {
 
         // Splitting up the genres, so we can work with them easier, we will be checking against this list
         String[] selected_genres = genres.split(",");
-        ArrayList<String> genre_list = new ArrayList<>(Arrays.asList(selected_genres));
 
         Track[] top_tracks = PersonalizationUtilities.getUsersTopTracks(spotify_api);
 
         for (Track track : top_tracks) {
 
-            if(num_tracks_found == desired_num_seed_tracks) break;
+            if (num_tracks_found == desired_num_seed_tracks) break;
 
             // Can only check genre with an Artist object, so grab all the artists on the current track
             ArtistSimplified[] simplified_artists = track.getArtists();
@@ -282,24 +281,27 @@ abstract public class GeneratePlaylist {
 
                 for (String genre : artist_genres) {
 
-                    if (genre_list.contains(genre)) {
+                    for (String selected_genre : selected_genres) {
 
-                        // num_tracks_found acts as an index as its value is always the index of the next track to add
-                        // when 0 found, add at 0. 2 track found add the next at index 2 and so on.
-                        seed_tracks[num_tracks_found] = track;
-                        num_tracks_found++;
-                        flag = false; // we are adding this track, so we need to check the next
+                        if (genre.contains(selected_genre)) {
 
-                        break;
+                            // num_tracks_found acts as an index as its value is always the index of the next track to add
+                            // when 0 found, add at 0. 2 track found add the next at index 2 and so on.
+                            seed_tracks[num_tracks_found] = track;
+                            num_tracks_found++;
+                            flag = false; // we are adding this track, so we need to check the next
+
+                            break;
+                        }
                     }
                 }
 
-                if(!flag) break; // go to next track
+                if (!flag) break; // go to next track
             }
         }
 
         // If no tracks were added the 0 element will still be null
-        if(seed_tracks[0] == null){
+        if (seed_tracks[0] == null) {
             return "";
         }
 
@@ -323,32 +325,34 @@ abstract public class GeneratePlaylist {
 
         // Splitting up the genres, so we can work with them easier, we will be checking against this list
         String[] selected_genres = genres.split(",");
-        ArrayList<String> genre_list = new ArrayList<>(Arrays.asList(selected_genres));
 
         Artist[] top_artists = PersonalizationUtilities.getUsersTopArtists(spotify_api);
 
         for (Artist artist : top_artists) {
 
-            if(num_artists_found == desired_num_seed_artists) break;
+            if (num_artists_found == desired_num_seed_artists) break;
 
             String[] artist_genres = artist.getGenres();
 
             for (String genre : artist_genres) {
 
-                if (genre_list.contains(genre)) {
+                for (String selected_genre : selected_genres) {
 
-                    // num_artists_found acts as an index as its value is always the index of the next artist to add
-                    // when 0 found, add at 0. 2 artists found add the next at index 2 and so on.
-                    seed_artists[num_artists_found] = artist;
-                    num_artists_found++;
+                    if (genre.contains(selected_genre)) {
 
-                    break;
+                        // num_artists_found acts as an index as its value is always the index of the next artist to add
+                        // when 0 found, add at 0. 2 artists found add the next at index 2 and so on.
+                        seed_artists[num_artists_found] = artist;
+                        num_artists_found++;
+
+                        break;
+                    }
                 }
             }
         }
 
         // If no artists were added the 0 element will still be null
-        if(seed_artists[0] == null){
+        if (seed_artists[0] == null) {
             return "";
         }
 
