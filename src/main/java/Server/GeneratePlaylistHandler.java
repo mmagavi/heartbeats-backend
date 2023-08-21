@@ -68,9 +68,6 @@ public class GeneratePlaylistHandler implements Route {
             verifyAge(age);
             verifyWorkoutLength(workout_length);
 
-            int genre_len = genres.length();
-            if(genres.charAt(genre_len) == ',') genres = genres.substring(0, genre_len - 2);
-
             spotify_api.setAccessToken(access_token);
             spotify_api.setRefreshToken(refresh_token);
 

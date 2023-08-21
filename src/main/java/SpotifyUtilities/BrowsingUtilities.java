@@ -22,6 +22,15 @@ public class BrowsingUtilities {
             throws GetRecommendationsException {
 
         try {
+
+            String seed_artists = args.seed_artists();
+            String seed_tracks = args.seed_tracks();
+            String seed_genres = args.seed_genres();
+
+            System.out.println("seed artists: " + args.seed_artists());
+            System.out.println("seed tracks: " + args.seed_tracks());
+            System.out.println("seed genres: " + args.seed_genres());
+
             GetRecommendationsRequest getRecommendationsRequest =
                     args.spotify_api().getRecommendations()
                             .limit(args.limit())
