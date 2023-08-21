@@ -43,7 +43,7 @@ abstract public class GeneratePlaylist {
     protected final int workout_length_min;
     protected final int workout_len_ms; // Length of the workout in MilliSeconds
     protected final String intensity;
-    protected final int resting_bpm = 70; // assuming an average resting bpm (formerly 69)
+    protected final int resting_bpm = 70; // assuming an average resting bpm
     protected final float margin_of_error; // percent a playlist can be off the target by and still be acceptable
     protected final float avg_song_len = 3.5f;
     protected int seed_genres_provided = 0;
