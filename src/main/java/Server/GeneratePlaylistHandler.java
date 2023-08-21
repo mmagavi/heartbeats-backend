@@ -27,7 +27,7 @@ public class GeneratePlaylistHandler implements Route {
     static ArrayList<String> available_genres = new ArrayList<>(Arrays.asList("afrobeat", "alt-rock", "alternative", "blues",
             "brazil", "british", "chill", "classical", "club", "country", "dance", "disco", "dubstep", "edm", "emo",
             "folk", "french", "funk", "garage", "german", "grunge", "hardcore", "hip-hop", "indian", "indie",
-            "indie-pop", "industrial", "j-pop", "jazz", "k-pop", "latino", "malay", "mandopop", "metal", "new-age",
+            "indie-pop", "industrial", "j-pop", "jazz", "k-pop", "latino", "malay", "mandopop", "metal",
             "new-release", "opera", "party", "philippines-opm", "pop", "punk", "punk-rock", "r-n-b", "rainy-day",
             "reggae", "rock", "sad", "samba", "sertanejo", "sleep", "soul", "spanish", "synth-pop", "techno",
             "work-out", "world-music"));

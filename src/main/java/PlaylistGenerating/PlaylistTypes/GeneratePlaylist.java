@@ -278,6 +278,7 @@ abstract public class GeneratePlaylist {
             for (Artist artist : artists) {
 
                 String[] artist_genres = artist.getGenres();
+                removeGenreDashes(selected_genres);
 
                 for (String genre : artist_genres) {
 
@@ -333,6 +334,8 @@ abstract public class GeneratePlaylist {
             if (num_artists_found == desired_num_seed_artists) break;
 
             String[] artist_genres = artist.getGenres();
+            removeGenreDashes(selected_genres);
+
 
             for (String genre : artist_genres) {
 

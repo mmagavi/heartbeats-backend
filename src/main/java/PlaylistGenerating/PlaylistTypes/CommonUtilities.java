@@ -163,6 +163,29 @@ public class CommonUtilities {
         }
     }
 
+    public static void removeGenreDashes(String[] genres){
+
+        HashMap<String, String> map = new HashMap<>();
+
+        map.put("hip-hop", "hip hop");
+        map.put("indie-pop", "indie pop");
+        map.put(" r-n-b", "r&b");
+        map.put("synth-pop", "synthpop");
+        map.put("work-out", "workout");
+        map.put("world-music", "world");
+
+        for(int index =0; index < genres.length; index++){
+
+            String genre = genres[index];
+
+            if(map.get(genre) != null){
+
+                // Replace the old genre with the correctly formatted one
+                genres[index] = map.get(genre);
+            }
+        }
+    }
+
     static class DuplicateTrack {
 
         public DuplicateTrack(TrackSimplified track, int track_index){

@@ -20,7 +20,8 @@ public class PersonalizationUtilities {
     public static Artist[] getUsersTopArtists(SpotifyApi spotify_api) throws GetUsersTopArtistsRequestException {
         try{
 
-            GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotify_api.getUsersTopArtists().build();
+            GetUsersTopArtistsRequest getUsersTopArtistsRequest =
+                    spotify_api.getUsersTopArtists().time_range("long_term").build();
 
             Paging<Artist> artistPaging = getUsersTopArtistsRequest.execute();
 
@@ -35,7 +36,8 @@ public class PersonalizationUtilities {
 
         try{
 
-            GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotify_api.getUsersTopArtists().limit(limit).build();
+            GetUsersTopArtistsRequest getUsersTopArtistsRequest =
+                    spotify_api.getUsersTopArtists().limit(limit).time_range("long_term").build();
 
             Paging<Artist> artistPaging = getUsersTopArtistsRequest.execute();
 
@@ -57,7 +59,8 @@ public class PersonalizationUtilities {
     public static Track[] getUsersTopTracks(SpotifyApi spotify_api) throws GetUsersTopTracksRequestException {
         try{
 
-            GetUsersTopTracksRequest getUsersTopTracksRequest = spotify_api.getUsersTopTracks().build();
+            GetUsersTopTracksRequest getUsersTopTracksRequest =
+                    spotify_api.getUsersTopTracks().time_range("long_term").build();
 
             Paging<Track> trackPaging = getUsersTopTracksRequest.execute();
 
@@ -72,7 +75,8 @@ public class PersonalizationUtilities {
     public static Track[] getUsersTopTracks(SpotifyApi spotify_api, int limit) throws GetUsersTopTracksRequestException {
         try{
 
-            GetUsersTopTracksRequest getUsersTopTracksRequest = spotify_api.getUsersTopTracks().limit(limit).build();
+            GetUsersTopTracksRequest getUsersTopTracksRequest =
+                    spotify_api.getUsersTopTracks().limit(limit).time_range("long_term").build();
 
             Paging<Track> trackPaging = getUsersTopTracksRequest.execute();
 
