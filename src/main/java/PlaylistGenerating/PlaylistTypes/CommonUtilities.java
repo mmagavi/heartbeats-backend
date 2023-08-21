@@ -198,12 +198,6 @@ public class CommonUtilities {
 
     public static String createCommaSeperatedString(Artist[] artists){
 
-
-
-        System.out.println("In artist comma seperated string");
-
-        for(Artist artist: artists) System.out.println(artist.getName());
-
         StringBuilder string_builder = new StringBuilder();
 
         // Will flip to true when there is more than one artist is seed_artists, so they can be comma seperated
