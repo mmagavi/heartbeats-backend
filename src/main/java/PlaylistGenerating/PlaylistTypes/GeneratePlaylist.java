@@ -272,7 +272,6 @@ abstract public class GeneratePlaylist {
             String[] ids = getArtistIDs(simplified_artists);
             Artist[] artists = getSeveralArtists(spotify_api, ids);
 
-            boolean flag = true;
 
             // If one of the artists on the track is described as being in a genre the user selected, add the track
             for (Artist artist : artists) {
@@ -290,14 +289,13 @@ abstract public class GeneratePlaylist {
                             // when 0 found, add at 0. 2 track found add the next at index 2 and so on.
                             seed_tracks[num_tracks_found] = track;
                             num_tracks_found++;
-                            flag = false; // we are adding this track, so we need to check the next
 
-                            break;
+                            if(num_tracks_found == desired_num_seed_tracks){
+                                return createCommaSeperatedString(seed_tracks);
+                            }
                         }
                     }
                 }
-
-                if (!flag) break; // go to next track
             }
         }
 
@@ -331,8 +329,6 @@ abstract public class GeneratePlaylist {
 
         for (Artist artist : top_artists) {
 
-            if (num_artists_found == desired_num_seed_artists) break;
-
             String[] artist_genres = artist.getGenres();
             removeGenreDashes(selected_genres);
 
@@ -348,7 +344,9 @@ abstract public class GeneratePlaylist {
                         seed_artists[num_artists_found] = artist;
                         num_artists_found++;
 
-                        break;
+                        if (num_artists_found == desired_num_seed_artists) {
+                            return createCommaSeperatedString(seed_artists);
+                        }
                     }
                 }
             }
