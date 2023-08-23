@@ -11,15 +11,12 @@ import SpotifyUtilities.RecommendationArguments;
 import se.michaelthelin.spotify.SpotifyApi;;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges.getTargetHeartRateRange;
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.ArtistUtilities.getSeveralArtists;
 import static SpotifyUtilities.BrowsingUtilities.*;
-import static SpotifyUtilities.PersonalizationUtilities.getUsersTopArtists;
-import static SpotifyUtilities.PersonalizationUtilities.getUsersTopTracks;
 import static SpotifyUtilities.TrackUtilities.duration_comparator;
 import static SpotifyUtilities.UserProfileUtilities.getCurrentUsersProfile;
 
@@ -32,6 +29,7 @@ abstract public class GeneratePlaylist {
     protected final String genres;
     // The spotifyAPI containing the user's information
     protected final SpotifyApi spotify_api;
+
     protected final int age;
     protected final int workout_length_min;
     protected final int workout_len_ms; // Length of the workout in MilliSeconds

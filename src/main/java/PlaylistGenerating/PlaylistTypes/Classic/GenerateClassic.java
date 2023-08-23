@@ -80,13 +80,13 @@ public class GenerateClassic extends GeneratePlaylist {
             CreatePlaylistException, AddItemsToPlaylistException, GetAudioFeaturesForTrackException {
 
         System.out.println("warmup");
-        TrackSimplified[] warmup_track_uris = findTransitionTracks(true);
+        TrackSimplified[] warmup_tracks = findTransitionTracks(true);
         System.out.println("target");
-        TrackSimplified[] target_track_uris = getTargetTracks();
+        TrackSimplified[] target_tracks = getTargetTracks();
         System.out.println("wind-down");
-        TrackSimplified[] wind_down_track_uris = findTransitionTracks(false);
+        TrackSimplified[] wind_down_tracks = findTransitionTracks(false);
 
-        TrackSimplified[] playlist_tracks = concatTracks(warmup_track_uris, target_track_uris, wind_down_track_uris);
+        TrackSimplified[] playlist_tracks = concatTracks(warmup_tracks, target_tracks, wind_down_tracks);
 
         eliminateDupesAndNonPlayable(spotify_api, playlist_tracks, genres, seed_artists, seed_tracks, user.getCountry());
 
@@ -97,6 +97,12 @@ public class GenerateClassic extends GeneratePlaylist {
 
         System.out.println("Creating Playlist");
         PlaylistUtilities.addItemsToPlaylist(spotify_api, playlist_id, playlist_track_uris);
+
+        try {
+            printPlaylistTempos(spotify_api, playlist_tracks);
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
 
         return playlist_id;
     }
@@ -126,7 +132,7 @@ public class GenerateClassic extends GeneratePlaylist {
                 tracks = getBestFit(closest_column);
             }
 
-            setTransitionLengths(local_moe += .01); // relax the moe a bit so we can find something
+            setTransitionLengths(local_moe += .005); // relax the moe a bit so we can find something
 
         } while (tracks == null); // if an acceptable ordering was not found, try again
 
@@ -297,25 +303,12 @@ public class GenerateClassic extends GeneratePlaylist {
 
         float query_bpm = initializeQueryBPM(is_warmup); // will be updated in for-loop
 
-//        System.out.println("Resting BPM: " + resting_bpm);
-//        System.out.println("Target BPM: " + target_bpm);
-//        System.out.println("num_intervals: " + num_intervals);
-//        System.out.println("BPM difference: " + bpm_difference);
-
         // We need to call the recommendations endpoint for each interval, fetching a few songs in that interval's range
         // This yields better results than requesting a lot of songs in a large range
         for (int current_interval = 0; current_interval < num_intervals; current_interval++) {
 
-            //System.out.println("is_warmup: " + is_warmup);
-            //System.out.println("query_bpm: " + query_bpm + '\n');
-
-            // Update BPM to the next interval
-            query_bpm = updateQueryBPM(query_bpm, is_warmup);
-
-            //System.out.println(query_bpm);
 
             TrackSimplified[] recommended_tracks;
-
             int local_offset = bpm_offset;
 
             do {
@@ -328,6 +321,9 @@ public class GenerateClassic extends GeneratePlaylist {
             } while (recommended_tracks.length < limit);
 
             sorted_intervals.put(current_interval, recommended_tracks);
+
+            // Update BPM to the next interval
+            query_bpm = updateQueryBPM(query_bpm, is_warmup);
         }
 
         return sorted_intervals;
@@ -344,7 +340,6 @@ public class GenerateClassic extends GeneratePlaylist {
      * @return TrackSimplified array of the track IDs
      */
     private TrackSimplified[] getTargetTracks() throws GetRecommendationsException {
-
 
         int target_length_min = target_length_ms / 60_000;
         // number of tracks we want in the target sequence
@@ -368,7 +363,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             System.out.println(local_offset);
             local_offset++;
-            setTargetLengths(local_moe += .005);
+            //setTargetLengths(local_moe += .005);
 
         } while (true);
     }
@@ -456,7 +451,7 @@ public class GenerateClassic extends GeneratePlaylist {
         if (is_warmup) {
             return resting_bpm; // If warming up we want to start from the resting BPM and go up
         } else {
-            return target_bpm; // If winding down we want to start from the target BPM and come down
+            return target_bpm - bpm_difference; // If winding down we want to start from the target BPM and come down
         }
     }
 

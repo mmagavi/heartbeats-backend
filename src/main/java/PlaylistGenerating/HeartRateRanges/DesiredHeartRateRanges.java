@@ -13,7 +13,7 @@ public class DesiredHeartRateRanges {
         SEVENTY_AND_UP
     }
 
-    private final static TargetHeartRateRange twenty_and_under = new TargetHeartRateRange(110, 140, 170);
+    private final static TargetHeartRateRange twenties_and_under = new TargetHeartRateRange(110, 140, 170);
     private final static TargetHeartRateRange thirty_to_thirty_five = new TargetHeartRateRange(105, 133, 162);
     private final static TargetHeartRateRange thirty_five_to_forty = new TargetHeartRateRange(103, 130, 157);
     private final static TargetHeartRateRange forty_to_forty_five = new TargetHeartRateRange(100, 126, 153);
@@ -25,7 +25,7 @@ public class DesiredHeartRateRanges {
     private final static TargetHeartRateRange seventy_and_up = new TargetHeartRateRange(85, 107, 128);
 
     private static final Map<AGE_RANGE, TargetHeartRateRange> age_to_heart_rate_map = Map.of
-            (AGE_RANGE.TWENTIES_AND_UNDER, twenty_and_under,
+            (AGE_RANGE.TWENTIES_AND_UNDER, twenties_and_under,
                     AGE_RANGE.THIRTY_TO_THIRTY_FIVE, thirty_to_thirty_five,
                     AGE_RANGE.THIRTY_FIVE_TO_FORTY, thirty_five_to_forty,
                     AGE_RANGE.FORTY_TO_FORTY_FIVE, forty_to_forty_five,

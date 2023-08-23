@@ -129,6 +129,18 @@ public class CommonUtilities {
         return stream.toArray(TrackSimplified[]::new);
     }
 
+    public static void printPlaylistTempos(SpotifyApi spotifyApi, TrackSimplified[] tracks)
+            throws GetAudioFeaturesForSeveralTracksException{
+
+        String[] ids = getTrackIDs(tracks);
+
+        AudioFeatures[] audio_features = getAudioFeaturesForSeveralTracks(spotifyApi, ids);
+
+        for(AudioFeatures audio_feature: audio_features){
+            System.out.println(audio_feature.getTempo());
+        }
+    }
+
     /**
      * Recursively searches for the greatest common factor GCF between the two given numbers
      * @param num_one first number
