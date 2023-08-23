@@ -46,7 +46,7 @@ abstract public class GeneratePlaylist {
     protected String seed_artists;
     protected String seed_tracks;
     protected final int target_bpm;
-    protected final float starting_energy = .5f;
+    protected final float starting_energy = .4f;
     protected final float energy_offset = .05f;
     protected final float target_energy;
 

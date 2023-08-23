@@ -24,7 +24,7 @@ import static SpotifyUtilities.TrackUtilities.duration_comparator;
 public class GenerateClassic extends GeneratePlaylist {
 
     //protected static final int limit = 21; // Number of tracks we want to get
-    protected static final int limit = 15; // Number of tracks we want to get
+    protected static final int limit = 21; // Number of tracks we want to get
     protected static int num_intervals;
     protected static int transition_length_ms = 0; // transition length is the warm-up/ wind down sequence individually
     protected static int min_transition_length_ms;
@@ -36,7 +36,7 @@ public class GenerateClassic extends GeneratePlaylist {
     private final float energy_difference;
     private HashMap<Integer, TrackSimplified[]> intervals;
     private final float transition_moe = .02f;
-    private static final int bpm_offset = 28; // How far from the query bpm we want song tempos in the recommendations request below
+    private static final int bpm_offset = 100; // How far from the query bpm we want song tempos in the recommendations request below
 
 
     /**
