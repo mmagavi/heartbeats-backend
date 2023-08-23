@@ -58,10 +58,10 @@ public class ClassicCheckingUtilities {
             duration_ms += track.getDurationMs();
         }
 
-        System.out.println("Duration: " + duration_ms);
-        System.out.println("Target Duration: " + target_length_ms);
-        System.out.println("Min Duration: " + min_target_length_ms);
-        System.out.println("Max Duration: " + max_target_length_ms);
+//        System.out.println("Duration: " + duration_ms);
+//        System.out.println("Target Duration: " + target_length_ms);
+//        System.out.println("Min Duration: " + min_target_length_ms);
+//        System.out.println("Max Duration: " + max_target_length_ms);
 
         if (duration_ms < min_target_length_ms) {
             return DURATION_RESULT.TOO_SHORT;

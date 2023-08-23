@@ -186,7 +186,7 @@ public class GenerateInterval extends GeneratePlaylist {
      * @return TrackSimplified array of tracks from the recommendation endpoint
      * @throws GetRecommendationsException If an error was encountered in the recommendation endpoint
      */
-    TrackSimplified[] getRecommendedTracks(int limit, int min_bpm, int max_bpm, int target_bpm)
+    TrackSimplified[] getRecommendedTracks(int limit, int min_bpm, int max_bpm, int target_bpm, float energy)
             throws GetRecommendationsException {
 
         TrackSimplified[] recommended_tracks;
@@ -196,7 +196,7 @@ public class GenerateInterval extends GeneratePlaylist {
         do {
 
             recommended_tracks = getUnsortedRecommendations(limit, min_bpm - local_offset,
-                    max_bpm + local_offset, target_bpm);
+                    max_bpm + local_offset, target_bpm, energy);
 
 
             // Hash set can take the null element which we want to avoid
@@ -273,7 +273,7 @@ public class GenerateInterval extends GeneratePlaylist {
      * @param limit     how many tracks to return (MAX 100)
      * @return arrayList of track IDs
      */
-    protected ArrayList<TrackSimplified> getRecommendedTracks(int query_bpm, int limit)
+    protected ArrayList<TrackSimplified> getRecommendedTracks(int query_bpm, int limit, float energy)
             throws GetRecommendationsException {
 
         int local_offset = og_offset; // Was og_offset (3) for a while
@@ -286,7 +286,7 @@ public class GenerateInterval extends GeneratePlaylist {
 
             // We use the unsorted version as they will all be thrown in a hashset anyway, so we will sort later on
             recommended_tracks = getUnsortedRecommendations(limit,
-                    query_bpm - local_offset, query_bpm + local_offset, query_bpm);
+                    query_bpm - local_offset, query_bpm + local_offset, query_bpm, energy);
 
             // Hash set can take the null element which we want to avoid, also want to avoid adding process if empty
             if (recommended_tracks != null && recommended_tracks.length != 0) {
@@ -406,7 +406,7 @@ public class GenerateInterval extends GeneratePlaylist {
      * @throws GetRecommendationsException if there is an error getting recommendations
      */
     protected ArrayList<TrackSimplified> fillIntervals(ArrayList<TrackSimplified> tracks, int total_tracks_needed,
-                                                       int query_bpm) throws GetRecommendationsException {
+                                                       int query_bpm, float energy) throws GetRecommendationsException {
 
         TrackSimplified[] recommended_tracks;
         TrackSimplified[] tracks_to_add;
@@ -428,7 +428,7 @@ public class GenerateInterval extends GeneratePlaylist {
             do {
 
                 recommended_tracks = getRecommendedTracks(limit, query_bpm - local_offset,
-                        query_bpm + local_offset, query_bpm);
+                        query_bpm + local_offset, query_bpm, energy);
 
                 tracks_to_add = getIntervalTracks(recommended_tracks);
 

@@ -20,8 +20,8 @@ public class Server {
     private static final String client_id = "60e466a61f4d4128a568f166f6a2b077";
     private static final String client_secret = "cbac320a58cd453da172aef4d88f4997";
     protected static final URI redirectUri =
-            SpotifyHttpManager.makeUri("https://heartbeatsapp.netlify.app/music");
-            //SpotifyHttpManager.makeUri("http://localhost:5173/music");
+            //SpotifyHttpManager.makeUri("https://heartbeatsapp.netlify.app/music");
+            SpotifyHttpManager.makeUri("http://localhost:5173/music");
 
     public static String code = "";
 
@@ -34,11 +34,11 @@ public class Server {
     public static void main(String[] args) {
 
 
-        int port = Integer.parseInt(args[0]);
-
-
-        Spark.port(port);
-        //Spark.port(3232);
+//        int port = Integer.parseInt(args[0]);
+//
+//
+//        Spark.port(port);
+        Spark.port(3232);
 
 
         /*

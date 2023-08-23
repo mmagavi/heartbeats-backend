@@ -83,7 +83,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
             //TODO: consider reducing limit for closer tempo matches
             //System.out.println("Getting Recommended Tracks");
             // Get recommended tracks for the slow interval
-            recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit);
+            recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit, starting_energy);
 
             //System.out.println("Finding Slow Intervals");
             // Fill the intervals the best we can with the given 100 tracks
@@ -97,7 +97,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
 
                 //System.out.println("Filling Slow Intervals");
                 // Find a good ordering of each interval
-                slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm);
+                slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm, starting_energy);
 
                 //System.out.println("Ordering Tracks");
                 final_playlist = orderTracks(slow_intervals, fast_intervals);
@@ -121,6 +121,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
         }
 
         int[] interval_BPMs = getIncreasingIntervalBPMS(); // All the increasing interval's BPMs (including the peak)
+        float[] interval_energies = getIncreasingIntervalEnergies();
 
         ArrayList<TrackSimplified> fast_tracks = new ArrayList<>(); // Place final tracks here
         Stack<ArrayList<TrackSimplified>> decreasing_intervals_stack = new Stack<>();
@@ -132,11 +133,12 @@ public class GenerateIntervalTwo extends GenerateInterval {
 
             // Each target BPM refers to two intervals, one before and after the peak (middle) interval
             int current_target_bpm = interval_BPMs[interval];
+            float current_target_energy = interval_energies[interval];
 
             ArrayList<TrackSimplified> double_interval = null; // reset to null each iteration for below while condition
 
             do {
-                ArrayList<TrackSimplified> recommended_tracks = getRecommendedTracks(current_target_bpm, limit);
+                ArrayList<TrackSimplified> recommended_tracks = getRecommendedTracks(current_target_bpm, limit, current_target_energy);
 
                 // Each interval has one corresponding interval to fill, hence the 2 intervals to fill in the call below
                 ArrayList<TrackSimplified> rough_intervals = findRoughIntervals(recommended_tracks, 2);
@@ -144,7 +146,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
                 if (rough_intervals != null) {
 
                     int total_tracks_needed = tracks_per_interval * 2; // Number of TOTAL tracks needed for 2 intervals
-                    double_interval = fillIntervals(rough_intervals, total_tracks_needed, current_target_bpm);
+                    double_interval = fillIntervals(rough_intervals, total_tracks_needed, current_target_bpm, current_target_energy);
                 }
 
                 setIntervalLengths(local_moe += .01); // loosen MOE
@@ -179,7 +181,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
         float local_moe = margin_of_error;
 
         do {
-            ArrayList<TrackSimplified> recommended_tracks = getRecommendedTracks(target_bpm, 30);
+            ArrayList<TrackSimplified> recommended_tracks = getRecommendedTracks(target_bpm, 30, target_energy);
 
             // Each interval has one corresponding interval to fill, hence the 2 intervals to fill in the call below
             ArrayList<TrackSimplified> rough_intervals = findRoughIntervals(recommended_tracks, 1);
@@ -187,7 +189,7 @@ public class GenerateIntervalTwo extends GenerateInterval {
             if (rough_intervals != null) {
 
                 //MOE restored in fillIntervals
-                return fillIntervals(rough_intervals, tracks_per_interval, target_bpm);
+                return fillIntervals(rough_intervals, tracks_per_interval, target_bpm, target_energy);
             }
 
             setIntervalLengths(local_moe += .01); // loosen MOE
@@ -269,6 +271,32 @@ public class GenerateIntervalTwo extends GenerateInterval {
         return fast_interval_BPMs;
     }
 
+    private float[] getIncreasingIntervalEnergies() {
+
+        // TODO: decide if this if statement is necessary as the calling function deals with this issue earlier
+        // In the case playlist length is under 21 minutes, there is only 2 fast intervals of the same BPM
+        if (num_fast_intervals == 2) {
+            return new float[]{target_energy, target_energy};
+        }
+
+        float energy_difference = target_energy - starting_energy;
+        int num_increasing_intervals = Math.round(num_fast_intervals / 2f);
+        int interval_difference = Math.round(energy_difference / num_increasing_intervals);
+
+        float[] fast_interval_energies = new float[num_increasing_intervals]; // We will return this
+
+        float current_energy = starting_energy;
+
+        for (int interval = 0; interval < num_increasing_intervals; interval++) {
+
+            current_energy += interval_difference;
+
+            fast_interval_energies[interval] = current_energy;
+        }
+
+        return fast_interval_energies;
+    }
+
     /**
      * Special case function that finds the tracks for the fast intervals in the event there are only 2 fast intervals.
      * This only happens when the playlist length is under 21 minutes. All other times there is an odd number of fast
@@ -284,14 +312,14 @@ public class GenerateIntervalTwo extends GenerateInterval {
 
         do {
 
-            recommended_fast_tracks = getRecommendedTracks(target_bpm, 50);
+            recommended_fast_tracks = getRecommendedTracks(target_bpm, 50, target_energy);
             fast_intervals = findRoughIntervals(recommended_fast_tracks, num_fast_intervals);
 
             if (fast_intervals != null) {
 
                 // MOE is restores in function below, no need to do it here as well
 
-                return fillIntervals(fast_intervals, num_fast_tracks, target_bpm);
+                return fillIntervals(fast_intervals, num_fast_tracks, target_bpm, target_energy);
             }
 
             setIntervalLengths(local_moe += .01); // loosen MOE

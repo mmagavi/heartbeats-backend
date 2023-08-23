@@ -5,14 +5,16 @@ import ExceptionClasses.BrowsingExceptions.GetRecommendationsException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopArtistsRequestException;
 import ExceptionClasses.PersonalizationExceptions.GetUsersTopTracksRequestException;
 import ExceptionClasses.ProfileExceptions.GetCurrentUsersProfileException;
+import PlaylistGenerating.EnergyRanges.EnergyRange;
 import PlaylistGenerating.HeartRateRanges.TargetHeartRateRange;
 import SpotifyUtilities.PersonalizationUtilities;
 import SpotifyUtilities.RecommendationArguments;
-import se.michaelthelin.spotify.SpotifyApi;;
+import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.util.Arrays;
 
+import static PlaylistGenerating.EnergyRanges.DesiredEnergyRanges.getEnergyRange;
 import static PlaylistGenerating.HeartRateRanges.DesiredHeartRateRanges.getTargetHeartRateRange;
 import static PlaylistGenerating.PlaylistTypes.CommonUtilities.*;
 import static SpotifyUtilities.ArtistUtilities.getSeveralArtists;
@@ -34,7 +36,7 @@ abstract public class GeneratePlaylist {
     protected final int workout_length_min;
     protected final int workout_len_ms; // Length of the workout in MilliSeconds
     protected final String intensity;
-    protected final int resting_bpm = 70; // assuming an average resting bpm
+    protected final int resting_bpm = 80; // assuming an average resting bpm
     protected final float margin_of_error; // percent a playlist can be off the target by and still be acceptable
     protected final float avg_song_len = 3.5f;
     protected int seed_genres_provided = 0;
@@ -44,9 +46,11 @@ abstract public class GeneratePlaylist {
     protected String seed_artists;
     protected String seed_tracks;
     protected final int target_bpm;
+    protected final float starting_energy = .5f;
+    protected final float energy_offset = .05f;
+    protected final float target_energy;
 
     protected User user;
-
     protected final boolean is_personalized;
 
     public GeneratePlaylist(SpotifyApi spotify_api, String genres, int age, int workout_length, String intensity,
@@ -65,6 +69,7 @@ abstract public class GeneratePlaylist {
         this.is_personalized = is_personalized;
 
         target_bpm = getTargetBPM();
+        target_energy = getTargetEnergy();
 
         // Only 5 seed values across tracks, artists, and genres can be provided to the recommendations endpoint
         // so if less than the max of 3 genres the front end lets the user choose from were chosen we can provide
@@ -98,6 +103,27 @@ abstract public class GeneratePlaylist {
             }
             case "high" -> {
                 return targetHeartRateRange.high_intensity_target();
+            }
+            default -> {
+                return -1;
+                // Due to input validation in GeneratePlaylistHandler this should not be reached
+            }
+        }
+    }
+
+    private float getTargetEnergy(){
+
+        EnergyRange energy_range = getEnergyRange(this.age);
+
+        switch (intensity) {
+            case "low" -> {
+                return energy_range.low_intensity_target();
+            }
+            case "medium" -> {
+                return energy_range.medium_intensity_target();
+            }
+            case "high" -> {
+                return energy_range.high_intensity_target();
             }
             default -> {
                 return -1;
@@ -150,11 +176,25 @@ abstract public class GeneratePlaylist {
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
      */
-    protected TrackSimplified[] getSortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+    protected TrackSimplified[] getSortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo, float energy)
             throws GetRecommendationsException {
 
 
-        TrackSimplified[] recommended_tracks = getUnsortedRecommendations(limit, min_tempo, max_tempo, target_tempo);
+        TrackSimplified[] recommended_tracks = getUnsortedRecommendations(limit, min_tempo, max_tempo, target_tempo, energy);
+
+        if (recommended_tracks == null) return null;
+
+        Arrays.sort(recommended_tracks, duration_comparator);
+
+        return recommended_tracks;
+    }
+
+    protected TrackSimplified[] getSortedRecommendations(int limit, float min_tempo, float max_tempo,
+                                                         float target_tempo, float min_energy, float max_energy,float energy)
+            throws GetRecommendationsException {
+
+
+        TrackSimplified[] recommended_tracks = getUnsortedRecommendations(limit, min_tempo, max_tempo, target_tempo, energy);
 
         if (recommended_tracks == null) return null;
 
@@ -173,7 +213,7 @@ abstract public class GeneratePlaylist {
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
      */
-    protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+    protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo, float energy)
             throws GetRecommendationsException {
 
 //        System.out.println("genres: " + genres);
@@ -182,7 +222,27 @@ abstract public class GeneratePlaylist {
 
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, seed_artists, seed_tracks,
-                min_tempo, max_tempo, target_tempo, user.getCountry());
+                min_tempo, max_tempo, target_tempo, energy - energy_offset, energy + energy_offset,
+                energy, user.getCountry());
+
+        Recommendations recommendations;
+
+        recommendations = getRecommendations(current_arguments);
+
+        return recommendations.getTracks();
+    }
+
+    protected TrackSimplified[] getUnsortedRecommendations(int limit, float min_tempo, float max_tempo,
+                                                           float target_tempo, float min_energy, float max_energy, float energy)
+            throws GetRecommendationsException {
+
+//        System.out.println("genres: " + genres);
+//        System.out.println("seed_artists: " + seed_artists);
+//        System.out.println("seed_tracks: " + seed_tracks);
+
+        RecommendationArguments current_arguments = new RecommendationArguments(
+                spotify_api, limit, genres, seed_artists, seed_tracks,
+                min_tempo, max_tempo, target_tempo, min_energy, max_energy, energy, user.getCountry());
 
         Recommendations recommendations;
 
@@ -202,13 +262,14 @@ abstract public class GeneratePlaylist {
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
      */
-    protected TrackSimplified[] getUnsortedGenreRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo)
+    protected TrackSimplified[] getUnsortedGenreRecommendations(int limit, float min_tempo, float max_tempo, float target_tempo, float energy)
             throws GetRecommendationsException {
 
         // Don't need seed artists and tracks as they will not be accessed so passing null is okay here
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, null, null, min_tempo,
-                max_tempo, target_tempo, user.getCountry());
+                max_tempo, target_tempo, energy - energy_offset, energy + energy_offset,
+                energy, user.getCountry());
 
         Recommendations recommendations = getGenreRecommendations(current_arguments);
 
@@ -224,13 +285,14 @@ abstract public class GeneratePlaylist {
      * @return TrackSimplified array of sorted tracks which were fetched by the recommendation endpoint
      * @throws GetRecommendationsException if an error occurs when fetching the recommendation
      */
-    protected TrackSimplified[] getSortedRecommendationRange(int limit, float min_tempo, float max_tempo)
+    protected TrackSimplified[] getSortedRecommendationRange(int limit, float min_tempo, float max_tempo, float energy)
             throws GetRecommendationsException {
 
         // Target tempo will not be used, 0 is used as a placeholder
         RecommendationArguments current_arguments = new RecommendationArguments(
                 spotify_api, limit, genres, seed_artists, seed_tracks,
-                min_tempo, max_tempo, 0, user.getCountry());
+                min_tempo, max_tempo, 0, energy - energy_offset, energy + energy_offset,
+                energy, user.getCountry());
 
         Recommendations recommendations = getRecommendationTempoRange(current_arguments);
 

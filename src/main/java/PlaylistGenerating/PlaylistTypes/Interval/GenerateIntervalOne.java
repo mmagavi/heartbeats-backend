@@ -84,8 +84,8 @@ public class GenerateIntervalOne extends GenerateInterval {
 
             //System.out.println("Getting Recommended Tracks");
             // Get recommended tracks
-            recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit);
-            recommended_fast_tracks = getRecommendedTracks(target_bpm, query_limit);
+            recommended_slow_tracks = getRecommendedTracks(resting_bpm, query_limit, starting_energy);
+            recommended_fast_tracks = getRecommendedTracks(target_bpm, query_limit, target_energy);
 
             //System.out.println("Finding Rough Intervals");
             // Fill the intervals the best we can with the given 100 tracks
@@ -97,8 +97,8 @@ public class GenerateIntervalOne extends GenerateInterval {
 
                 //System.out.println("Filling Intervals");
                 // Find a good ordering of each interval
-                slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm);
-                fast_intervals = fillIntervals(fast_intervals, num_fast_tracks, resting_bpm);
+                slow_intervals = fillIntervals(slow_intervals, num_slow_tracks, resting_bpm, starting_energy);
+                fast_intervals = fillIntervals(fast_intervals, num_fast_tracks, resting_bpm, target_energy);
 
                 //System.out.println("Ordering Tracks");
                 // Order the tracks correctly

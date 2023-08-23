@@ -13,7 +13,7 @@ public class DesiredHeartRateRanges {
         SEVENTY_AND_UP
     }
 
-    private final static TargetHeartRateRange twenties_and_under = new TargetHeartRateRange(110, 140, 170);
+    private final static TargetHeartRateRange twenties_and_under = new TargetHeartRateRange(110, 125, 140);
     private final static TargetHeartRateRange thirty_to_thirty_five = new TargetHeartRateRange(105, 133, 162);
     private final static TargetHeartRateRange thirty_five_to_forty = new TargetHeartRateRange(103, 130, 157);
     private final static TargetHeartRateRange forty_to_forty_five = new TargetHeartRateRange(100, 126, 153);

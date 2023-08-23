@@ -21,5 +21,8 @@ public record RecommendationArguments(
     float min_tempo,
     float max_tempo,
     float target_tempo,
+    float min_energy,
+    float max_energy,
+    float energy,
     CountryCode market
 ){}

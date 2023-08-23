@@ -23,7 +23,8 @@ import static SpotifyUtilities.TrackUtilities.duration_comparator;
 
 public class GenerateClassic extends GeneratePlaylist {
 
-    protected static final int limit = 21; // Number of tracks we want to get
+    //protected static final int limit = 21; // Number of tracks we want to get
+    protected static final int limit = 15; // Number of tracks we want to get
     protected static int num_intervals;
     protected static int transition_length_ms = 0; // transition length is the warm-up/ wind down sequence individually
     protected static int min_transition_length_ms;
@@ -32,9 +33,10 @@ public class GenerateClassic extends GeneratePlaylist {
     protected static int min_target_length_ms;
     protected static int max_target_length_ms;
     private final float bpm_difference;
+    private final float energy_difference;
     private HashMap<Integer, TrackSimplified[]> intervals;
     private final float transition_moe = .02f;
-    private static final int bpm_offset = 3; // How far from the query bpm we want song tempos in the recommendations request below
+    private static final int bpm_offset = 28; // How far from the query bpm we want song tempos in the recommendations request below
 
 
     /**
@@ -67,6 +69,7 @@ public class GenerateClassic extends GeneratePlaylist {
         // We will round up to avoid intervals needing to have exceptionally long songs
         num_intervals = Math.round(transition_length_min / avg_song_len);
         bpm_difference = findBpmDifference();
+        energy_difference = findEnergyDifference();
 
         transition_length_ms = (int) (transition_length_min * 60_000); // conversion
         setTransitionLengths(transition_moe);
@@ -302,6 +305,7 @@ public class GenerateClassic extends GeneratePlaylist {
         HashMap<Integer, TrackSimplified[]> sorted_intervals = new HashMap<>();
 
         float query_bpm = initializeQueryBPM(is_warmup); // will be updated in for-loop
+        float query_energy = initializeQueryEnergy(is_warmup); // will be updated in for-loop
 
         // We need to call the recommendations endpoint for each interval, fetching a few songs in that interval's range
         // This yields better results than requesting a lot of songs in a large range
@@ -310,13 +314,19 @@ public class GenerateClassic extends GeneratePlaylist {
 
             TrackSimplified[] recommended_tracks;
             int local_offset = bpm_offset;
+            float local_energy_offset = energy_offset;
 
             do {
 
                 recommended_tracks = getSortedRecommendations(limit, query_bpm - local_offset,
-                        query_bpm + local_offset, query_bpm);
+                        query_bpm + local_offset, query_bpm, query_energy - local_energy_offset,
+                        query_energy + local_energy_offset, query_energy);
 
                 local_offset++;
+                local_energy_offset += .01;
+
+                System.out.println("offset: " + local_offset);
+                System.out.println("energy offset: " + local_energy_offset);
 
             } while (recommended_tracks.length < limit);
 
@@ -324,6 +334,8 @@ public class GenerateClassic extends GeneratePlaylist {
 
             // Update BPM to the next interval
             query_bpm = updateQueryBPM(query_bpm, is_warmup);
+            query_energy = updateQueryEnergy(query_energy, is_warmup);
+            System.out.println("query_energy: " + query_energy);
         }
 
         return sorted_intervals;
@@ -348,13 +360,15 @@ public class GenerateClassic extends GeneratePlaylist {
         int local_offset = bpm_offset;
         int local_limit = num_tracks * 2;
         float local_moe = margin_of_error;
+        float local_energy_offset = energy_offset;
 
         do {
 
             TrackSimplified[] recommended_tracks = getSortedRecommendations(local_limit,
-                    target_bpm - local_offset, target_bpm + local_offset, target_bpm);
+                    target_bpm - local_offset, target_bpm + local_offset, target_bpm,
+                    target_energy - local_energy_offset, target_energy + local_energy_offset, target_energy);
 
-            if (recommended_tracks.length >= local_limit) {
+            if (recommended_tracks != null && recommended_tracks.length >= local_limit) {
                 TrackSimplified[] tracks = findBestTargetTracks(recommended_tracks, num_tracks);
 
                 if (tracks != null) return tracks;
@@ -363,6 +377,7 @@ public class GenerateClassic extends GeneratePlaylist {
 
             System.out.println(local_offset);
             local_offset++;
+            local_energy_offset += .01;
             //setTargetLengths(local_moe += .005);
 
         } while (true);
@@ -455,6 +470,14 @@ public class GenerateClassic extends GeneratePlaylist {
         }
     }
 
+    private float initializeQueryEnergy(boolean is_warmup) {
+        if (is_warmup) {
+            return starting_energy; // If warming up we want to start from the resting BPM and go up
+        } else {
+            return target_energy - energy_difference; // If winding down we want to start from the target BPM and come down
+        }
+    }
+
     /**
      * Updates the query bpm based on the isWarmup boolean
      *
@@ -468,6 +491,15 @@ public class GenerateClassic extends GeneratePlaylist {
             return query_bpm + bpm_difference; // If warming up we want to increase the BPM
         } else {
             return query_bpm - bpm_difference; // If winding down we want to decrease the BPM
+        }
+    }
+
+    private float updateQueryEnergy(float query_energy, boolean is_warmup) {
+
+        if (is_warmup) {
+            return query_energy + energy_difference; // If warming up we want to increase the energy
+        } else {
+            return query_energy - energy_difference; // If winding down we want to decrease the energy
         }
     }
 
@@ -488,6 +520,17 @@ public class GenerateClassic extends GeneratePlaylist {
             // By finding the difference between the target bpm and resting bpm and finally dividing by the number of
             // intervals in the warmup we find the tempo difference between each interval
             return (float) ((target_bpm - resting_bpm) / num_intervals);
+        }
+    }
+
+    private float findEnergyDifference(){
+        if (num_intervals < 2) {
+
+            return (float) ((target_energy - starting_energy) / 2);
+        } else {
+            // By finding the difference between the target bpm and resting bpm and finally dividing by the number of
+            // intervals in the warmup we find the tempo difference between each interval
+            return (float) ((target_energy - starting_energy) / num_intervals);
         }
     }
 }

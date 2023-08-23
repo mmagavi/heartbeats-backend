@@ -88,6 +88,9 @@ public class GenerateRelax extends GeneratePlaylist {
 
         ArrayList<TrackSimplified> track_list = new ArrayList<>();
 
+        float energy_difference = ((target_energy - starting_energy) / num_intervals);
+        float energy = target_energy;
+
         // difference between target bpm for each interval
         int bpm_difference = ((target_bpm - resting_bpm) / num_intervals);
         int local_max_bpm = target_bpm;
@@ -103,7 +106,7 @@ public class GenerateRelax extends GeneratePlaylist {
             local_moe = margin_of_error;
 
             do {
-                TrackSimplified[] recommended_tracks = getRecommendedTracks(local_min_bpm, local_max_bpm, local_target_bpm);
+                TrackSimplified[] recommended_tracks = getRecommendedTracks(local_min_bpm, local_max_bpm, local_target_bpm, energy);
 
                 tracks_to_add = getIntervalTracks(recommended_tracks);
 
@@ -118,6 +121,7 @@ public class GenerateRelax extends GeneratePlaylist {
             local_min_bpm -= bpm_difference;
             local_max_bpm -= bpm_difference;
             local_target_bpm -= bpm_difference;
+            energy -= energy_difference;
         }
 
         TrackSimplified[] tracks = track_list.toArray(TrackSimplified[]::new);
@@ -187,7 +191,7 @@ public class GenerateRelax extends GeneratePlaylist {
      * @return TrackSimplified array of tracks from the recommendation endpoint
      * @throws GetRecommendationsException If an error was encountered in the recommendation endpoint
      */
-    private TrackSimplified[] getRecommendedTracks(int min_bpm, int max_bpm, int target_bpm)
+    private TrackSimplified[] getRecommendedTracks(int min_bpm, int max_bpm, int target_bpm, float energy)
             throws GetRecommendationsException {
 
         TrackSimplified[] recommended_tracks;
@@ -196,7 +200,7 @@ public class GenerateRelax extends GeneratePlaylist {
         do {
 
             recommended_tracks = getSortedRecommendations(limit, min_bpm - local_offset,
-                    max_bpm + local_offset, target_bpm);
+                    max_bpm + local_offset, target_bpm, energy);
 
             local_offset++; // increase offset to find more tracks as the current bpm boundaries may be too restrictive
 

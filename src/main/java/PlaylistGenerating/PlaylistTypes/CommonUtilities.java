@@ -20,6 +20,8 @@ import static SpotifyUtilities.TrackUtilities.*;
 
 public class CommonUtilities {
 
+    private static final float energy_offset = .1f;
+
     /**
      * Loops through all the given tracks and stores their URIs in a string array which is then returned
      *
@@ -137,7 +139,7 @@ public class CommonUtilities {
         AudioFeatures[] audio_features = getAudioFeaturesForSeveralTracks(spotifyApi, ids);
 
         for(AudioFeatures audio_feature: audio_features){
-            System.out.println(audio_feature.getTempo());
+            System.out.println("tempo: " + audio_feature.getTempo() + " energy: " + audio_feature.getEnergy());
         }
     }
 
@@ -293,8 +295,11 @@ public class CommonUtilities {
 
         for (DuplicateTrack duplicate : duplicates) {
             TrackSimplified duplicate_track = duplicate.track;
+
+            float energy = getTrackEnergy(spotify_api, duplicate_track);
+
             TrackSimplified replacement =
-                    replaceTrack(spotify_api, track_map, duplicate_track, genres, seed_artists, seed_tracks, market);
+                    replaceTrack(spotify_api, track_map, duplicate_track, genres, seed_artists, seed_tracks, energy, market);
 
             int track_index = duplicate.track_index; // The index we need to put the new non-duplicate song into
 
@@ -306,7 +311,7 @@ public class CommonUtilities {
 
     private static TrackSimplified replaceTrack(SpotifyApi spotify_api, HashMap<TrackSimplified, Integer> track_map,
                                                 TrackSimplified track, String genres, String seed_artists, String seed_tracks,
-                                                CountryCode market)
+                                                float energy, CountryCode market)
             throws GetAudioFeaturesForTrackException, GetRecommendationsException {
 
         System.out.println("Replacing");
@@ -321,7 +326,8 @@ public class CommonUtilities {
         while(true) {
             RecommendationArguments current_arguments = new RecommendationArguments(
                     spotify_api, limit, genres, seed_artists, seed_tracks,
-                    tempo - offset, tempo + offset, tempo, market);
+                    tempo - offset, tempo + offset, tempo, energy - energy_offset,
+                    energy + energy_offset, energy, market);
 
             Recommendations recommendations = getRecommendations(current_arguments);
             TrackSimplified[] recommended_tracks = recommendations.getTracks();
@@ -358,6 +364,13 @@ public class CommonUtilities {
             offset++; // relax constraints
             margin_of_error += .01;
         }
+    }
+
+    public static float getTrackEnergy(SpotifyApi spotify_api, TrackSimplified track) throws GetAudioFeaturesForTrackException{
+
+        AudioFeatures feature = getAudioFeaturesForTrack(spotify_api, track.getId());
+
+        return feature.getEnergy();
     }
 
     /**
